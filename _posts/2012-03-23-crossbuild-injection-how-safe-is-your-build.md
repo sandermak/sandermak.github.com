@@ -7,7 +7,7 @@ excerpt: "Imagine a world in which people blindly trust binaries uploaded to the
 
 ---
 
-Imagine a world in which people blindly trust binaries uploaded to the internet by random strangers. Certainly not a world in which we as software engineers want to live. Except that many of us, including myself, do exactly that.  On a regular  basis. In our most precious environment: the software build process.
+_Imagine a world in which people blindly trust binaries uploaded to the internet by random strangers. Certainly not a world in which we as software engineers want to live. Except that many of us, including myself, do exactly that.  On a regular  basis. In our most precious environment: the software build process._
 
 What follows is a tale of trust and naiveté, leading to vulnerabilities that we rarely talk about: the injection of malicious code into our own applications. Enter the wonderful world of 'Cross-build injection attacks' (XBI). Aptly named by [Fortify (pdf)](https://www.fortify.com/downloads2/public/fortify_attacking_the_build.pdf) after website attacks such  Cross-site Scripting and Cross-site Request Forgery, but without even nearly as much mindshare among developers.
 
