@@ -3,6 +3,7 @@ layout: post
 category : lessons
 tags : [intro, beginner, jekyll, tutorial]
 excerpt: This is the intro...
+published: false
 ---
 {% include JB/setup %}
 
