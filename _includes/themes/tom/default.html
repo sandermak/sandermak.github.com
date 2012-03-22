@@ -17,8 +17,12 @@
    <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
 </head>
 <body>
-  <h1>{{ site.title }}<h1>
-  <h4>{{ site.tagline }}</h4>
+  <div class="header">
+    <h1 class="header">{{ site.title }}</h1>
+    <h4 class="tagline">{{ site.tagline }}</h4>
+    <br />
+    <hr />
+  </div>
   <div class="site">
     <div class="title">
       <a href="{{ HOME_PATH }}">Home</a>
@@ -42,6 +46,12 @@
           <a href="http://github.com/{{ site.author.github }}/">github.com/{{ site.author.github }}</a><br />
           <a href="http://twitter.com/{{ site.author.twitter }}/">twitter.com/{{ site.author.twitter }}</a><br />
         </p>
+      </div>
+      <div class="contact">
+         <p>
+            <a href="https://twitter.com/Sander_Mak" class="twitter-follow-button" data-show-count="false">Follow @Sander_Mak</a>
+            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+         </p>
       </div>
     </div>
   </div>
