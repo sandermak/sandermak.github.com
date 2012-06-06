@@ -4,7 +4,6 @@ title: "Preparing a technical talk"
 category : conferences
 tags : [conferences, speaking]
 excerpt: "We software engineers love giving talks. Fortunately, the abundance of technical conferences shows that we like listening too. A lot of talks on these conferences are given by software engineers who love sharing knowledge, rather than professional speakers. This especially holds true for conferences organized by user groups. Since I'm one of those software engineers who likes to give talks, I'd like to share my thoughts on what you can do to prepare a technical talk."
-published: false
 ---
 
 In the past few years I've gained some experience with presenting at conferences. In fact, I started writing this post en-route to JEEConf where I'll give two talks (trip report [here](http://branchandbound.net/blog/conferences/2012/05/jeeconf-tripreport)). While I enjoy doing this, I'm by no means a professional speaker. It's really a matter of learning-by-doing. To me, giving a talk in front of a like-minded audience is exhilarating, and striking up interesting conversations afterwards can be really rewarding. But don't be fooled: even though your performance may last for only an hour, you'll be investing a lot of time to make it go just right.
