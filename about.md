@@ -1,6 +1,6 @@
 ---
 title: About
-layout: page
+layout: default 
 ---
 # Sander Mak
 After getting his master's degree in Software Technology, Sander became a software developer/architect specializing in Java and application integration at Info Support, The Netherlands. He loves sharing knowledge, for example by writing for the Dutch Java Magazine and presenting at conferences. 
