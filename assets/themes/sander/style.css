@@ -28,3 +28,16 @@ div.twittersidebar {
   border-bottom: 1px dotted #67666f;
   padding: 3px 0 3px 0;
 }
+
+.label-comments[href] {
+  margin: 9px 3px 3px 3px;
+  background-color: rgba(125, 98, 44, 0.5);
+}
+
+.label-readmore[href] {
+  margin: 9px 3px 3px 3px;
+}
+
+img.rss {
+  height: 32px;
+}
