@@ -1,0 +1,30 @@
+ul.posts {
+  list-style-type: none;
+  margin-bottom: 2em;
+  margin: 0 0 9px 3px;
+}
+
+ul.posts li {
+  line-height: 1.75em;
+}
+
+ul.posts span {
+  color: #aaa;
+  font-family: Monaco, "Courier New", monospace;
+  font-size: 80%;
+}
+
+div.sidebar {
+  background-color: rgba(125, 98, 44, 0.3);
+  padding: 10px;
+}
+
+div.twittersidebar {
+  background-color: rgba(125, 98, 44, 0.1);
+  padding: 10px;
+}
+
+.twittersidebar li {
+  border-bottom: 1px dotted #67666f;
+  padding: 3px 0 3px 0;
+}
