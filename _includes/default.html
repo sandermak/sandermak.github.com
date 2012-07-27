@@ -54,8 +54,6 @@
               <li><a href="{{ HOME_PATH }}">Home</a></li>
               <li><a href="{{ BASE_PATH }}/about.html">About</a></li>
               <li><a href="{{ BASE_PATH }}{{ site.JB.archive_path }}">Archive</a></li>
-              <li><a href="{{ BASE_PATH }}{{ site.JB.categories_path }}">Categories</a></li>
-              <li><a href="{{ BASE_PATH }}{{ site.JB.tags_path }}">Tags</a></li>
             </ul>
           </div><!--/.nav-collapse -->
         </div>
@@ -71,10 +69,15 @@
         <div class="span3">
          <div class="hero-unit sidebar">
            <a href="http://feeds.feedburner.com/{{ site.author.feedburner }}"><img class="rss pull-right" src="{{ ASSET_PATH }}/rss.png"></img></a>
-           <strong>{{ site.title }} Blog</strong>
-           <br>
+           <h4 class="sidebar"><strong>{{ site.title }} Blog</strong></h4>
            <em>{{ site.tagline }}</em> 
            <hr>
+           <h5 class="sidebar">&nbsp;View archive by:</h5>
+           <ul class="sidebar unstyled">
+             <li><a href="{{ BASE_PATH }}{{ site.JB.categories_path }}">Category</a></li>
+             <li><a href="{{ BASE_PATH }}{{ site.JB.categories_path }}">Tag</a></li>
+             <li><a href="{{ BASE_PATH }}{{ site.JB.archive_path }}">Date</a></li>
+           </ul>
           </div>
           <div class="hero-unit twittersidebar">
            <p>
@@ -97,7 +100,7 @@
            </div>
          </div>
          <div class="row">
-          <div class="span3 offset2">
+          <div class="span4 offset2">
             <p>{{ site.title }} - {{ site.tagline }}</p>
           </div>   
           <div class="span2 offset9">  
