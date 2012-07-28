@@ -68,15 +68,25 @@
         </div>
         <div class="span3">
          <div class="hero-unit sidebar">
-           <a href="http://feeds.feedburner.com/{{ site.author.feedburner }}"><img class="rss pull-right" src="{{ ASSET_PATH }}/rss.png"></img></a>
+           <a href="http://feeds.feedburner.com/{{ site.author.feedburner }}"><img class="rss pull-right" title="Branch and Bound Blog RSS Feed" alt="RSS Feed" src="{{ ASSET_PATH }}/rss.png"></img></a>
            <h4 class="sidebar"><strong>{{ site.title }} Blog</strong></h4>
            <em>{{ site.tagline }}</em> 
            <hr>
+           <ul class="sidebar unstyled">
+             <li><a href="{{ BASE_PATH }}/about.html">About Sander</a></li>
+           </ul>
+           <span class="sidebar pull-right">
+             <a href="http://www.twitter.com/Sander_Mak" target="_blank"><img title="Twitter" alt="Twitter" class="small" src="{{ ASSET_PATH }}/twitter.png"></img></a>
+             <a href="http://nl.linkedin.com/in/SanderMak" target="_blank"><img title="Linkedin profile" alt="Linkedin profile" class="small" src="{{ ASSET_PATH }}/linkedin.png"></img></a>
+             <a href="http://www.github.com/SanderMak" target="_blank"><img  title="GitHub" alt="GitHub" class="small" src="{{ ASSET_PATH }}/github.png"></img></a>
+             <a href="http://www.slideshare.net/SanderMak/presentations" target="_blank"><img title="Slideshare presentations"  alt="Slideshare presentations" class="small" src="{{ ASSET_PATH }}/slideshare.png"></img></a>
+           </span>
+           <hr>
            <h5 class="sidebar">&nbsp;View archive by:</h5>
            <ul class="sidebar unstyled">
+             <li><a href="{{ BASE_PATH }}{{ site.JB.archive_path }}">Date</a></li>
              <li><a href="{{ BASE_PATH }}{{ site.JB.categories_path }}">Category</a></li>
              <li><a href="{{ BASE_PATH }}{{ site.JB.categories_path }}">Tag</a></li>
-             <li><a href="{{ BASE_PATH }}{{ site.JB.archive_path }}">Date</a></li>
            </ul>
           </div>
           <div class="hero-unit twittersidebar">
@@ -96,6 +106,7 @@
         <div class="container">
          <div class="row">
            <div class="span9 offset2">
+            <br>
             <hr></hr>
            </div>
          </div>
@@ -103,8 +114,8 @@
           <div class="span4 offset2">
             <p>{{ site.title }} - {{ site.tagline }}</p>
           </div>   
-          <div class="span2 offset9">  
-            <p>by Sander Mak</p>
+          <div class="span5">  
+            <p class="pull-right">by Sander Mak</p>
           </div>
          </div>
         </div>

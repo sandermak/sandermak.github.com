@@ -1,3 +1,11 @@
+/* Navbar CSS */
+.navbar .nav > li > a:hover {
+  color: #dd5600;
+  text-shadow: 0 -1px 0 rgba(255, 255, 255, 0.25);
+
+}
+
+/* Posts CSS */
 ul.posts {
   list-style-type: none;
   margin-bottom: 2em;
@@ -14,7 +22,14 @@ ul.posts span {
   font-size: 80%;
 }
 
+/* Sidebar CSS */
+.sidebar hr {
+  margin: 8px 0;
+  opacity: 0.6;
+}
+
 div.sidebar {
+  font-size: 12px;
   background-color: rgba(125, 98, 44, 0.3);
   padding: 10px;
 }
@@ -23,7 +38,14 @@ h4.sidebar, h5.sidebar {
   color: #555;
 }
 
+span.sidebar {
+  margin-top: 6px;
+  size: 100px;
+}
+
 ul.sidebar {
+  margin: 0 0 0px -3px;
+  display: inline-block;
   width: 50%;
 }
 
@@ -75,6 +97,10 @@ div.twittersidebar {
 
 img.rss {
   height: 32px;
+}
+
+img.small {
+  height: 16px;
 }
 
 
