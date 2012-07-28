@@ -1,5 +1,5 @@
 ---
-title: About
+title: About Sander Mak
 layout: default 
 ---
 # Sander Mak
