@@ -1,5 +1,5 @@
 ---
-title: Branch and Bound Blog - pruning the software universe ...
+title: Branch and Bound Blog - Sander Mak
 layout: default
 ---
 {% for post in site.posts limit:4 %}
@@ -8,7 +8,7 @@ layout: default
 </h2>
 <em>{{ post.date | date: '%B %e, %Y' }}</em>
 <p>
-    {{ post.excerpt }}
+    {{ post.excerpt | markdownify }}
 </p>
 <a class="label label-readmore label-info pull-right" href="{{post.url}}">Read more&nbsp;<span class="icon-white icon-hand-right"></span></a>
 <a class="label label-comments label-info pull-right"  href="{{site.production_url}}{{post.url}}/#disqus_thread">0 Comments and 0 Reactions</a>
