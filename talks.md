@@ -10,45 +10,45 @@ Here are some talks I've given at usergroups and conferences:
 <table class="table table-bordered table-striped">
 	<thead>
 		<tr>
-			<td><strong>Title</strong></td>	
-			<td><strong>Venue</strong></td>
-			<td><strong>Year</strong></td>
-			<td></td>
+			<th>Title</th>	
+			<th>Venue</th>
+			<th>Year</th>
+			<th></th>
 		</tr>
 	</thead>
 	<tr>
 		<td>Hibernate Performance Tuning</td>
-		<td><a href="http://www.jeeconf.com">JEEConf</a> (Ukraine)</td>
+		<td><a href="http://jeeconf.com/home/conference-overview/">JEEConf</a> (Ukraine)</td>
 		<td>2012</td>
-		<td><a href="http://www.slideshare.net/SanderMak/scala-functional-programming-for-the-imperative-mind">slides</a></td>
+		<td><a href="http://www.slideshare.net/SanderMak/hibernate-performance-tuning-jeeconf-2012">slides</a></td>
 	</tr>
 	<tr>
 		<td>Elevate your webapps with Scala and Lift</td>
-		<td><a href="http://www.jeeconf.com">JEEConf</a> (Ukraine)</td>
+		<td><a href="http://jeeconf.com/home/conference-overview/">JEEConf</a> (Ukraine)</td>
 		<td>2012</td>
-		<td><a href="">slides</a></td>
+		<td><a href="http://www.slideshare.net/SanderMak/scala-lift-jeeconf-2012">slides</a></td>
 	</tr>
 	<tr>
 		<td>Fork/Join and Akka</td>
 		<td><a href="http://www.bejug.org">BeJUG</a> (Belgium)</td>
 		<td>2012</td>
-		<td>Part 1: <a href="">slides</a>, <a href="">recording</a>
+		<td>Part 1: <a href="http://www.slideshare.net/SanderMak/fork-join-bejug-2012">slides</a>, <a href="http://parleys.com/d/3217">recording</a>
 			<br>
-			Part 2: <a href="">slides</a>, <a href="">recording</a>
+			Part 2: <a href="http://www.slideshare.net/SanderMak/akka-bejug">slides</a>, <a href="http://parleys.com/d/3218">recording</a>
 		</td>
 	</tr>	
 	<tr>
 		<td>Fork/Join for Fun and Profit!</td>
-		<td>J-Fall (Holland)</td>
+		<td><a href="http://www.nljug.org/pages/events/content/jfall_2011/sessions/00060/">J-Fall</a> (Holland)</td>
 		<td>2011</td>
 		<td><a href="http://www.slideshare.net/SanderMak/forkjoin-for-fun-and-profit-10075746">slides</a>, <a href="http://www.parleys.com/d/2746">video (Dutch)</a>
 		</td>
 	</tr>
 	<tr>
 		<td>Elevate your webapps with Scala and Lift</td>
-		<td>J-Fall</td>
+		<td><a href="http://www.nljug.org/pages/events/content/jfall_2010/sessions/00016/">J-Fall</a> (Holland)</td>
 		<td>2010</td>
-		<td><a href="">slides</a></td>
+		<td><a href="http://www.slideshare.net/SanderMak/elevate-your-webapps-with-scala-and-lift">slides</a></td>
 	</tr>
 	<tr>
 		<td>JDK7: Improved support for dynamic languages</td>
