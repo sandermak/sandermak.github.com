@@ -17,6 +17,12 @@ Here are some talks I've given at usergroups and conferences:
 		</tr>
 	</thead>
 	<tr>
+		<td>Cross-Build Injection attacks: how safe is your Java build?</td>
+		<td><a href="http://www.oracle.com/javaone/index.html">JavaOne</a> (USA)</td>
+		<td>2012</td>
+		<td><a href="https://www.slideshare.net/SanderMak/crossbuild-injection-attacks-how-safe-is-your-java-build">slides</a></td>
+	</tr>
+	<tr>
 		<td>Hibernate Performance Tuning</td>
 		<td><a href="http://jeeconf.com/home/conference-overview/">JEEConf</a> (Ukraine)</td>
 		<td>2012</td>
