@@ -77,6 +77,11 @@ div.twittersidebar {
   padding: 10px;
 }
 
+.twittersidebar ul {
+  list-style-type: none;  
+  margin: 0px;
+}
+
 .twittersidebar li {
   border-bottom: 1px dotted #67666f;
   padding: 3px 0 3px 0;
