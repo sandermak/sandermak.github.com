@@ -71,13 +71,12 @@ ul.sidebar a:hover {
   background: #dd5600;
 }
 
-
-div.twittersidebar {
+div.twittersidebar, div.readingsidebar {
   background-color: rgba(125, 98, 44, 0.1);
   padding: 10px;
 }
 
-.twittersidebar ul {
+.twittersidebar ul, .readingsidebar ul {
   list-style-type: none;  
   margin: 0px;
 }
