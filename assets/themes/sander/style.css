@@ -2,10 +2,13 @@
 .navbar .nav > li > a:hover {
   color: #dd5600;
   text-shadow: 0 -1px 0 rgba(255, 255, 255, 0.25);
-
 }
 
 /* Posts CSS */
+.unobtrusive {
+  opacity: 0.6;
+}
+
 ul.posts {
   list-style-type: none;
   margin-bottom: 2em;
