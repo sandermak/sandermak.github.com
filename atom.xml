@@ -22,7 +22,7 @@ title : Atom Feed
    <updated>{{ post.date | date_to_xmlschema }}</updated>
    <id>{{ site.production_url }}{{ post.id }}</id>
    <content type="html">
-       {{ post.excerpt | xml_escape }}
+       {{ post.excerpt | markdownify | xml_escape }}
        {{ post.content | xml_escape }}
    </content>
  </entry>
