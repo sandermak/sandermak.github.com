@@ -7,7 +7,11 @@
     <br>
 
     <p><em>{{page.excerpt | markdownify}}</em></p>
-  <header>
+  </header>
+  {% if page.bookurl != null %}
+    {% include bookheader.html %}
+  {% endif %}
+
   <section>
    {{ content }}
   </section>

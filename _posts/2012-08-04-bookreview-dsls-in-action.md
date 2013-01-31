@@ -4,35 +4,15 @@ title: "Book review: DSLs in Action"
 category : bookreview 
 tags : [java, scala, dsl, book]
 excerpt: "Domain-Specific Languages are not the most used tools in the toolbox of developers. According to the author of 'DSLs in Action' this is a missed opportunity: these little languages can deliver lots of benefits. In this book he argues this position with fervor. But be warned: this is not a book for beginners."
+bookurl: http://www.amazon.com/gp/product/1935182455/ref=as_li_qf_sp_asin_il_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=1935182455&linkCode=as2&tag=branandboun-20
+bookimg: dsls_in_action.png
+booktitle: DSLs in Action
+bookauthor: Debasish Ghosh
+bookpub: Manning (2010)
 ---
-<table>
-	<tr>
-		<td>
-			<a href="http://www.amazon.com/gp/product/1935182455/ref=as_li_qf_sp_asin_il_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=1935182455&linkCode=as2&tag=branandboun-20" target="_blank"><img src="/pics/dsls_in_action.png" alt="DSLs in Action"></a>
-		</td>
-		<td>&nbsp;</td>
-		<td>
-			<br>
-			<table class="table table-bordered table-striped">
-				<tr>
-					<td><strong>Title</strong></td>
-					<td>DSLs in Action</td>
-				</tr>
-				<tr>
-					<td><strong>Author</strong></td>
-					<td>Debasish Ghosh</td>
-				</tr>
-				<tr>
-					<td><strong>Publisher</strong></td>
-					<td>Manning</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-</table>
 
 
-[DSLs in Action](http://www.amazon.com/gp/product/1935182455/ref=as_li_qf_sp_asin_il_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=1935182455&linkCode=as2&tag=branandboun-20) (affiliate link) consists of three main parts and a well-filled appendix. The first part introduces the term DSL and shows the benefits of DSL-driven development. It's also made clear that the purpose of DSLs is not to allow the business to program, but to help developers write code that can be a means of communication with the business. Ultimately, a DSL is a way to achieve 'beautiful abstractions'. The introduction is followed by concrete examples of DSL implementations in Java and Groovy. But obviously, without a domain there is no DSL. Therefore, throughout the whole book the stock trading domain is used in all examples. The author takes the time to thoroughly describe this domain, so the examples are non-trivial and really fit the narrative.
+[DSLs in Action]({{ page.bookurl }}) (affiliate link) consists of three main parts and a well-filled appendix. The first part introduces the term DSL and shows the benefits of DSL-driven development. It's also made clear that the purpose of DSLs is not to allow the business to program, but to help developers write code that can be a means of communication with the business. Ultimately, a DSL is a way to achieve 'beautiful abstractions'. The introduction is followed by concrete examples of DSL implementations in Java and Groovy. But obviously, without a domain there is no DSL. Therefore, throughout the whole book the stock trading domain is used in all examples. The author takes the time to thoroughly describe this domain, so the examples are non-trivial and really fit the narrative.
 
 ### Internal DSLs
 In the second part the so-called 'internal DSLs' are described. These are languages ​​embedded in an existing programming language. Of course the expressiveness of the existing programming language determines how successful such an embedding can be. Examples are provided using both dynamic languages ​​and statically typed languages. The dynamic examples use concepts such as meta-programming, macros, and monkey-patching using Groovy, Clojure and Ruby. The statically typed examples are all written in Scala, and clearly demonstrate the value of the type-system for enforcing domain-specific rules. Fortunately you don't have to be an expert in those languages​​, because the book contains appendices with an introduction and a cheat sheet for each of the mentioned languages.
@@ -50,7 +30,7 @@ The last part looks at expected developments in the field of domain-specific lan
 
 A similar book has been published by Martin Fowler: [Domain-Specific Languages](http://www.amazon.com/gp/product/0321712943/ref=as_li_qf_sp_asin_il_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=0321712943&linkCode=as2&tag=branandboun-20). However, Fowler explicitly focuses on an Object-Oriented approach to DSLs, whereas DSLs in Action takes both the OO and functional approach. In my opinion you can't ignore functional languages when talking about (internal) DSLs.
 
-All in all, [DSLs in Action](http://www.amazon.com/gp/product/1935182455/ref=as_li_qf_sp_asin_il_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=1935182455&linkCode=as2&tag=branandboun-20) is a top-notch book that I heartily recommend.
+All in all, [DSLs in Action]({{ page.bookurl }}) is a top-notch book that I heartily recommend.
 
 _(a Dutch version of this article was print in the [Dutch Java Magazine](http://javamagazine.nl/))_
 
