@@ -17,6 +17,7 @@ title : Atom Feed
 
  {% for post in site.posts %}
  <entry>
+   <author><name>{{ site.author.name }}</name></author>
    <title>{{ post.title }}</title>
    <link href="{{ site.production_url }}{{ post.url }}"/>
    <updated>{{ post.date | date_to_xmlschema }}</updated>
