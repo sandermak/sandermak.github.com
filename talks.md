@@ -21,7 +21,7 @@ Here are some talks I've given at usergroups and conferences:
 		<td><a href="http://www.oracle.com/javaone/index.html">JavaOne</a> (USA)</td>
 		<td>2012</td>
 		<td><a href="https://www.slideshare.net/SanderMak/crossbuild-injection-attacks-how-safe-is-your-java-build">slides</a>,
-		    <a href="https://oracleus.activeevents.com/connect/sessionDetail.ww?SESSION_ID=3892">slides+audio</a> (under 'Media')</td>
+		    <a href="http://www.youtube.com/watch?v=K2aTRS8uvY4&amp;list=PLKCk3OyNwIzsR4S-A62e73qi1ZV3phwS6">slides+audio</a></td>
 	</tr>
 	<tr>
 		<td>Hibernate Performance Tuning</td>
