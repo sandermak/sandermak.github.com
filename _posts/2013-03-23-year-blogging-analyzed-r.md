@@ -10,7 +10,7 @@ excerpt: "Today it's exactly one year ago that I published my first blogpost on 
 Like most people I use Google Analytics to track what's happening on this site. However, I'm not going to show you screenshots of the GA Dashboard. Not that it's bad (it's actually pretty good), but where's the fun in that? Since this is a programming blog we're going to hook into the [Google Analytics API](https://developers.google.com/analytics/devguides/reporting/core/v3/). And this time, without using my standard tools of trade. Instead of using a JVM based language, I'm turning to R to do some number crunching.
 
 ### Learning R
-[The R language](http://www.r-project.org/) is geared towards statistical programming and data analysis. Someone described it to me as a headless version of Excel on steroids. I think this gives the right feeling for what R is. If you're coming from a statically-typed background or expect a perfectly crafted language, you're in for a culture shock. R lives firmly in the camp of 'shut up, it works' and its virtues lie in the vast amount of statistical libraries that are available. Let's just say that the intersection on the Venn diagram covering statisticians and kick-ass language designers/software engineers is very small.
+[The R language](http://www.r-project.org/) is geared towards statistical programming and data analysis. Someone described it to me as a headless version of Excel on steroids. I think this gives the right feeling for what R is. If you're coming from a statically-typed background or expect a perfectly crafted language, you're in for a culture shock. R lives firmly in the camp of 'shut up, it works' and its virtues lie in the vast amount of statistical libraries that are available. Let's just say that the intersection on the Venn diagram covering statisticians and kick-ass language designers/software engineers is very small:
 
 ![Statisticians vs. Language Designers :)](/pics/statisticians_langdesigners_venn.png)
 
@@ -39,7 +39,7 @@ ga.df <- ga$getData("XXXXXXXX", # replace with your GA profile id
 {% endhighlight %}
 Yes, that `instance="ga"` on the second line specifies the name of a variable that will pop into existence, later to be used in `ga$getData()`. Life's full of dynamic surprises with R.
 
-We're assigning the result of the ga$getData call to a variable called `ga.df`. Here, df is short for dataframe, a handy datatype which resembles the familiar relational table. Because R has named parameters, the actual call is more or less self-explanatory. It returns the visits by date over the specified period. All parameters with "ga:" prefixes follow the [official API](https://developers.google.com/analytics/devguides/reporting/core/v3/) directly. 
+We're assigning the result of the ga$getData call to a variable called `ga.df`. Here, df is short for dataframe, a handy datatype which resembles the familiar relational table. Because R has named parameters, the actual call is more or less self-explanatory. It returns the visits by date over the specified period. All parameters with "ga:" prefixes follow the [dimension and metrics](https://developers.google.com/analytics/devguides/reporting/core/dimsmets) name from the Google Analytics API directly. 
 
 Actually, the hardest part was finding out the right profile id to use for calling the API. Just so you know, this id is not the same as the tracking id you use on your page. Anyway, a quick way to find all your profile id's is to head to Google's [OAuth2 playground](https://developers.google.com/oauthplayground/), authorize the Analytics API and call:
 
@@ -48,12 +48,13 @@ https://www.googleapis.com/analytics/v3/management/accounts/~all/webproperties/~
 {% endhighlight  %}
 
 ### Visitors
-Now on to some actual numbers. In the past year, this blog received 23,903 visits (18724 unique), generating 27,860 pageviews. As you can see, there are some huge spikes in the number of visitors:
+Now on to some actual numbers. In the past year, this blog received 23,903 visits (from 18724 unique visitors), generating 27,860 pageviews. As you can see, there are some huge spikes in the number of visitors:
+
 ![Visits per day](/analytics/figure/visitsperday.png)
 
 (again, check the [RMarkdown](/analytics/blog_analytics.html) to see how the graphs are generated)
 
-The highest datapoint was measured on the day [Martin Odersky](https://twitter.com/odersky) tweeted my [Scala is like Git](/blog/scala/2012/12/scala-is-like-git/) post in December 2012, driving a record 2077 visits to my blog in one day. The other peaks can all be explained by referral traffic from social link sharing sites such as Reddit and DZone. Alas, 15, the median number of visits per day paints a better picture of the actual events for most days. Fortunately, the trendline (a linear regression line) is sloped upwards.
+The highest datapoint was measured in December 2012 when [Martin Odersky](https://twitter.com/odersky) tweeted my [Scala is like Git](/blog/scala/2012/12/scala-is-like-git/) post, driving a record 2077 visits to my blog in one day. The other peaks can all be explained by referral traffic from social link sharing sites such as Reddit and DZone. Alas, 15, the median number of visits per day paints a better picture of the actual events for most days. Fortunately, the trendline (a linear regression line) is sloped upwards.
 
 It's also interesting to see how the visits are distributed over the days of the week, using a boxplot on the same data:
 ![Visits per day of week](/analytics/figure/visitsperweekday.png)
@@ -84,7 +85,7 @@ Writing blog articles is a funny thing. You have complete freedom to write whate
   
 ['Scala is like Git'](/blog/scala/2012/12/scala-is-like-git/) is the undeniable winner here, accounting for approximately a third of all pageviews in this year of blogging. I honestly did not expect this post to take off like that. On the other end of the spectrum we find ['Book review: Infinity and the Mind'](/blog/bookreview/2013/01/bookreview-infinity-and-the-mind/). While it is also the most recent post, I don't expect it go anywhere. I still think it's a great book though, and certainly don't regret the time it has taken me to write a thorough review. 
 
-During the year, I also became part of Dzone's 'Most Valuable Blogger' program. Through this program, some of the posts from above have been republished on DZone. My [DZone profile](http://architects.dzone.com/users/sammy8306) shows that these republished articles garnered another 18k pageviews, which are obviously not present in my dataset. 
+During the year, I also became part of DZone's 'Most Valuable Blogger' program. Through this program, some of the posts from above have been republished on DZone. My [DZone profile](http://architects.dzone.com/users/sammy8306) shows that these republished articles garnered another 18k pageviews, which are obviously not present in my dataset. 
 
 ### Traffic patterns
 Most of the traffic originates from social sharing sites. This becomes clear by looking at the percentage of visits by medium, over time:
@@ -95,4 +96,6 @@ The blue area represents referral traffic. On the Google Analytics dashboard I c
 What's more interesting to me is that the percentage of "organic" traffic (ie. search traffic) is steadily increasing. That makes sense, since I started out with virtually no content and zero PageRank, but that has changed in the course of the year. In the [complete analysis](/analytics/blog_analytics.html) you can also find a graph that corroborates this finding using absolute numbers of search traffic.
 
 ### Keep on blogging
-While it's nice to put some numbers on what's happening at a blog, in the end it doesn't really matter. It's not a business and I'll keep writing anyway. It's fun, engaging and helps me to verbalize my thoughts regardless of someone reads it or not. Meanwhile, I hope this post has provided some inspiration on how to use R for analyzing Google Analytics data
+It certainly was a good learning experience to free myself from the Google Analytics dashboard and try to work with the analytics data directly in R. Obviously, there's plenty more to explore. I'll get to that when my statistics and R knowledge has made sufficient progress.
+
+While it's nice to put some numbers on what's happening with this blog, in the end it doesn't really matter. It's not a business and I'll keep writing anyway. It's fun, engaging and helps me to verbalize my thoughts whether someone reads it or not. Meanwhile, I hope this post has provided some inspiration on how to use R for analyzing and visualizing Google Analytics data.
