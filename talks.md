@@ -16,6 +16,13 @@ Here are some talks I've given at usergroups and conferences:
 			<th></th>
 		</tr>
 	</thead>
+		<tr>
+		<td>Modularity in the cloud: a case study</td>
+		<td><a href="http://jeeconf.com/home/conference-overview/">JEEConf</a> (Ukraine)</td>
+		<td>2013</td>
+		<td><a href="http://www.slideshare.net/SanderMak/modularity-in-thecloud">slides</a>, 
+		    <a href="http://jeeconf.com/materials/osgi-in-the-cloud/">video</a></td>
+	</tr>
 	<tr>
 		<td>Cross-Build Injection attacks: how safe is your Java build?</td>
 		<td><a href="http://www.oracle.com/javaone/index.html">JavaOne</a> (USA)</td>
