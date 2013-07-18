@@ -48,8 +48,7 @@ OSGi adds modularity as a first-class citizen to the JVM by amending Jars and pa
 ![OSGi bundles](/pics/osgi_bundles.png)
 
 And the accompanying manifest for the service bundle:
-
-```
+{% highlight properties %}
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: MyService bundle
@@ -57,7 +56,8 @@ Bundle-SymbolicName: com.foo.service
 Bundle-Version: 1.0.0
 Import-Package:  org.apache.commons.logging;version="1.0.4"
 Export-Package:  com.foo.service.api;version="1.0.0"
-```
+{% endhighlight %}
+
 And there you have it: OSGi provides an independently deployable Jar with a stable identity, and the possibility to require or advertise dependencies (ie. versioned packages). Everything else is strictly contained inside bundles. The OSGi runtime takes care of all the gritty details to enforce this strict separation at runtime. It even allows bundles to be added, removed and hot-swapped at run-time!
 
 ### OSGi services
