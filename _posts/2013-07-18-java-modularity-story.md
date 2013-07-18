@@ -1,5 +1,4 @@
 ---
-published: false
 layout: post
 title: "The Java Modularity Story" 
 category : java 
@@ -10,7 +9,7 @@ excerpt: "So you've got a growing Java application with a nice feature set. Unfo
 Modularity leads to more maintainable, composable and extensible systems. When you have clearly demarcated module boundaries and explicit contracts between modules, life is good. Functionality can be tested in isolation, and divide-and-conquer can be applied at the code and team-level. This speeds up development, not just in the first year of the system, but throughout its whole lifecycle.
 
 ### From architecture to software
-So how do you get to that point? We'll get to a specific solution later, but first I want to take the time to define the problem clearly. Modularity plays a big role at many levels of abstractions. At the system architecture level, we have Service Oriented Architecture. When done right, SOA means explicit and versioned public interfaces (mostly webservices) between loosely coupled subsystems that hide their internal details. These subsystems possibly even run on completely disparate technology stacks and are easily replaceable on an individual basis.
+So how do you get to that point? We'll get to a specific solution later, but first I want to take the time to define the problem clearly. Modularity plays a big role at many levels of abstractions. At the systems architecture level, we have Service Oriented Architecture. When done right, SOA means explicit and versioned public interfaces (mostly webservices) between loosely coupled subsystems that hide their internal details. These subsystems possibly even run on completely disparate technology stacks and are easily replaceable on an individual basis.
 
 However, when building the individual services or subsystems in Java, a monolithic approach is often irresistible. Java's own runtime, rt.jar is unfortunately [a prime example](https://blogs.oracle.com/mr/entry/massive_monolithic_jdk). Sure, you may partition your monolithic application into the three obligatory layers, but that's a far cry from _true modularity_. Just ask yourself what it would take to swap out the lowest layer of your application for a completely different implementation. Oftentimes, this would ripple through the whole application. Now, try thinking of how you would do this without disrupting the other parts of your application, when hot-swapping at run-time. Because why should this be possible in a SOA context, but not inside our applications?
 
