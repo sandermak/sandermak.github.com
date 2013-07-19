@@ -54,7 +54,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: MyService bundle
 Bundle-SymbolicName: com.foo.service
 Bundle-Version: 1.0.0
-Import-Package:  org.apache.commons.logging;version="1.0.4"
+Import-Package:  org.apache.commons.logging;version="[1.0.4, 2.0.0)"
 Export-Package:  com.foo.service.api;version="1.0.0"
 {% endhighlight %}
 
