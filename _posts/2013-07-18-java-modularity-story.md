@@ -2,7 +2,7 @@
 layout: post
 title: "The Java Modularity Story" 
 category : java 
-tags : [java,modularity,osgi]
+tags : [java, modularity, osgi]
 excerpt: "So you've got a growing Java application with a nice feature set. Unfortunately adding new features gets harder over time and things start breaking in unexpected places. Chances are that your applications is not as modular as it could be. Relax, it's not (just) your fault. Plain Java is notoriously lacking in the modularity department. But it doesn't have be this way."
 ---
 
