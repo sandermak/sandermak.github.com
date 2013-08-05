@@ -1,32 +1,1470 @@
----
-layout: nil
-title : Atom Feed
----
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
  
- <title>{{ site.title }}</title>
- <link href="{{ site.production_url }}/atom.xml" rel="self"/>
- <link href="{{ site.production_url }}"/>
- <updated>{{ site.time | date_to_xmlschema }}</updated>
- <id>{{ site.production_url }}/</id>
+ <title>Branch and Bound</title>
+ <link href="http://branchandbound.net/atom.xml" rel="self"/>
+ <link href="http://branchandbound.net"/>
+ <updated>2013-08-05T11:11:05+02:00</updated>
+ <id>http://branchandbound.net/</id>
  <author>
-   <name>{{ site.author.name }}</name>
-   <email>{{ site.author.email }}</email>
+   <name>Sander Mak</name>
+   <email>sandermak@gmail.com</email>
  </author>
 
- {% for post in site.posts %}
+ 
  <entry>
-   <author><name>{{ site.author.name }}</name></author>
-   <title>{{ post.title }}</title>
-   <link href="{{ site.production_url }}{{ post.url }}"/>
-   <updated>{{ post.date | date_to_xmlschema }}</updated>
-   <id>{{ site.production_url }}{{ post.id }}</id>
+   <author><name>Sander Mak</name></author>
+   <title>Some AngularJS pitfalls</title>
+   <link href="http://branchandbound.net/blog/web/2013/08/some-angularjs-pitfalls"/>
+   <updated>2013-08-05T00:00:00+02:00</updated>
+   <id>http://branchandbound.net/blog/web/2013/08/some-angularjs-pitfalls</id>
    <content type="html">
-       {{ post.excerpt | markdownify | xml_escape }}
-       {{ post.content | xml_escape }}
+       &lt;p&gt;In the past few months I've been heavily using AngularJS. It's a marvelous framework for modern web applications. But as with every new toy, there are some rough edges that you have to be aware of. In this post I'll round up some gotcha's I encountered. Assuming you already know your way around Angular, these may be helpful.&lt;/p&gt;
+
+       &lt;h3&gt;The flickering UI&lt;/h3&gt;
+
+&lt;p&gt;Angular's automatic data-binding feature is awesome. However, it does have a flipside: before Angular is initialized, your page may show unparsed expressions to the user. When the DOM is ready and Angular calculates and replaces the values, this results in an ugly flickering effect:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/pics/angular_flicker.png&quot; alt=&quot;Unparsed Angular expression&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The above situation is a direct result of rendering this example from the &lt;a href=&quot;http://docs.angularjs.org/tutorial/step_02&quot;&gt;Angular tutorial&lt;/a&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;html&quot;&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;body&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;ng-controller=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;PhoneListCtrl&amp;quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;ul&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;li&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;ng-repeat=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;phone in phones&amp;quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+      {{ phone.name }}
+      &lt;span class=&quot;nt&quot;&gt;&amp;lt;p&amp;gt;&lt;/span&gt;{{ phone.snippet }}&lt;span class=&quot;nt&quot;&gt;&amp;lt;/p&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;/li&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;/ul&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/body&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;If you have a single page application, this problem only occurs on the first page-load. Fortunately, it's easily prevented: don't use inline &lt;code&gt;{{ }}&lt;/code&gt; expressions. Instead, use the ng-bind directive:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;html&quot;&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;body&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;ng-controller=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;PhoneListCtrl&amp;quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;ul&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;li&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;ng-repeat=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;phone in phones&amp;quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+      &lt;span class=&quot;nt&quot;&gt;&amp;lt;span&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;ng-bind=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;phone.name&amp;quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/span&amp;gt;&lt;/span&gt;
+      &lt;span class=&quot;nt&quot;&gt;&amp;lt;p&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;ng-bind=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;phone.snippet&amp;quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;Optional: visually pleasing placeholder&lt;span class=&quot;nt&quot;&gt;&amp;lt;/p&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;/li&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;/ul&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/body&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;You need a tag to apply this directive, so I added a &lt;code&gt;&amp;lt;span&amp;gt;&lt;/code&gt; around the phone name. What happens is that initially, the value inside the tag is shown (but you can choose to leave it empty.) Then, when Angular initializes and replaces the innards of the bound tag with the result of the expression. Note that you don't need to add the curly braces inside the &lt;a href=&quot;http://docs.angularjs.org/api/ng.directive:ngBind&quot;&gt;ng-bind&lt;/a&gt; property. Much cleaner! If you need a compound expression, use &lt;a href=&quot;http://docs.angularjs.org/api/ng.directive:ngBindTemplate&quot;&gt;ng-bind-template&lt;/a&gt; instead. With this variant you do need the curly braces though, in order to differentiate between string literals and expressions.&lt;/p&gt;
+
+&lt;p&gt;Another option is to completely hide elements, or even your whole application, until Angular is ready. Angular provides &lt;a href=&quot;http://docs.angularjs.org/api/ng.directive:ngCloak&quot;&gt;ng-cloak&lt;/a&gt; to this end. It works by injecting a CSS rule very early in the initialization phase into the page. Alternatively you can include this CSS hiding rule in your own stylesheet so it loads early. Angular will the remove the cloak style when it is ready to roll, unveiling your application (or designated elements) at once and fully rendered.&lt;/p&gt;
+
+&lt;h3&gt;jQuery and Angular&lt;/h3&gt;
+
+&lt;p&gt;Angular doesn't depend on jQuery. In fact, the Angular source contains an embedded lightweight alternative: &lt;a href=&quot;http://docs.angularjs.org/api/angular.element&quot;&gt;jqLite&lt;/a&gt;. Still, when Angular detects the presence of a jQuery version in your page, it uses that full jQuery implementation in lieu of jqLite. One direct way in which this manifests itself is with Angular's element abstraction. For example, in a directive you get access to the element that the directive applies to:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;javascript&quot;&gt;&lt;span class=&quot;nx&quot;&gt;angular&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;module&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;#39;jqdependency&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[])&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;directive&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;#39;failswithoutjquery&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+      &lt;span class=&quot;nx&quot;&gt;restrict&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&amp;#39;A&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+      &lt;span class=&quot;nx&quot;&gt;link&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;scope&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;element&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;attrs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+               &lt;span class=&quot;nx&quot;&gt;element&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;hide&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;4000&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+             &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;(see this example in action in &lt;a href=&quot;http://plunker.co/edit/aqeDikqd6O2QaqH3eaIq?p=preview&quot;&gt;this plunkr&lt;/a&gt;)&lt;/p&gt;
+
+&lt;p&gt;but is this &lt;code&gt;element&lt;/code&gt; a jqLite or jQuery element? It depends. The manual states:&lt;/p&gt;
+
+&lt;blockquote&gt;&lt;p&gt; All element references in Angular are always wrapped with jQuery or jqLite; they are never raw DOM references.&lt;/p&gt;&lt;/blockquote&gt;
+
+&lt;p&gt;So it will be a jqLite element only if jQuery was not detected by Angular. The &lt;code&gt;hide()&lt;/code&gt; method only exists for jQuery elements, meaning this example only works when Angular uses jQuery. If you (accidentally) switch the order of AngularJS and jQuery script tags in your page, this code breaks! Shuffling script tags around may not happen very often, but it bit me when I started modularizing our codebase. Especially when you start using a module loader (like &lt;a href=&quot;http://requirejs.org&quot;&gt;RequireJS&lt;/a&gt;), this can rear it's ugly head. For RequireJS, I solved it by explicitly declaring that Angular does in fact depend on JQuery in the &lt;a href=&quot;http://requirejs.org/docs/api.html#config-shim&quot;&gt;shim config&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Another takeaway might be that you shouldn't call jQuery specific methods through Angular's element wrapper. Instead you can use &lt;code&gt;$(element).hide(4000)&lt;/code&gt; to make it abundantly clear that you do, in fact, depend on jQuery. In that case, changing the script tag order won't break the directive.&lt;/p&gt;
+
+&lt;h3&gt;Minification&lt;/h3&gt;
+
+&lt;p&gt;Special care should be taken for Angular applications that need to be minified. Otherwise error messages like &lt;code&gt;'Unknown provider: aProvider &amp;lt;- a'&lt;/code&gt; will hound you. Like with so many things, this information is hidden somewhere in the &lt;a href=&quot;http://docs.angularjs.org/tutorial/step_05&quot;&gt;official documentation&lt;/a&gt;. In short, Angular depends on function parameter names to perform dependency injection. The minifier,  blissfully unaware of the special semantics of formal parameter names in Angular, mangles them to the shortest possible identifier. Solution? Use the minify-friendly method of method injection. From this:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;javascript&quot;&gt;&lt;span class=&quot;nx&quot;&gt;module&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;service&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;#39;myservice&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;$http&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;$q&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; 
+   &lt;span class=&quot;c1&quot;&gt;// This breaks when minified&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;to this:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;javascript&quot;&gt;&lt;span class=&quot;nx&quot;&gt;module&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;service&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;#39;myservice&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&amp;#39;$http&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&amp;#39;$q&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;$http&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;$q&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; 
+   &lt;span class=&quot;c1&quot;&gt;// Using the array syntax to declare dependencies works with minification!&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}]);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The array syntax is accepted wherever a to-be-injected function is accepted. My advise is to use this syntax from the get-go. It will prevent a lot of pain later on if you decice to minify your JavaScript. There also seems to be a &lt;a href=&quot;https://github.com/btford/ngmin&quot;&gt;automatic rewriter&lt;/a&gt;, although I don't know how well it works.&lt;/p&gt;
+
+&lt;p&gt;One last bit of advice: when you need to rewrite your functions using the array syntax, apply it at every location where Angular injects dependencies. This includes directives, but also controllers on directives. A spot that is easily missed (speaking from experience):&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;javascript&quot;&gt;&lt;span class=&quot;c1&quot;&gt;// the directive itself needs array injection syntax:&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;module&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;directive&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;#39;directive-with-controller&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;#39;myservice&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;myservice&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+      &lt;span class=&quot;nx&quot;&gt;controller&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;#39;$timeout&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;$timeout&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;//  but this controller needs array injection syntax, too!  &lt;/span&gt;
+      &lt;span class=&quot;p&quot;&gt;}],&lt;/span&gt;
+      &lt;span class=&quot;nx&quot;&gt;link&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;scope&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;element&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;attrs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ctrl&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+                
+      &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}]);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Note that the link function doesn't need the array syntax, since it is not actually an injection target. It is a fixed-arity function called directly by Angular. Injections from the directive level can be used inside the link function though.&lt;/p&gt;
+
+&lt;h3&gt;Directives are never 'done'&lt;/h3&gt;
+
+&lt;p&gt;One irritating issue with directives is that you don't get a hook for when the directive is 'done'. When integrating a jQuery plugin inside a directive, such a hook would be very helpful. Let's say you want to display a table with dynamic (ng-repeat) data as a jQuery datatable. You need to call &lt;code&gt;$('.mytable').dataTable()&lt;/code&gt; at some point when all data is actually materialized in an HTML table (and preferably before it is inserted into the DOM), but you can't.&lt;/p&gt;
+
+&lt;p&gt;Why is that? Angular's data-binding is powered by a continuous digest-cycle which can lead to updates and re-rendering of directives. As such, there is never really a moment that the framework is 'at-rest' when applying directives. One (admittedly ugly) workaround is to schedule the jQuery dataTable call outside the current digest-cycle by using timeout:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;javascript&quot;&gt;&lt;span class=&quot;nx&quot;&gt;angular&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;module&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;#39;table&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,[]).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;directive&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;#39;mytable&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;#39;$timeout&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;$timeout&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+      &lt;span class=&quot;nx&quot;&gt;restrict&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&amp;#39;E&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+      &lt;span class=&quot;nx&quot;&gt;template&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&amp;#39;&amp;lt;table class=&amp;quot;mytable&amp;quot;&amp;gt;&amp;#39;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;
+                   &lt;span class=&quot;s1&quot;&gt;&amp;#39;&amp;lt;thead&amp;gt;&amp;lt;tr&amp;gt;&amp;lt;th&amp;gt;counting&amp;lt;/th&amp;gt;&amp;lt;/tr&amp;gt;&amp;lt;/thead&amp;gt;&amp;#39;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;
+                   &lt;span class=&quot;s1&quot;&gt;&amp;#39;&amp;lt;tr ng-repeat=&amp;quot;data in datas&amp;quot;&amp;gt;&amp;lt;td&amp;gt;&amp;lt;/td&amp;gt;&amp;lt;/tr&amp;gt;&amp;#39;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;
+                &lt;span class=&quot;s1&quot;&gt;&amp;#39;&amp;lt;/table&amp;gt;&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+      &lt;span class=&quot;nx&quot;&gt;link&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;scope&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;element&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;attrs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ctrl&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+         &lt;span class=&quot;nx&quot;&gt;scope&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;datas&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;one&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;two&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;three&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+         &lt;span class=&quot;c1&quot;&gt;// Doesn&amp;#39;t work, shows an empty table:&lt;/span&gt;
+         &lt;span class=&quot;c1&quot;&gt;// $(&amp;#39;.mytable&amp;#39;, element).dataTable()   &lt;/span&gt;
+         &lt;span class=&quot;c1&quot;&gt;// But this does:&lt;/span&gt;
+         &lt;span class=&quot;nx&quot;&gt;$timeout&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; 
+           &lt;span class=&quot;nx&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;#39;.mytable&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;element&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;dataTable&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt; 
+         &lt;span class=&quot;p&quot;&gt;},&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+      &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}]);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;(see this example in action in &lt;a href=&quot;http://plnkr.co/edit/ir7U3h1C26NTUpPgyeqG?p=preview&quot;&gt;this plunkr&lt;/a&gt;)&lt;/p&gt;
+
+&lt;p&gt;In our codebase we've even encountered a situation where a doubly-nested &lt;code&gt;$timeout&lt;/code&gt; was necessary. Another crazy work around is to add a &lt;code&gt;&amp;lt;script&amp;gt;&lt;/code&gt; tag in the template which does a callback to an Angular function using &lt;code&gt;scope.$apply()&lt;/code&gt;. Suffice to say, it's less than ideal. Due to Angular's nature this is &lt;a href=&quot;https://github.com/angular/angular.js/issues/734&quot;&gt;unlikely&lt;/a&gt; to change.&lt;/p&gt;
+
+&lt;p&gt;All this being said, Angular is still my favorite client-side JS framework. Did you encounter other pitfalls while using Angular? Or did you solve similar problems in a different way? Leave a comment!&lt;/p&gt;
+
    </content>
  </entry>
- {% endfor %}
+ 
+ <entry>
+   <author><name>Sander Mak</name></author>
+   <title>The Java Modularity Story</title>
+   <link href="http://branchandbound.net/blog/java/2013/07/java-modularity-story"/>
+   <updated>2013-07-18T00:00:00+02:00</updated>
+   <id>http://branchandbound.net/blog/java/2013/07/java-modularity-story</id>
+   <content type="html">
+       &lt;p&gt;So you've got a growing Java application with a nice feature set. Unfortunately adding new features gets harder over time and things start breaking in unexpected places. Chances are that your applications is not as modular as it could be. Relax, it's not (just) your fault. Plain Java is notoriously lacking in the modularity department. But it doesn't have be this way.&lt;/p&gt;
+
+       &lt;p&gt;Modularity leads to more maintainable, composable and extensible systems. When you have clearly demarcated module boundaries and explicit contracts between modules, life is good. Functionality can be tested in isolation, and divide-and-conquer can be applied at the code and team-level. This speeds up development, not just in the first year of the system, but throughout its whole lifecycle.&lt;/p&gt;
+
+&lt;h3&gt;From architecture to software&lt;/h3&gt;
+
+&lt;p&gt;So how do you get to that point? We'll get to a specific solution later, but first I want to take the time to define the problem clearly. Modularity plays a big role at many levels of abstractions. At the systems architecture level, we have Service Oriented Architecture. When done right, SOA means explicit and versioned public interfaces (mostly webservices) between loosely coupled subsystems that hide their internal details. These subsystems possibly even run on completely disparate technology stacks and are easily replaceable on an individual basis.&lt;/p&gt;
+
+&lt;p&gt;However, when building the individual services or subsystems in Java, a monolithic approach is often irresistible. Java's own runtime, rt.jar is unfortunately &lt;a href=&quot;https://blogs.oracle.com/mr/entry/massive_monolithic_jdk&quot;&gt;a prime example&lt;/a&gt;. Sure, you may partition your monolithic application into the three obligatory layers, but that's a far cry from &lt;em&gt;true modularity&lt;/em&gt;. Just ask yourself what it would take to swap out the lowest layer of your application for a completely different implementation. Oftentimes, this would ripple through the whole application. Now, try thinking of how you would do this without disrupting the other parts of your application, when hot-swapping at run-time. Because why should this be possible in a SOA context, but not inside our applications?&lt;/p&gt;
+
+&lt;h3&gt;True modularity&lt;/h3&gt;
+
+&lt;p&gt;So what is this true modularity I alluded to in the preceding paragraph? Let me state some defining characteristics of a &lt;em&gt;true module&lt;/em&gt;:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;a module is an independent unit of deployment (reusable in any context),&lt;/li&gt;
+&lt;li&gt;it has a stable, reified identity (for example name and version),&lt;/li&gt;
+&lt;li&gt;it states requirements (dependencies),&lt;/li&gt;
+&lt;li&gt;it advertises capabilities for other modules to use while hiding implementation details.&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;p&gt;Ideally, these modules live in a lightweight runtime environment that matches up the requirements and capabilities of modules for us according to our desired composition. In short, we want our application to use modules to get the good parts of a Service Oriented Architecture on a smaller scale. And not just on the whiteboard, but also while coding and running the application. We want our physical implementation to follow our logical design all the way through production. What's more, the composition of modules shouldn't be static: applications need to be resilient and extensible without downtime or full redeployment.&lt;/p&gt;
+
+&lt;h3&gt;Objects: true modules?&lt;/h3&gt;
+
+&lt;p&gt;What about the lowest layer of structural abstraction in Java: classes and objects. Doesn't OO provide identity, information hiding and loose coupling through interfaces in Java? Yes it does, to a degree. However, object identity is ephemeral and interfaces are unversioned. Classes are most certainly not an independent unit of deployment in Java. In practice, classes tend to get way too familiar with each other. Public means visible to literally every other class on the JVM's classpath. Which is probably not what you want for anything but truly public interfaces. To make matters worse, Java's visibility modifiers are weakly enforced (think reflection) at runtime.&lt;/p&gt;
+
+&lt;p&gt;Reuse of classes outside their original context is hard when nobody forces the cost of their implicit external dependencies on you. I can practically hear the words 'Dependency Injection' and 'Inversion of Control' racing through your mind now. Yes, these principles help to make dependencies of a class explicit. Unfortunately their &lt;a href=&quot;http://www.springsource.org/spring-framework&quot;&gt;archetypical&lt;/a&gt; &lt;a href=&quot;http://www.oracle.com/technetwork/java/javaee/ejb-141389.html&quot;&gt;implementations&lt;/a&gt; in Java still leave your application as a big ball of objects wired together statically at runtime by a big ball of configuration. I highly recommend reading &lt;a href=&quot;http://www.amazon.com/gp/product/0321247132/ref=as_li_qf_sp_asin_il_tl?ie=UTF8&amp;amp;camp=1789&amp;amp;creative=9325&amp;amp;creativeASIN=0321247132&amp;amp;linkCode=as2&amp;amp;tag=branandboun-20&quot;&gt;'Java Application Architecture: Modularity Patterns'&lt;/a&gt; if you wan to learn more about modular design patterns. But you'll also find that applying these patterns in Java without additional runtime enforcement of modularity is fighting an uphill battle.&lt;/p&gt;
+
+&lt;h3&gt;Packages: true modules?&lt;/h3&gt;
+
+&lt;p&gt;But then what is the unit of modularity in Java inbetween applications and objects? You could argue that packages must be it. The combination of package names, import statements and visibility modifiers (e.g. public/protected/private) gives the illusion that at least some of the characteristics of true modules are present. Unfortunately packages are purely a cosmetic construct, providing namespacing for classes. Even their apparent hierarchy is actually &lt;a href=&quot;http://stackoverflow.com/questions/1764078/apparent-hierarchies-of-packages&quot;&gt;an illusion&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;So yes, by all means use packages to structure your code base in logical chunks. Just don't count on packages to improve modularity beyond pretty names. To be fair, there are &lt;a href=&quot;http://structure101.com/&quot;&gt;tools&lt;/a&gt; that can help with enforcing package dependencies through static verification at development time. But that's hardly a satisfying solution.&lt;/p&gt;
+
+&lt;h3&gt;JAR files: true modules?&lt;/h3&gt;
+
+&lt;p&gt;Surely the true unit of modularity for Java applications then must be JAR files (Jars). Well, yes and no. Yes, because Jars are the independent units of deployment for Java applications. No, because they fail on the three other characteristics. Jars have a filename, and sometimes a version in the MANIFEST.MF. Neither are part of the runtime model and hence do not form an explicit reified identity. Dependencies on other Jars can't be declared. &lt;strong&gt;You&lt;/strong&gt; have to make sure any dependencies are on the classpath. Which, by the way, is just a flat collection of classes: gone is the link to the originating Jars. This also explains another big problem: any public class in a Jar is visible to the whole classpath. There is no 'jar-scope' modifier to hide implementation details inside a Jar.&lt;/p&gt;
+
+&lt;p&gt;All of the above means that Jars are a necessary, but not sufficient mechanism for modular applications. Many people are successfully building systems out of lots of Jars (by applying &lt;a href=&quot;http://www.amazon.com/gp/product/0321247132/ref=as_li_qf_sp_asin_il_tl?ie=UTF8&amp;amp;camp=1789&amp;amp;creative=9325&amp;amp;creativeASIN=0321247132&amp;amp;linkCode=as2&amp;amp;tag=branandboun-20&quot;&gt;modular architecture patterns&lt;/a&gt;), managing the identities and dependencies with their favorite compile-time dependency management tool. Take for example the Netflix API, which is &lt;a href=&quot;http://www.slideshare.net/danieljacobson/scaling-the-netflix-api/76&quot;&gt;composed of 500 JARs&lt;/a&gt;. Unfortunately, your compile-time and run-time classpath &lt;em&gt;will&lt;/em&gt; diverge in unforeseen ways, giving rise to the &lt;a href=&quot;http://stackoverflow.com/questions/6909306/jar-hell-how-to-use-a-classloader-to-replace-one-jar-library-version-with-anoth&quot;&gt;JAR-hell&lt;/a&gt;. Alas, we can do better than this.&lt;/p&gt;
+
+&lt;h3&gt;OSGi bundles&lt;/h3&gt;
+
+&lt;p&gt;Clearly, plain Java doesn't offer enough in terms of modularity. It's an acknowledged problem and with &lt;a href=&quot;http://openjdk.java.net/projects/jigsaw/&quot;&gt;project Jigsaw&lt;/a&gt; there might be a native solution on the way. However, it has &lt;a href=&quot;http://mreinhold.org/blog/late-for-the-train&quot;&gt;missed the Java 8 train&lt;/a&gt; (and Java 7 before that), so it will be quite some time before we can use it. If it ever arrives. Enter &lt;a href=&quot;http://www.osgi.org/Technology/WhatIsOSGi&quot;&gt;OSGi&lt;/a&gt;: a modular Java platform that's mature and battle-hardened. It is used by the likes of &lt;a href=&quot;https://wikis.oracle.com/display/GlassFish/OSGi&quot;&gt;application&lt;/a&gt; &lt;a href=&quot;https://www.ibmdw.net/wasdev/docs/introducing_the_liberty_profile/&quot;&gt;servers&lt;/a&gt; and &lt;a href=&quot;http://www.eclipse.org/osgi/&quot;&gt;IDEs&lt;/a&gt; as the basis for their extensible architectures.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/pics/osgi_alliance.png&quot; alt=&quot;OSGi alliance&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;OSGi adds modularity as a first-class citizen to the JVM by amending Jars and packages with the necessary semantics to achieve all of our stated goals for true modularity. An OSGi bundle (module) is a Jar++. It defines additional fields inside a Jar's manifest for a (preferably &lt;a href=&quot;http://semver.org&quot;&gt;semantic&lt;/a&gt;) version, bundle-name and which packages of the bundle should be exported. Exporting a package means you give the package a version, and all public classes of the package are visible to other bundles. All classes in non-exported packages are only visible inside the bundle. OSGi enforces this at runtime as well by having a separate classloader per bundle. A bundle can choose to import packages exported by another bundle, again by defining its imported dependencies in the Jar's manifest. Of course such an import must define a version (range) to get meaningful dependencies and guide the OSGi bundle resolving process. This way, you can even have multiple versions of package and its classes running simultaneously. A small example of a manifest with some OSGi parameters:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/pics/osgi_bundles.png&quot; alt=&quot;OSGi bundles&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;And the accompanying manifest for the service bundle:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;properties&quot;&gt;&lt;span class=&quot;na&quot;&gt;Manifest-Version&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;1.0&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;Bundle-ManifestVersion&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;2&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;Bundle-Name&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;MyService bundle&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;Bundle-SymbolicName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;com.foo.service&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;Bundle-Version&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;1.0.0&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;Import-Package&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;  &lt;span class=&quot;s&quot;&gt;org.apache.commons.logging;version=&amp;quot;[1.0.4, 2.0.0)&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;Export-Package&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;  &lt;span class=&quot;s&quot;&gt;com.foo.service.api;version=&amp;quot;1.0.0&amp;quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;And there you have it: OSGi provides an independently deployable Jar with a stable identity, and the possibility to require or advertise dependencies (ie. versioned packages). Everything else is strictly contained inside bundles. The OSGi runtime takes care of all the gritty details to enforce this strict separation at runtime. It even allows bundles to be added, removed and hot-swapped at run-time!&lt;/p&gt;
+
+&lt;h3&gt;OSGi services&lt;/h3&gt;
+
+&lt;p&gt;So, OSGi bundles take care of dependencies defined on the package level, and defines a &lt;a href=&quot;http://devangelist.blogspot.nl/2011/04/osgi-bundle-lifecycles.html&quot;&gt;dynamic lifecycle&lt;/a&gt; for bundles containing these packages. Is that all we need to create a SOA-like solution in the small? Almost. There is one more crucial concept before we can really have modular &lt;em&gt;micro-services&lt;/em&gt; with OSGi bundles.&lt;/p&gt;
+
+&lt;p&gt;With OSGi bundles, you can program to an interface that is exported by a bundle. But, how do you obtain an implementation of this interface? It would be bad to export the implementing class, just so you can instantiate it in consuming bundles. You could use the factory pattern and export the factory as part of the API. But having to write a factory for every interface sounds… boiler-platey. Not good. Fortunately, there's a solution: OSGi services. OSGi provides a service-registry mechanism, where you can register your implementation under its interface in the service registry. Typically, you register your service when the bundle containing the implementation is started. Other bundles can request an implementation for a given public interface from the service-registry. They will get an implementation from the registry without ever needing to know the underlying implementation class in their code. Dependencies between service consumers and providers are automatically managed by OSGi in much the same way as the package-level dependencies are.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/pics/osgi_services.png&quot; alt=&quot;OSGi services&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Sounds good, right? There's one slight bump in the road: using the low-level OSGi service API correctly &lt;a href=&quot;http://blog.osgi.org/2013/07/real-men-dont-use-ds.html&quot;&gt;is hard and verbose&lt;/a&gt;, since services can come and go at runtime. This is because bundles that expose services can be started and stopped at-will and even running bundles can decide to start and their services at any time. That's extremely powerful when you want to build resilient and long-lived applications, but as a developer you have to stand your ground. Lucky for us, many higher-level abstractions have been created to take care of this problem. So, when using OSGi services, use something like &lt;a href=&quot;http://www.vogella.com/articles/OSGiServices/article.html&quot;&gt;Declarative Services&lt;/a&gt; or &lt;a href=&quot;http://felix.apache.org/site/apache-felix-dependency-manager-background.html&quot;&gt;Felix Dependency Manager&lt;/a&gt; (which is what &lt;a href=&quot;http://luminis-technologies.com&quot;&gt;we&lt;/a&gt; use in our projects) and create and consume micro-services with ease. You can thank me later.&lt;/p&gt;
+
+&lt;h3&gt;Is it worth it?&lt;/h3&gt;
+
+&lt;p&gt;I hope you agree with me that having a modular codebase is a worthy goal. And no, you don't &lt;strong&gt;need&lt;/strong&gt; OSGi to modularize a codebase. Conversely, modular runtimes like OSGi can't rescue a non-modular codebase. In the end, modularity is an architectural principle that can be applied in almost any environment, given enough willpower. It takes additional effort to create a modular design. It's only natural to use runtime in which modules and their dependencies are first-class citizens from design-time through run-time to ease the burden.&lt;/p&gt;
+
+&lt;p&gt;Is it hard in practice? There definitely is a learning curve, but it's not as bad as some people make it out to be. Tooling for OSGi-based development has improved tremendously the past few years. Especially &lt;a href=&quot;http://www.aqute.biz/Bnd/Bnd&quot;&gt;bnd&lt;/a&gt; and &lt;a href=&quot;http://bndtools.org/&quot;&gt;bndtools&lt;/a&gt; deserve a mention for this. If you'd like to get a feel for what it means to develop a modular Java application, watch this &lt;a href=&quot;http://amdatu.org/howto/ide.html&quot;&gt;screencast&lt;/a&gt; from my co-worker &lt;a href=&quot;https://twitter.com/pbakker&quot;&gt;Paul Bakker&lt;/a&gt;. He is also the co-author of an upcoming O'reilly book on this topic that you can &lt;a href=&quot;http://www.amazon.com/gp/product/1449345158/ref=as_li_qf_sp_asin_il_tl?ie=UTF8&amp;amp;camp=1789&amp;amp;creative=9325&amp;amp;creativeASIN=1449345158&amp;amp;linkCode=as2&amp;amp;tag=branandboun-20&quot;&gt;preorder here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Modular architectures and designs are increasingly getting attention. If you want to apply this &lt;strong&gt;now&lt;/strong&gt; in your Java environment I encourage you to follow some of the links in this article and give OSGi a spin. Again, it won't come from for free. But remember: OSGi isn't hard, true modularity is.&lt;/p&gt;
+
+   </content>
+ </entry>
+ 
+ <entry>
+   <author><name>Sander Mak</name></author>
+   <title>Annoyances in the daily life of a developer</title>
+   <link href="http://branchandbound.net/blog/development/2013/06/annoyances-daily-life-developer"/>
+   <updated>2013-06-24T00:00:00+02:00</updated>
+   <id>http://branchandbound.net/blog/development/2013/06/annoyances-daily-life-developer</id>
+   <content type="html">
+       &lt;p&gt;I'm not complaining and I love my job, but sometimes...&lt;/p&gt;
+
+       &lt;p&gt;&lt;img src=&quot;/pics/annoyed.jpg&quot; alt=&quot;Annoyed&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;You know it's a bad day when you experience all of these.&lt;/p&gt;
+
+&lt;h3&gt;Exceptional errors&lt;/h3&gt;
+
+&lt;p&gt;So you run into a &lt;em&gt;really&lt;/em&gt; obscure error or exception. Google it. Result: many promising threads. Except you'll only find: 'I ran into this problem, help plz!' Bonus points for the sadistic 'never mind, solved it!' follow-up without an actual solution. Consider it a challenge.&lt;/p&gt;
+
+&lt;h3&gt;Scratch this&lt;/h3&gt;
+
+&lt;p&gt;Work on a feature all day long, only to discover that with a few lines of well-placed code somewhere else all your work is made redundant. Actually, this is enlightenment. But man, does it feel annoying.&lt;/p&gt;
+
+&lt;h3&gt;Breaking bad&lt;/h3&gt;
+
+&lt;p&gt;That awkward moment when you realize you pushed something completely unacceptable that will break the build.&lt;/p&gt;
+
+&lt;h3&gt;Git woes&lt;/h3&gt;
+
+&lt;p&gt;That awkward moment when you realize you forgot to push something completely acceptable that your co-worker needs.&lt;/p&gt;
+
+&lt;h3&gt;Heisentools&lt;/h3&gt;
+
+&lt;p&gt;Strange and hard to reproduce bugs happen. But often it's not you, it's them. Flippant browser caches. Unpredictable IDEs (I'm looking at you, Eclipse). Fumbling operating systems. Did you try refreshing/restarting/rebooting?&lt;/p&gt;
+
+&lt;h3&gt;Coding, interrupted&lt;/h3&gt;
+
+&lt;p&gt;Email. Twitter. Co-workers. Bosses. Recruiters. The first two are easily taken care of... yeah, right.&lt;/p&gt;
+
+&lt;h3&gt;You start talking, I stop listening&lt;/h3&gt;
+
+&lt;p&gt;&quot;Can't we just ...&quot; or, &quot;how hard can it be?&quot;, or &quot;it's just a small additional feature&quot;. Nope. Nip it in the bud, it only goes downhill from here. Skip the weasel words and have a realistic discussion, please.&lt;/p&gt;
+
+&lt;h3&gt;Documentation fail&lt;/h3&gt;
+
+&lt;p&gt;As in: no library documentation available. Or, if there is, it's wildly out-of-sync. Even worse: up-to-date auto-generated documentation. Come on library authors, documentation is the most important part of your API. We'll conveniently forget about the state of the documentation of our own code for now. No hard feelings.&lt;/p&gt;
+
+&lt;p&gt;Finally: I'm still not complaining, and I still love my job!&lt;/p&gt;
+
+   </content>
+ </entry>
+ 
+ <entry>
+   <author><name>Sander Mak</name></author>
+   <title>JEEConf 2013 trip report</title>
+   <link href="http://branchandbound.net/blog/conferences/2013/05/jeeconf-2013-tripreport"/>
+   <updated>2013-05-25T00:00:00+02:00</updated>
+   <id>http://branchandbound.net/blog/conferences/2013/05/jeeconf-2013-tripreport</id>
+   <content type="html">
+       &lt;p&gt;Like &lt;a href=&quot;/blog/conferences/2012/05/jeeconf-tripreport&quot;&gt;last year&lt;/a&gt;, I had the opportunity to speak at JEEConf Kiev, the leading Java conference in Eastern Europe. More than 700 people from countries like Ukraine, Russia and Belarus attended JEEConf. Most talks are therefore in Russian. However, there was just enough English content to keep me entertained as well.&lt;/p&gt;
+
+       &lt;p&gt;This year, the conference lasted two days rather than one. Somehow, this provided a bit more relaxed atmosphere. Unfortunately I had to miss out on some good content the second day, since I had to leave early to catch my flight.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/pics/jeeconf13_venue.jpg&quot; alt=&quot;The venue&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;(the conference venue)&lt;/em&gt;&lt;/p&gt;
+
+&lt;h3&gt;The content&lt;/h3&gt;
+
+&lt;p&gt;JEEConf started with a keynote by Reza Rahman on Java EE 7 and 8. To be honest, I think this talk is getting a bit stale. Not that the content is bad, but I've heard (slight variations) of this talk by different Oracle people for more than two years now. It's good to tell a consistent story, but a bit excitement might be good for a change.&lt;/p&gt;
+
+&lt;p&gt;I enjoyed the session on &lt;a href=&quot;http://arquillian.org&quot;&gt;Arquillian&lt;/a&gt; and some of its extensions. Arquillian isn't really new to me, but I hadn't been actively following its development. This was a nice status update, showing many improvements that are very useful in integration test scenario's. For example, being able to have data-driven integration tests using the Persistence extension (based on DBUnit). Another cool extension is the Selenium integration of Arquillian, called Arquillian Drone. You can deploy your app with Arquillian, get the resulting URL injected into your test class and run Selenium tests for different browsers easily.&lt;/p&gt;
+
+&lt;p&gt;Another highlight were the talks bij Venkat Subramaniam, also known as &lt;a href=&quot;http://twitter.com/venkat_s&quot;&gt;venkat_s&lt;/a&gt;. His talks are packed with practical knowledge, an enormous amount of energy and humor as well. His performance was even more impressive given the fact that his laptop broke down minutes before the session. So Venkat did all his live coding on a borrowed machine from one of the participants. The first talk was a practical guide to picking a JVM language like Scala, Groovy or Clojure. This lead to a good discussion on whether such a switch is even feasible for 'typical' Java developers. Yakov Fain articulates his point in a &lt;a href=&quot;http://yakovfain.com/2013/05/25/how-to-bring-scala-to-enterprise-it/&quot;&gt;blog post&lt;/a&gt;. Even though I don't fully agree with his conclusions, it is a good discussion.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/pics/jeeconf13_venkats.jpg&quot; alt=&quot;Venkat_s in action&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;(Venkat_s in action)&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;The second talk by Venkat was on concurrency with &lt;a href=&quot;http://akka.io&quot;&gt;Akka actors&lt;/a&gt;. While it's easy to label something as the Next Big Thing™, I believe Akka really is a big deal. It has solid engineering behind it and opens up new doors for highly concurrent applications. With their cluster-implementation maturing as well, we're going to hear a lot more about Akka in the near future.&lt;/p&gt;
+
+&lt;h3&gt;Modularity in the Cloud&lt;/h3&gt;
+
+&lt;p&gt;My talk 'Modularity in the Cloud: a case study' was on the fourth timeslot in the second biggest room. This was my first conference session as a representative of &lt;a href=&quot;http://luminis-technologies.com&quot;&gt;Luminis Technologies&lt;/a&gt; which I joined March this year. Around 150 people attended the session and judging by the insightful questions and positive feedback, I think the message came across very well. Here are the slides:&lt;/p&gt;
+
+&lt;iframe src=&quot;http://www.slideshare.net/slideshow/embed_code/21834897&quot; width=&quot;425&quot; height=&quot;355&quot; frameborder=&quot;0&quot; marginwidth=&quot;0&quot; marginheight=&quot;0&quot; scrolling=&quot;no&quot;&gt;embed&lt;/iframe&gt;
+
+
+&lt;p&gt;The case study focussed on PulseOn, an educational system that Luminis Technologies is building. If you want to find out more about this system, check out the &lt;a href=&quot;http://pulseon.nl/indexEN.php&quot;&gt;PulseOn website&lt;/a&gt;. On the technical side, the open-source &lt;a href=&quot;http://www.amdatu.org&quot;&gt;Amdatu&lt;/a&gt; project is where you should look. I'll write a dedicated post on the actual content of the talk later. Applying modular architecture is a very relevant message for contemporary Java developers, even though there are no easy answers. So watch this space.&lt;/p&gt;
+
+&lt;h3&gt;The people&lt;/h3&gt;
+
+&lt;p&gt;Besides technical content, the other important part of a conference is meeting people and exchanging ideas. Unlike last year there was a speaker's dinner which provided ample opportunities for exchanging ideas and having a good time.&lt;/p&gt;
+
+&lt;p&gt;It was nice to see &lt;a href=&quot;http://twitter.com/yfain&quot;&gt;Yakov Fain&lt;/a&gt; again, whom I met previous year at JEEConf as well. I should also mention &lt;a href=&quot;http://twitter.com/_tamanm&quot;&gt;Mohamed Taman&lt;/a&gt;, an active Java community member who is doing some &lt;a href=&quot;http://tamanmohamed.blogspot.nl/search/label/JCP&quot;&gt;great work&lt;/a&gt; for the JCP. I also talked to &lt;a href=&quot;http://twitter.com/trnl&quot;&gt;Vladimir Miguro&lt;/a&gt; (aka vova), who is working on the new MongoDB 3 Java driver. It's interesting to hear how it will to totally revamped to provide a more fluent and idiomatic Java interface. Fear not, there will be a v2 compatibility layer for those who have non-modular applications that cannot easily cope with changes in underlying API's :-)&lt;/p&gt;
+
+&lt;p&gt;Last but not least, props to &lt;a href=&quot;http://twitter/xpinjection&quot;&gt;Mikalai&lt;/a&gt; and Aleksey, who once again organized a great Java conference!&lt;/p&gt;
+
+   </content>
+ </entry>
+ 
+ <entry>
+   <author><name>Sander Mak</name></author>
+   <title>Launching Scalabitz</title>
+   <link href="http://branchandbound.net/blog/scala/2013/05/launching-scalabitz"/>
+   <updated>2013-05-12T00:00:00+02:00</updated>
+   <id>http://branchandbound.net/blog/scala/2013/05/launching-scalabitz</id>
+   <content type="html">
+       &lt;p&gt;Today marks the launch of my lingering weekend-project: &lt;a href=&quot;http://scalabitz.com&quot;&gt;scalabitz.com&lt;/a&gt;. It tries to surface interesting Scala content through the API of link-shortener Bit.ly. The site was built using Scala and Play (and a bit of Akka) with a MongoDB storage layer and can be found on &lt;a href=&quot;https://github.com/sandermak/scalabitz&quot;&gt;GitHub&lt;/a&gt;.&lt;/p&gt;
+
+       &lt;p&gt;&lt;a href=&quot;http://scalabitz.com&quot;&gt;&lt;img src=&quot;/pics/scalabitz_logo.png&quot; alt=&quot;Scalabitz logo&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Before you read on you may want to take a look at &lt;a href=&quot;http://scalabitz.com&quot;&gt;scalabitz.com&lt;/a&gt; to get an idea what the rest of this post is all about. You can also &lt;a href=&quot;https://twitter.com/scalabitz&quot;&gt;follow Scalabitz on Twitter&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3&gt;Finding content&lt;/h3&gt;
+
+&lt;p&gt;One of the harder problems on the web is how to find relevant content. Link aggregators like Reddit and Hacker News solve part of this problem by crowd-sourcing links. Twitter and Facebook can be more tailored, but only work as good as the people you follow. Startups like Prismatic create a more personalized solution using machine learning and there are many solutions combining different approaches. In short, this is not a solved problem. A while ago I stumbled across the Bit.ly API and wondered whether it could provide an alternative. Can we find interesting content from the data behind a link-shortening service? Hence the start of my experiment. So far I believe the answer is a cautious yes, since people tend to shorten links they care about.&lt;/p&gt;
+
+&lt;h3&gt;But is it relevant?&lt;/h3&gt;
+
+&lt;p&gt;The Bit.ly API offers a &lt;a href=&quot;http://dev.bitly.com/data_apis.html#v3_search&quot;&gt;search endpoint&lt;/a&gt;. If you start feeding it 'Scala' as keyword, surprisingly many interesting Scala-related links surface. But this also gives a lot of false positives. For example, it turns out there are many clubs and restaurants called 'Scala' announcing events through Bit.ly links. You could use 'Scala programming' as search phrase, but then you miss a lot of content.&lt;/p&gt;
+
+&lt;p&gt;For &lt;a href=&quot;http://scalabitz.com&quot;&gt;scalabitz.com&lt;/a&gt; I went with just 'Scala' as search phrase. This means I have to do something about the false positives. Currently, the results on the frontpage are manually curated. There is a small keyword-matching heuristic on content that helps me to quickly see whether content is relevant:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/pics/admin_screenshot.png&quot; alt=&quot;Scalabitz admin page&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;(a partial screenshot of the admin page, green is good, red is bad...)&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;Fortunately the volume of new links discovered through the Bit.ly API is manageable for now. To avoid flooding the frontpage after a moderating session by yours truly, approved links are released one-by-one in a timed fashion. Hence the 'prepublish' action on the screenshot above, which puts the link into the publishing queue. Obviously, this is all far for from perfect. My goal is to make the curation process fully automatic. As a next step I will try to implement a supervised machine learning algorithm when I have a larger corpus of training data with correct publish/reject decisions available.&lt;/p&gt;
+
+&lt;p&gt;Additionally, a &lt;a href=&quot;http://dev.bitly.com/link_metrics.html#v3_link_clicks&quot;&gt;different&lt;/a&gt; Bit.ly endpoint provides data on how many click-throughs the links received. This count is updated periodically by the Scalabitz backend and shown on the frontpage.&lt;/p&gt;
+
+&lt;h3&gt;Why Play?&lt;/h3&gt;
+
+&lt;p&gt;One of the reasons I chose the Play framework was that I wanted to explore building a webapp that is completely asynchronous and non-blocking. Play helps you to write reactive applications on all levels: from handling HTTP requests, to performing the backend REST calls and querying the database. The first two are native Play features and for the latter you can use the &lt;a href=&quot;http://reactivemongo.org/&quot;&gt;ReactiveMongo&lt;/a&gt; driver. Even though the driver is not at 1.0 yet, it is a pleasure to use.&lt;/p&gt;
+
+&lt;p&gt;The main building block for this application is &lt;code&gt;scala.concurrent.Future&lt;/code&gt;. Introduced in Scala 2.10, the &lt;code&gt;Future&lt;/code&gt; API provides a very nice way to do async programming. It has been adopted by both Play and Akka, so all the pieces fit together perfectly. To give a taste of how easily you can do non-blocking and asynchronous programming with Scala and Play, consider the following snippet:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;scala&quot;&gt;&lt;span class=&quot;nc&quot;&gt;ScalabitzService&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;getPublishedArticles&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Some&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;100&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)).&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;flatMap&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;articles&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&amp;gt;&lt;/span&gt; 
+   &lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;clickFutures&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;article&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;articles&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;yield&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;clickWSCall&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;article&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; 
+   &lt;span class=&quot;nc&quot;&gt;Future&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sequence&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;clickFutures&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; 
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;em&gt;(see the code &lt;a href=&quot;https://github.com/sandermak/scalabitz/blob/master/app/service/BitlyService.scala#L119&quot;&gt;in context&lt;/a&gt; on GitHub)&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;The &lt;code&gt;getPublishedArticles&lt;/code&gt; method returns a &lt;code&gt;Future[List[ScalabitzArticle]]&lt;/code&gt;, essentially promising that this list of articles will be available from Mongo  at some point in the future. Next we must specify what should happen to the result inside the &lt;code&gt;Future&lt;/code&gt; when it is succesfully completed. We can do this by defining a transformation, in this case using the &lt;code&gt;flatMap&lt;/code&gt; method. In fact, &lt;code&gt;flatMap&lt;/code&gt; is a monadic bind operation, making it a general mechanism for composing actions with other &lt;code&gt;Future&lt;/code&gt;s like we are going to do here.&lt;/p&gt;
+
+&lt;p&gt;On to the actual transformation. For each of the articles we want to retrieve the click count. Since there is no single Bit.ly endpoint accepting multiple identifiers at once, we need to do a single call to Bit.ly for each article. Obviously we don't want to do this blocking and sequentially. Therefore, the for-comprehension builds up a &lt;code&gt;List[Future[(String, Int)]]&lt;/code&gt; based on the &lt;code&gt;articles&lt;/code&gt; we got from the outer database call. The method &lt;code&gt;clickWSCall&lt;/code&gt; uses Play's non-blocking &lt;a href=&quot;http://www.playframework.com/documentation/2.1.1/ScalaWS&quot;&gt;WS API&lt;/a&gt; to perform these calls, ultimately returning a &lt;code&gt;Future&lt;/code&gt;. Now the variable &lt;code&gt;clickFutures&lt;/code&gt; represents the result of all these calls at some point in the future. However, there's no blocking or busy waiting for any WS call. Then, we feed the resulting list of type &lt;code&gt;List[Future[(String, Int)]]&lt;/code&gt; to the &lt;code&gt;Future.sequence&lt;/code&gt; method. Et voila, this creates a new &lt;code&gt;Future[List[(String,Int)]]&lt;/code&gt; (notice the inversion in the type?), eventually containing all click counts associated with their id in a tuple. It is asynchronously completed when all individual futures are completed automatically.&lt;/p&gt;
+
+&lt;p&gt;The topic of reactive applications deserves a blogpost of its own, which will surely follow... After some adjustments the paradigm feels almost as natural as doing it the 'old way'. Almost, with the exception of error handling, which I haven't really tackled in an elegant manner yet. Another area of improvement is to find a nice model for dependency injection of services (may be the &lt;a href=&quot;http://www.cakesolutions.net/teamblogs/2011/12/19/cake-pattern-in-depth/&quot;&gt;Cake pattern&lt;/a&gt;?), currently there's just singleton objects wired directly to each other.&lt;/p&gt;
+
+&lt;h3&gt;Deployment&lt;/h3&gt;
+
+&lt;p&gt;I've had many toy-projects over the past years, but none of them made it out of the comfort of my own machine. Therefore I'm still looking for the perfect production environment. Heroku is the current deployment platform for Scalabitz because it supports Play apps natively, is low-friction and it's free. Deploying the app is as simple as doing a Git push to Heroku, which is nice. Since the app is rebuilt on Heroku before it is deployed and started, it is a bit slower than ideal. Also, I'm not sure how long the free tier will work for this application. I guess I will find out soon enough.&lt;/p&gt;
+
+&lt;h3&gt;Future developments&lt;/h3&gt;
+
+&lt;p&gt;Next up is automatically feeding the &lt;a href=&quot;https://twitter.com/scalabitz&quot;&gt;@scalabitz&lt;/a&gt; twitter account with published links. So &lt;a href=&quot;https://twitter.com/scalabitz&quot; class=&quot;twitter-follow-button&quot; data-show-count=&quot;false&quot; data-size=&quot;small&quot;&gt;Follow @@scalabitz&lt;/a&gt; to get a nice feed of Scala articles! On the backend side of things the next priority is to get a more accurate classification of incoming links. Fortunately I've been notching up my machine learning skills in the past year, so that should be a nice challenge. One other interesting idea is to generalize this 'platform', since the same could be done not just for Scala but for a range of topics.&lt;/p&gt;
+
+&lt;p&gt;In short, I have tons of ideas for developing Scalabitz further. But the most important question is: what do you think? Promising? Pointless? Let me know in the comments or on Twitter!&lt;/p&gt;
+
+   </content>
+ </entry>
+ 
+ <entry>
+   <author><name>Sander Mak</name></author>
+   <title>A year of blogging analyzed with R</title>
+   <link href="http://branchandbound.net/blog/data/2013/03/year-blogging-analyzed-r"/>
+   <updated>2013-03-23T00:00:00+01:00</updated>
+   <id>http://branchandbound.net/blog/data/2013/03/year-blogging-analyzed-r</id>
+   <content type="html">
+       &lt;p&gt;Today it's exactly one year ago that I published my first blogpost on branchandbound.net. During this year I've written 12 posts, including this one. Since we live in the age of analytics, I thought it would be nice to show how this blog has fared during its first year.&lt;/p&gt;
+
+       &lt;p&gt;Like most people I use Google Analytics to track what's happening on this site. However, I'm not going to show you screenshots of the GA Dashboard. Not that it's bad (it's actually pretty good), but where's the fun in that? Since this is a programming blog we're going to hook into the &lt;a href=&quot;https://developers.google.com/analytics/devguides/reporting/core/v3/&quot;&gt;Google Analytics API&lt;/a&gt;. And this time, without using my standard tools of trade. Instead of using a JVM based language, I'm turning to R to do some number crunching.&lt;/p&gt;
+
+&lt;h3&gt;Learning R&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://www.r-project.org/&quot;&gt;The R language&lt;/a&gt; is geared towards statistical programming and data analysis. Someone described it to me as a headless version of Excel on steroids. I think this gives the right feeling for what R is. If you're coming from a statically-typed background or expect a perfectly crafted language, you're in for a culture shock. R lives firmly in the camp of 'shut up, it works' and its virtues lie in the vast amount of statistical libraries that are available. Let's just say that the intersection on the Venn diagram covering statisticians and kick-ass language designers/software engineers is very small:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/pics/statisticians_langdesigners_venn.png&quot; alt=&quot;Statisticians vs. Language Designers :)&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;(the intersection &lt;em&gt;is&lt;/em&gt; inhabited though: check the &lt;a href=&quot;http://www.johnmyleswhite.com/notebook/2012/03/31/julia-i-love-you/&quot;&gt;Julia&lt;/a&gt; language)&lt;/p&gt;
+
+&lt;p&gt;I picked up R while following two Coursera courses that both use R as main language: &lt;a href=&quot;https://www.coursera.org/course/compdata&quot;&gt;Computing for Data Analysis&lt;/a&gt;  and &lt;a href=&quot;https://www.coursera.org/course/dataanalysis&quot;&gt;Data Analysis&lt;/a&gt;. The former is more an introduction to programming with R, whereas the latter course focuses on applied statistics and machine learning with R. I don't have a formal background in statistics, hence Data Analysis course was much more of a challenge for me.&lt;/p&gt;
+
+&lt;h3&gt;Setup Google Analytics with R&lt;/h3&gt;
+
+&lt;p&gt;Enough about learning R, let's try to load some analytics data. If you want to jump right into the code and results, you can view the RMarkdown output of &lt;a href=&quot;/analytics/blog_analytics.html&quot;&gt;my exploratory analysis&lt;/a&gt;. RMarkdown enables literate programming, by combining Markdown syntax with R code. You can see that it shows my narrative interspersed with actual code and the output that it produces. For the remainder of this post I'll discuss some of the results from this exploratory analysis without diving too deep into the mechanics behind it.&lt;/p&gt;
+
+&lt;p&gt;How do you get the Google Analytics data into R? We could work with the Analytics REST API directly in R, but there is also a nice wrapper library call &lt;a href=&quot;http://skardhamar.github.com/rga/&quot;&gt;rga&lt;/a&gt;. Did I mention there's a package for everything in R? Here's how you call the Google Analytics API:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;r&quot;&gt;library&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;rga&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; 
+rga.open&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;instance &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;ga&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; where &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;~/temp/ga-api&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;# the call above triggers the oAuth flow, and the resulting  &lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;# key is cached in the specified file.&lt;/span&gt;
+
+ga.df &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; ga&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;getData&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;XXXXXXXX&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# replace with your GA profile id&lt;/span&gt;
+                    start.date &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;2012-03-23&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+                    end.date &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;2013-03-23&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+                    metrics &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;ga:visits&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+                    dimensions &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;ga:date&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+                    max &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1500&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+                    sort &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;ga:date&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Yes, that &lt;code&gt;instance=&quot;ga&quot;&lt;/code&gt; on the second line specifies the name of a variable that will pop into existence, later to be used in &lt;code&gt;ga$getData()&lt;/code&gt;. Life's full of dynamic surprises with R.&lt;/p&gt;
+
+&lt;p&gt;We're assigning the result of the ga$getData call to a variable called &lt;code&gt;ga.df&lt;/code&gt;. Here, df is short for dataframe, a handy datatype which resembles the familiar relational table. Because R has named parameters, the actual call is more or less self-explanatory. It returns the visits by date over the specified period. All parameters with &quot;ga:&quot; prefixes follow the &lt;a href=&quot;https://developers.google.com/analytics/devguides/reporting/core/dimsmets&quot;&gt;dimension and metrics&lt;/a&gt; name from the Google Analytics API directly.&lt;/p&gt;
+
+&lt;p&gt;Actually, the hardest part was finding out the right profile id to use for calling the API. Just so you know, this id is not the same as the tracking id you use on your page. Anyway, a quick way to find all your profile id's is to head to Google's &lt;a href=&quot;https://developers.google.com/oauthplayground/&quot;&gt;OAuth2 playground&lt;/a&gt;, authorize the Analytics API and call:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;html&quot;&gt;https://www.googleapis.com/analytics/v3/management/accounts/~all/webproperties/~all/profiles
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;Visitors&lt;/h3&gt;
+
+&lt;p&gt;Now on to some actual numbers. In the past year, this blog received 23,903 visits (from 18724 unique visitors), generating 27,860 pageviews. As you can see, there are some huge spikes in the number of visitors:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/analytics/figure/visitsperday.png&quot; alt=&quot;Visits per day&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;(again, check the &lt;a href=&quot;/analytics/blog_analytics.html&quot;&gt;RMarkdown&lt;/a&gt; to see how the graphs are generated)&lt;/p&gt;
+
+&lt;p&gt;The highest datapoint was measured in December 2012 when &lt;a href=&quot;https://twitter.com/odersky&quot;&gt;Martin Odersky&lt;/a&gt; tweeted my &lt;a href=&quot;/blog/scala/2012/12/scala-is-like-git/&quot;&gt;Scala is like Git&lt;/a&gt; post, driving a record 2077 visits to my blog in one day. The other peaks can all be explained by referral traffic from social link sharing sites such as Reddit and DZone. Alas, 15, the median number of visits per day paints a better picture of the actual events for most days. Fortunately, the trendline (a linear regression line) is sloped upwards.&lt;/p&gt;
+
+&lt;p&gt;It's also interesting to see how the visits are distributed over the days of the week, using a boxplot on the same data:
+&lt;img src=&quot;/analytics/figure/visitsperweekday.png&quot; alt=&quot;Visits per day of week&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The horizontal lines inside the boxes represent the median number of visitors for that particular weekday. The boxplot is deliberately zoomed in on the y-axis to show the interesting parts. You can imagine the outlier of 2077 visits on a single day (it was on a Thursday) otherwise makes the plot unreadable. It's pretty clear that my blog is not as popular on the weekends as it is during weekdays. Apparently programming blogs are read mostly at work, which makes sense. Mondays and Thursdays are the best performing weekdays. Are people reading away their Monday blues on a programming blog? I don't have an explanation why Tuesday is relatively weak in comparison to the other weekdays.&lt;/p&gt;
+
+&lt;h3&gt;Popular articles&lt;/h3&gt;
+
+&lt;p&gt;Writing blog articles is a funny thing. You have complete freedom to write whatever is on your mind. Still you can't keep yourself from wondering 'who would read this?' The answer to this question is oftentimes surprising, at least to me. After a year of blogging I'm starting to find my tone of voice. I tend to write longer posts. Preferably ones that require some research and are not just short rants or opinion pieces. This approach seems to resonate with a lot of people. The following table shows exactly what was most popular on this blog last year:&lt;/p&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;&lt;/th&gt;
+&lt;th align=&quot;left&quot;&gt; Post (pagetitle)  &lt;/th&gt;
+&lt;th align=&quot;right&quot;&gt; Pageviews   &lt;/th&gt;
+&lt;th align=&quot;right&quot;&gt; Visits       &lt;/th&gt;
+&lt;th align=&quot;right&quot;&gt; Visitors &lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td align=&quot;left&quot;&gt;                                            &lt;a href=&quot;/blog/scala/2012/12/scala-is-like-git/&quot;&gt;Scala is like Git&lt;/a&gt;  &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;    9383  &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt; 8124   &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;  7936|&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td align=&quot;left&quot;&gt;                               &lt;a href=&quot;/blog/java/2012/07/modern-concurrency-and-javaee/&quot;&gt;Modern concurrency and Java EE&lt;/a&gt;  &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;    4300  &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt; 3849   &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;  3695|&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td align=&quot;left&quot;&gt;&lt;a href=&quot;/blog/web/2012/11/unify-server-side-client-side-rendering-embedding-json/&quot;&gt;Unify client-side and server-side rendering by embedding JSON&lt;/a&gt;  &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;    3141  &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt; 2807   &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;  2769|&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td align=&quot;left&quot;&gt;                              &lt;a href=&quot;/blog/security/2012/10/cross-build-injection-in-action/&quot;&gt;Cross-Build Injection in action&lt;/a&gt;  &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;    2355  &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt; 2111   &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;  2148|&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td align=&quot;left&quot;&gt;                                   &lt;a href=&quot;/blog/conferences/2012/06/preparing-a-technical-talk/&quot;&gt;Preparing a technical talk&lt;/a&gt;  &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;    2343  &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt; 2104   &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;  1995|&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td align=&quot;left&quot;&gt;                           &lt;a href=&quot;/&quot;&gt;Branch and Bound Blog - Sander Mak (homepage)&lt;/a&gt;  &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;    1225  &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;  791   &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;   948|&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td align=&quot;left&quot;&gt;       &lt;a href=&quot;/blog/security/2012/03/crossbuild-injection-how-safe-is-your-build/&quot;&gt;Cross-build injection attacks: how safe is your build?&lt;/a&gt;  &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;    1218  &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;  883   &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;  1051|&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td align=&quot;left&quot;&gt;                                &lt;a href=&quot;/blog/security/2012/08/verify-dependencies-using-pgp/&quot;&gt;Verify dependencies using PGP&lt;/a&gt;  &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;     784  &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;  628   &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;   680|&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td align=&quot;left&quot;&gt;                           &lt;a href=&quot;/blog/conferences/2012/11/jfall-2012-dutch-java-awesomeness/&quot;&gt;JFall 2012: Dutch Java awesomeness&lt;/a&gt;  &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;     729  &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;  620   &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;   648|&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td align=&quot;left&quot;&gt;                                  &lt;a href=&quot;/blog/bookreview/2012/08/bookreview-dsls-in-action/&quot;&gt;Book review: DSLs in Action&lt;/a&gt;  &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;     633  &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;  575   &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;   598|&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td align=&quot;left&quot;&gt;                                     &lt;a href=&quot;/blog/conferences/2012/05/jeeconf-tripreport/&quot;&gt;JEEConf 2012 trip report&lt;/a&gt;  &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;     505  &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;  442   &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;   446|&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td align=&quot;left&quot;&gt;                                             &lt;a href=&quot;/about.html&quot;&gt;About Sander Mak&lt;/a&gt;  &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;     277  &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;   21   &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;   231|&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td align=&quot;left&quot;&gt;                                                      &lt;a href=&quot;/archive.html&quot;&gt;Archive&lt;/a&gt;  &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;     188  &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;   10   &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;   162|&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td align=&quot;left&quot;&gt;                                          &lt;a href=&quot;/talks.html&quot;&gt;Talks by Sander Mak&lt;/a&gt;  &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;      90  &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;    4   &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;    79|&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td align=&quot;left&quot;&gt;                           &lt;a href=&quot;/blog/bookreview/2013/01/bookreview-infinity-and-the-mind/&quot;&gt;Book review: Infinity and the Mind&lt;/a&gt;  &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;      70  &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;   50   &lt;/td&gt;
+&lt;td align=&quot;right&quot;&gt;    55|&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+
+&lt;p&gt;(in some rows the visitor count exceeds the number of visits. Not sure what is up with that...)&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;/blog/scala/2012/12/scala-is-like-git/&quot;&gt;'Scala is like Git'&lt;/a&gt; is the undeniable winner here, accounting for approximately a third of all pageviews in this year of blogging. I honestly did not expect this post to take off like that. On the other end of the spectrum we find &lt;a href=&quot;/blog/bookreview/2013/01/bookreview-infinity-and-the-mind/&quot;&gt;'Book review: Infinity and the Mind'&lt;/a&gt;. While it is also the most recent post, I don't expect it go anywhere. I still think it's a great book though, and certainly don't regret the time it has taken me to write a thorough review.&lt;/p&gt;
+
+&lt;p&gt;During the year, I also became part of DZone's 'Most Valuable Blogger' program. Through this program, some of the posts from above have been republished on DZone. My &lt;a href=&quot;http://architects.dzone.com/users/sammy8306&quot;&gt;DZone profile&lt;/a&gt; shows that these republished articles garnered another 18k pageviews, which are obviously not present in my dataset.&lt;/p&gt;
+
+&lt;h3&gt;Traffic patterns&lt;/h3&gt;
+
+&lt;p&gt;Most of the traffic originates from social sharing sites. This becomes clear by looking at the percentage of visits by medium, over time:
+&lt;img src=&quot;/analytics/figure/trafficpercentages.png&quot; alt=&quot;Visits per day of week&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The blue area represents referral traffic. On the Google Analytics dashboard I can see that Reddit is the top referrer (29%), followed by Twitter (11%) and DZone (9%). Some posts were submitted to Hacker News as well, but unfortunately never really gained traction.&lt;/p&gt;
+
+&lt;p&gt;What's more interesting to me is that the percentage of &quot;organic&quot; traffic (ie. search traffic) is steadily increasing. That makes sense, since I started out with virtually no content and zero PageRank, but that has changed in the course of the year. In the &lt;a href=&quot;/analytics/blog_analytics.html&quot;&gt;complete analysis&lt;/a&gt; you can also find a graph that corroborates this finding using absolute numbers of search traffic.&lt;/p&gt;
+
+&lt;h3&gt;Keep on blogging&lt;/h3&gt;
+
+&lt;p&gt;It certainly was a good learning experience to free myself from the Google Analytics dashboard and try to work with the analytics data directly in R. Obviously, there's plenty more to explore. I'll get to that when my statistics and R knowledge has made sufficient progress.&lt;/p&gt;
+
+&lt;p&gt;While it's nice to put some numbers on what's happening with this blog, in the end it doesn't really matter. It's not a business and I'll keep writing anyway. It's fun, engaging and helps me to verbalize my thoughts whether someone reads it or not. Meanwhile, I hope this post has provided some inspiration on how to use R for analyzing and visualizing Google Analytics data.&lt;/p&gt;
+
+   </content>
+ </entry>
+ 
+ <entry>
+   <author><name>Sander Mak</name></author>
+   <title>Book review: Infinity and the Mind</title>
+   <link href="http://branchandbound.net/blog/bookreview/2013/01/bookreview-infinity-and-the-mind"/>
+   <updated>2013-01-31T00:00:00+01:00</updated>
+   <id>http://branchandbound.net/blog/bookreview/2013/01/bookreview-infinity-and-the-mind</id>
+   <content type="html">
+       &lt;p&gt;&lt;a href=&quot;http://www.amazon.com/gp/product/0691121273/ref=as_li_ss_tl?ie=UTF8&amp;amp;camp=1789&amp;amp;creative=390957&amp;amp;creativeASIN=0691121273&amp;amp;linkCode=as2&amp;amp;tag=branandboun-20&quot;&gt;Infinity and the Mind&lt;/a&gt; provides a rare mixture of mathematical, scientific and philosophical explorations.  It gives both an account of the theory of transfinite numbers and discusses its implications from a philosophical point of view. With 'The science and philosophy of the infinite' as its subtitle, it is one of the most challenging books I've read in a while. Granted, this may be because I'm neither a mathematician nor a philosopher, just a software developer who has some interest in both fields. And yes, the book is relatively old, but it has stood the test of time.&lt;/p&gt;
+
+       &lt;p&gt;What is infinity? Does it even exist? How can there be more than one infinity? Using vivid imagery Rucker shows that throughout the ages man has pondered these questions. Ranging from Plato to Cantor, infinity has inspired awe, fear and feelings of futility. Through a fun exercise of 'name the largest natural number' the book starts exploring the concept of different levels of infinity. From the 'smallest' countable infinity &amp;omega; (omega) to the whole succession of Cantor's &amp;#1488; (aleph) numbers. Discussions are accompanied by drawings that are sometimes enlightening and other times mind-boggling. Every chapter concludes with puzzles and paradoxes for the reader. Fortunately the answers are included in the back, since many questions left me scratching my head.&lt;/p&gt;
+
+&lt;h3&gt;Absolute Infinity and the Mindscape&lt;/h3&gt;
+
+&lt;p&gt;It doesn't take long for Rucker to mix philosophy into his - so far mostly mathematical - discussion of infinity and transfinite numbers. Starting with the concept of Absolute Infinity, or &amp;Omega; (Omega), the inconceivable infinity that contains all ordinals. Now, if you're asking yourself how can you sensibly talk about something inconceivable, read Rucker's response:&lt;/p&gt;
+
+&lt;blockquote&gt;&lt;p&gt;A skeptical reader could, rightly, demand to know how it is possible to discourse  rationally about an inconceivable object like &amp;Omega;. I would respond that &amp;Omega; is a given, an object of our immediate pre-rational experience. And to use the tools of symbolic logic to investigate an empirically existing phenomenon is not to commit a category mistake, anymore than it is to look at living cells through the inanimate lenses of a microscope. We have a primitive concept of infinity. This concept is inspired, I suspect, by the same deep substrate of mind that conditions religious thought. &lt;em&gt;Set theory could even be viewed as a form of exact theology&lt;/em&gt;.&lt;/p&gt;&lt;/blockquote&gt;
+
+&lt;p&gt;One other philosophical notion I especially enjoyed is the Mindscape. Here Rucker conjectures that, like our bodies all occupy part of the same physical universe, our thoughts occupy part of a shared Mindscape. Your own thoughts are like a private room, and you can expand your view of the Mindscape by exploring it. Like in the physical universe, a single 'point' in the Mindscape can only be occupied by a single consciousness at the same time. But at the same time thoughts can be observed by many. Every possible thought is in the Mindscape, whether someone has thought of it or not. Of course the Mindscape is discussed in tandem with the Absolute Infinity, using set theory to formalize the notion.&lt;/p&gt;
+
+&lt;h3&gt;Paradoxes&lt;/h3&gt;
+
+&lt;p&gt;After discussing the theory and philosophy of infinities, the book continues exploring some famous paradoxes. The &lt;a href=&quot;http://www.princeton.edu/~achaney/tmve/wiki100k/docs/Berry_paradox.html&quot;&gt;Berry paradox&lt;/a&gt;, &lt;a href=&quot;https://www.dpmms.cam.ac.uk/~wtg10/richardsparadox.html&quot;&gt;Richard's paradox&lt;/a&gt; and the &lt;a href=&quot;http://plato.stanford.edu/entries/liar-paradox/&quot;&gt;Liar paradox&lt;/a&gt; (think: 'this sentence is false') are treated in great detail. However, the goal is not to bask in the glory of these paradoxes. No, Rucker wants to persuade the reader that the infinite regresses that underly these paradoxes point to mental concepts defying any exact formalization. Yet we as humans can understand these paradoxes and reason about them anyway.&lt;/p&gt;
+
+&lt;h3&gt;Thinking machines and Gödel&lt;/h3&gt;
+
+&lt;p&gt;If the last sentence left you wondering what this means for artificial intelligence and whether machines can ever think like humans, you're thinking in the right direction. The book introduces Gödel's &lt;a href=&quot;http://en.wikipedia.org/wiki/G%C3%B6del%27s_incompleteness_theorems&quot;&gt;incompleteness theorems&lt;/a&gt; in a chapter titled 'Robots &amp;amp; souls'. Ultimately, we are lead to the conclusion that we cannot possibly formalize all of our mathematical intuitions in a finite way. Because to formulate our intuitions is to create a formal system. This formal system must be incomplete and its consistency (even if we &lt;em&gt;know&lt;/em&gt; it is consistent) cannot be proven by the system itself according to Gödel's theorems. However, this does not mean that such a 'thinking' machine for all our mathematical intuitions cannot exist. It just means we won't be able construct or verify it. Rucker goes as far as stating that:&lt;/p&gt;
+
+&lt;blockquote&gt;&lt;p&gt;&amp;hellip; rationality can never penetrate to the final, ultimate truth.&lt;/p&gt;&lt;/blockquote&gt;
+
+&lt;p&gt;What I loved about this book is that Rucker shares his first-hand conversations with Kurt Gödel. It turns out Gödel had a mystic turn of thought, which Rucker shares throughout this book. It's less fuzzy than it sounds at first:&lt;/p&gt;
+
+&lt;blockquote&gt;&lt;p&gt;&amp;hellip; &quot;mysticism&quot; does have a precise meaning [..] not to be confused with occultism, strange rites and so on. Mysticism is just the simple awareness of the direct identity of the individual soul and the Absolute. Too much rationality quickly becomes inane and boring. What is needed is some kind of bridge between the two.&lt;/p&gt;&lt;/blockquote&gt;
+
+&lt;p&gt;And that is exactly what the book sets out to achieve. First using the pure mathematics of infinity, set in its historic background. But also by acknowledging that mathematics and science cannot answer all interesting questions posed by the existence of Absolute Infinity. As a Christian I recognize many of the conclusions Rucker draws while exploring the boundaries of our knowledge.&lt;/p&gt;
+
+&lt;h3&gt;Math overflow?&lt;/h3&gt;
+
+&lt;p&gt;Now, I'm a programmer. In my case that means I have some affinity for math, but clearly I'm out of my depth in several of the more rigorous mathematical interludes. But that's ok. The surrounding narrative is easy to follow, even if some of the finer points escape me. Especially if the alternative is for Rucker to hand-wave his way through important details,  I prefer rigor. I might even have learned a thing or two along the way. What made this book most interesting is the fact that it goes beyond just the math. It tries to derive meaning from notions like (absolute) infinity, relating it concepts like consciousness and the &lt;a href=&quot;http://plato.stanford.edu/entries/problem-of-many/&quot;&gt;One/Many problem&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;This is not a book for casual reading. You really have to make an effort, but when you do it is a very mind-expanding book. Which reminds me, I really should finish &lt;a href=&quot;http://www.amazon.com/gp/product/0465026567/ref=as_li_ss_tl?ie=UTF8&amp;amp;camp=1789&amp;amp;creative=390957&amp;amp;creativeASIN=0465026567&amp;amp;linkCode=as2&amp;amp;tag=branandboun-20&quot;&gt;Gödel, Escher and Bach&lt;/a&gt; as well some day... Since I only have finite space for this review, let me conclude by saying that I thoroughly enjoyed reading this book. If you have any interest in mathematics, philosophy and the intersection of these two, I highly recommend reading &lt;a href=&quot;http://www.amazon.com/gp/product/0691121273/ref=as_li_ss_tl?ie=UTF8&amp;amp;camp=1789&amp;amp;creative=390957&amp;amp;creativeASIN=0691121273&amp;amp;linkCode=as2&amp;amp;tag=branandboun-20&quot;&gt;'Infinity and the Mind'&lt;/a&gt;.&lt;/p&gt;
+
+   </content>
+ </entry>
+ 
+ <entry>
+   <author><name>Sander Mak</name></author>
+   <title>Scala is like Git</title>
+   <link href="http://branchandbound.net/blog/scala/2012/12/scala-is-like-git"/>
+   <updated>2012-12-20T00:00:00+01:00</updated>
+   <id>http://branchandbound.net/blog/scala/2012/12/scala-is-like-git</id>
+   <content type="html">
+       &lt;p&gt;Scala is often portrayed as being too complex. Many times these discussions about complexity remind me of similar arguments around the complexity of Git. I know, the comparison between a source control system and a programming language falls flat quickly when pushed too hard. But bear with me, because I do believe it can put the Scala complexity discussion in a new perspective.&lt;/p&gt;
+
+       &lt;p&gt;Both Git and Scala are power tools, meant to disrupt the status quo rather than incrementally improving it. Git isn't just a better CVS/Subversion: its distributed nature makes it fundamentally different. The same goes for Scala: it's not just a better Java, but a daring entrant into the hybrid FP/OO arena. Interestingly, the complexity arguments are often framed by comparing Git or Scala to fundamentally more limited technologies. Yes, obviously whatever you were doing in Subversion or Java may be much simpler. What should be at the forefront of these discussions though, is what more you can achieve using Git or Scala. It's not just about the (complexity) costs, but also about the benefits. Do you buy into the vision behind these power tools?&lt;/p&gt;
+
+&lt;h3&gt;Power tools require investment&lt;/h3&gt;
+
+&lt;p&gt;It has taken me a solid year of actually working with Git in a team-setting to appreciate all the advantages it has to offer. Before this period, I played around with it, mainly using GitHub, but many questions remained (why do I need a staging area? Why are there three ways to do the same thing?). Trusting people who went before me and embracing Git brought me a whole new level of productivity in the end. Scala's learning curve is similar. Even though I have a background in functional programming from my university days, there still was a lot to take in. But like with Git, for me the advantages far outweigh this awkward period of embracing a tool you don't fully 'get' yet.&lt;/p&gt;
+
+&lt;p&gt;Such an investment definitely poses a barrier to entry. However, Git has overcome this barrier by offering something very desirable: effortless branching and merging (or &lt;a href=&quot;http://git-scm.com/book/en/Git-Branching-Rebasing&quot;&gt;rebasing&lt;/a&gt;, love that). Likewise, Scala's gateway drug is &lt;a href=&quot;http://lampwww.epfl.ch/~phaller/upmarc/&quot;&gt;pervasive parallelization&lt;/a&gt; and an &lt;a href=&quot;http://typesafe.com/stack&quot;&gt;integrated stack&lt;/a&gt; of Scala, Akka and Play.&lt;/p&gt;
+
+&lt;h3&gt;Clean core&lt;/h3&gt;
+
+&lt;p&gt;What I like most about Git and Scala is that both embrace the approach of having a clean core of basic concepts. Git has its &lt;a href=&quot;http://eagain.net/articles/git-for-computer-scientists/&quot;&gt;Directed Acyclic Graph&lt;/a&gt; of commits, trees and blobs. Every operation is essentially a transformation of the graph (and/or refs into the graph, to be precise) . Complex? Maybe, but once you grasp it, you have so much power. A similar case can be made for Scala. Even though the amount of concepts is larger - it is a programming language after all, not a VCS - to me all language features show regularity both in the small and in the large. Everything can be nested and composed just like you would expect.&lt;/p&gt;
+
+&lt;p&gt;That Scala has a relatively small core is illustrated by the fact that the Scala Language Specification is quarter the size of the Java Language Specification. Scala's grammar is smaller as well. Let me be quick to add that specification size is by no means a token of superiority in and of itself (cf. &lt;a href=&quot;http://progopedia.com/language/brainfuck/&quot;&gt;Brainfuck&lt;/a&gt;). But it is congruent with this great quote by Martin Odersky:&lt;/p&gt;
+
+&lt;blockquote&gt;&lt;p&gt;I have always tried to make Scala a very powerful but at the same beautifully simple language, by trying to find unifications of formerly disparate concepts.&lt;/p&gt;&lt;/blockquote&gt;
+
+&lt;p&gt;This philosophy really resonates with me. Admittedly Scala doesn't fully unify everything that it could. It's also a very practical language with practical tradeoffs, for example concerning Java interop. Such is life.&lt;/p&gt;
+
+&lt;h3&gt;Complexity&lt;/h3&gt;
+
+&lt;p&gt;Even though Git and Scala have clean and composable primitives, the &lt;em&gt;surfaced complexity&lt;/em&gt; is relatively high. Git's CLI has an &lt;a href=&quot;http://stackoverflow.com/questions/7866353/git-list-all-available-commands&quot;&gt;abundance of commands&lt;/a&gt; and is &lt;a href=&quot;http://steveko.wordpress.com/2012/02/24/10-things-i-hate-about-git/&quot;&gt;notorious&lt;/a&gt; for its inconsistent flag usage. Scala's syntax has some &lt;a href=&quot;http://www.slideshare.net/normation/scala-dreaded&quot;&gt;surprises&lt;/a&gt; for newcomers as well. And yes, Scala may have a &lt;a href=&quot;http://programmers.stackexchange.com/questions/179699/whats-the-problem-with-scalas-xml-literals&quot;&gt;feature&lt;/a&gt; or &lt;a href=&quot;http://stackoverflow.com/questions/13011204/scalas-postfix-ops&quot;&gt;two&lt;/a&gt; too many. If you know the underlying core model that ties everything together, such issues are annoying but you'll get over them. It's a form of &lt;a href=&quot;http://c2.com/cgi/wiki?AccidentalComplexity&quot;&gt;accidental complexity&lt;/a&gt;. I do applaud the efforts of the Scala team to &lt;a href=&quot;http://docs.scala-lang.org/sips/pending/modularizing-language-features.html&quot;&gt;modularize language features&lt;/a&gt;, since it allows for gradual rectification of these issues!&lt;/p&gt;
+
+&lt;p&gt;In the end, being able to work with the elegant core models of these tools is worth the price of admission to me and many others. Yes, you will have some rope to hang yourself with both Git and Scala. Deal with it.&lt;/p&gt;
+
+&lt;h3&gt;GUIs&lt;/h3&gt;
+
+&lt;p&gt;But it doesn't stop there. One of the most important things for wide adoption, especially when taking into account the 'enterprise crowd', is having good GUI support. Git GUIs and IDE support for Scala have long been an afterthought. And I'm not even sure whether GUIs for Git actually reduce complexity. I tried &lt;a href=&quot;http://code.google.com/p/gitextensions/&quot;&gt;a&lt;/a&gt; &lt;a href=&quot;http://code.google.com/p/tortoisegit/&quot;&gt;few&lt;/a&gt;, but didn't like it. For Scala IDE plugins though, it's a no-brainer. Being able to navigate types and implicits in large codebases is invaluable. Fortunately, the Scala Eclipse plugin is now backed by &lt;a href=&quot;http://typesafe.com/&quot;&gt;Typesafe&lt;/a&gt; and is moving forward quickly. IntelliJ's Scala plugin is still going strong as well. I'd say Scala is ahead of Git in this regard, though not ahead of other programming languages to be fair.&lt;/p&gt;
+
+&lt;h3&gt;Real-world usage&lt;/h3&gt;
+
+&lt;p&gt;One thing that becomes apparent when adopting Git is that it doesn't prescribe a particular workflow. Hence, many different workflows have been championed. Some even including tool support, like git-flow and Legit. Does this indicate a shortcoming with Git? Is it too complex on its own? I don't believe so. It's just that people are looking for common ground and don't want to reinvent the wheel. But it is telling that none of these workflows and supporting tools have really won out. Diversity is key it seems.&lt;/p&gt;
+
+&lt;p&gt;For Scala, things are a bit different. Adoption is increasing, but the community is still looking for a common 'tone-of-voice'. For a programming language this is much more crucial, especially an expressive one like Scala. Java, by contrast, has had almost two decades to mature and develop widely accepted idioms and accompanying styleguides. I believe Scala needs to go through a similar process. The signs that this process has started &lt;a href=&quot;http://docs.scala-lang.org/style/&quot;&gt;are there&lt;/a&gt;. What we need is a definitive Effective Scala book that can lead the way, like &lt;a href=&quot;http://www.amazon.com/gp/product/0321356683/ref=as_li_qf_sp_asin_tl?ie=UTF8&amp;amp;camp=1789&amp;amp;creative=9325&amp;amp;creativeASIN=0321356683&amp;amp;linkCode=as2&amp;amp;tag=branandboun-20&quot;&gt;Effective Java&lt;/a&gt; did for Java.&lt;/p&gt;
+
+&lt;h3&gt;The enemy of good is good enough&lt;/h3&gt;
+
+&lt;p&gt;Why should people switch from SVN to Git, or from Java to Scala? After all, Subversion got merge-tracking and Java 8 will get lambdas. The point is that these additions do not change the fundamental core model of the 'older generation' tools. If anything, it adds unanticipated complexity without truly reaching the next level. It will be good enough for a lot of people though, and I recognize that changing VCS or programming language is not something to be taken lightly. I do urge you to explore new possibilities and see if good enough still cuts it for you.&lt;/p&gt;
+
+&lt;p&gt;Then there are the 'current generation' competing technologies. Git had to battle Mercurial and Bazaar. Scala faces potential competition from Kotlin and Ceylon. All these alternatives advertise simplicity or 'intuitiveness' as big selling point. And they may very well be more intuitive initially. I'm very curious whether they have to compromise on their core model and internal design philosophy to surface this intuitiveness. Fusing object-orientation and functional programming is a hard job. I'll definitely revisit this once these new languages are properly released.&lt;/p&gt;
+
+&lt;p&gt;In the end, Git has succeeded because it offers tangible benefits, despite its surfaced complexity. So can Scala.&lt;/p&gt;
+
+   </content>
+ </entry>
+ 
+ <entry>
+   <author><name>Sander Mak</name></author>
+   <title>Unify client-side and server-side rendering by embedding JSON</title>
+   <link href="http://branchandbound.net/blog/web/2012/11/unify-server-side-client-side-rendering-embedding-json"/>
+   <updated>2012-11-21T00:00:00+01:00</updated>
+   <id>http://branchandbound.net/blog/web/2012/11/unify-server-side-client-side-rendering-embedding-json</id>
+   <content type="html">
+       &lt;p&gt;Not many applications I work on these days are solely using the traditional server-side rendering model. Neither do they employ 100% client-side rendering and templating. Usually it's a mix in which the 'old' world meets the new world, giving rise to some interesting design decisions. In this article I want to explore a solution that combines both worlds while minimizing the duplication of rendering logic by embedding JSON in the view.&lt;/p&gt;
+
+       &lt;p&gt;Let's introduce a simple example to illustrate the JSON embedding trick. It's &lt;a href=&quot;https://github.com/sandermak/embedded-json-example&quot;&gt;on GitHub&lt;/a&gt;, with several branches showing different approaches. Say we have a screen containing a product list with paging:
+&lt;img src=&quot;/pics/embedded-json-app.png&quot; alt=&quot;Example screen&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;After the initial request to the server, the first page of products is shown. Once the page is shown, we want the paging links to be AJAX-enabled: no full page reloads. The server just returns JSON representing the products and the client renders them in a table.&lt;/p&gt;
+
+&lt;h3&gt;What duplication?&lt;/h3&gt;
+
+&lt;p&gt;We have two main goals:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Code for rendering the table should be written once&lt;/li&gt;
+&lt;li&gt;User-experience must be as smooth as possible (i.e. no visible flickering for AJAX updates of the initial page)&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;p&gt;Think about how you would implement this example. Strictly speaking, you can't really prevent duplicated logic. On the one hand, you need to render the table with the products from page one server-side on the initial request. Like in this JSP/JQuery based example:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;html&quot;&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;table&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;thead&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;tr&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;nt&quot;&gt;&amp;lt;th&amp;gt;&lt;/span&gt;Product&lt;span class=&quot;nt&quot;&gt;&amp;lt;/th&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;nt&quot;&gt;&amp;lt;th&amp;gt;&lt;/span&gt;Description&lt;span class=&quot;nt&quot;&gt;&amp;lt;/th&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;nt&quot;&gt;&amp;lt;th&amp;gt;&lt;/span&gt;Price&lt;span class=&quot;nt&quot;&gt;&amp;lt;/th&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;/tr&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;/thead&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;c:forEach&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;var=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;product&amp;quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;items=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;${products}&amp;quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;tr&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;nt&quot;&gt;&amp;lt;td&amp;gt;&amp;lt;c:out&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;value=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;${product.name}&amp;quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;/&amp;gt;&amp;lt;/td&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;nt&quot;&gt;&amp;lt;td&amp;gt;&amp;lt;em&amp;gt;&amp;lt;c:out&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;value=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;${product.description}&amp;quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;/&amp;gt;&amp;lt;/em&amp;gt;&amp;lt;/td&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;nt&quot;&gt;&amp;lt;td&amp;gt;&amp;lt;c:out&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;value=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;${product.price}&amp;quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt; Euro&lt;span class=&quot;nt&quot;&gt;&amp;lt;/td&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;/tr&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;/c:forEach&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/table&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;&amp;lt;!-- paging links omitted --&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Then you also need to construct the table again after a successful paging AJAX call:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;javascript&quot;&gt; 
+&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;products&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// JSON result of AJAX call&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;each&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;products&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;index&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;product&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;productTable&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;#39;&amp;lt;tr&amp;gt;&amp;lt;td&amp;gt;&amp;#39;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;product&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;#39;&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;&amp;lt;em&amp;gt;&amp;#39;&lt;/span&gt;
+          &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;product&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;description&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;#39;&amp;lt;/em&amp;gt;&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;&amp;#39;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;product&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;price&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;#39;&amp;lt;/td&amp;gt;&amp;lt;/tr&amp;gt;&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;(only do this when you can guarantee the concatenated strings are properly escaped!)&lt;/p&gt;
+
+&lt;p&gt;It's not just the grunt work of building the table rows again. Notice how we need to add the em-tag around the description in both templates. We can already see how specific duplication is creeping in. And real-world examples have an order of magnitude more complexity! By the way, the point I want to make in this post is agnostic of the Javascript framework used.  You can use your favorite Javascript templating/MVC library (too many to choose from!), I just picked plain JQuery since everybody is familiar with it. Of course the same goes for the server-side library: this issue crops with Rails, Django, and any 'traditional' webframework.&lt;/p&gt;
+
+&lt;h3&gt;The obvious solution&lt;/h3&gt;
+
+&lt;p&gt;How to prevent this mess? One option is to emit an empty placeholder table on the server-side, and to trigger an AJAX call from the client-side once the page has loaded to fill it with page one products. Twitter popularized this method for a while with its web-based timeline. Even though this moves all rendering of the paginated calls to the client, the solution unfortunately violates our second goal: a smooth user-experience. The user first sees an empty table which is later filled:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/pics/client-side-rendering-only.png&quot; alt=&quot;Diagram client-side-only&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Depending on the network latency the effects range from nearly unnoticeable to very annoying. In my &lt;a href=&quot;https://github.com/sandermak/embedded-json-example/tree/client-side-only&quot;&gt;example&lt;/a&gt; I added a 400ms delay to illustrate the effect of the additional roundtrip. Deferring the rendering of the complete page until the Ajax call completes is even worse. And think of how this would scale with many components on the page using this approach (hint: there is a &lt;a href=&quot;http://stackoverflow.com/questions/985431/max-parallel-http-connections-in-a-browser&quot;&gt;limit&lt;/a&gt; to the amount of concurrent connections browsers make).&lt;/p&gt;
+
+&lt;p&gt;Another option is to not pass JSON to the client, but return server-side rendered (partial) HTML for just this component. The trick is then to modularize your server-side code so that you can have a single template for both the initial request and subsequent AJAX calls. Component-based frameworks like JSF favor this approach. However, the consensus seems to moving towards consuming JSON on the client, giving the added benefit of a real API rather than a specific rendering band-aid.&lt;/p&gt;
+
+&lt;p&gt;The lazy option is to call it a day and revert to the old-skool &lt;a href=&quot;https://github.com/sandermak/embedded-json-example/tree/server-side-only&quot;&gt;server-side rendering model&lt;/a&gt;, where everything triggers a full page refresh. But that would be giving up, whereas there still is another option...&lt;/p&gt;
+
+&lt;h3&gt;Embedded JSON&lt;/h3&gt;
+
+&lt;p&gt;While the general idea of client-side only rendering is good, the execution can be improved. What if the server makes the product data available in a format digestible by the client in the first request, but without needing to render the actual HTML? It turns out we can do that by embedding JSON in the page rendered on the server:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;html&quot;&gt; 
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;html&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;head&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;c&quot;&gt;&amp;lt;!-- other header tags omitted --&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;script&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;// Where the magic happens:&lt;/span&gt;
+        &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;initialProducts&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;productJSON&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;// Fetch products using Ajax call and update html.&lt;/span&gt;
+        &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;getProducts&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;page&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;pageSize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+               &lt;span class=&quot;c1&quot;&gt;// snipped&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;// Render products from JSON&lt;/span&gt;
+        &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;updateProducts&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;products&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+              &lt;span class=&quot;c1&quot;&gt;// similar to previous JS snippet, render table rows&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;// On document.ready, render first products.&lt;/span&gt;
+        &lt;span class=&quot;nx&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;nx&quot;&gt;updateProducts&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;initialProducts&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;/script&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/head&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;body&amp;gt;&lt;/span&gt;
+   &lt;span class=&quot;c&quot;&gt;&amp;lt;!-- body containing an empty table and paging links etc. --&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/body&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/html&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;(View the full source of &lt;a href=&quot;https://github.com/sandermak/embedded-json-example/blob/master/src/main/webapp/WEB-INF/views/index.jsp&quot;&gt;this page&lt;/a&gt; here.)&lt;/p&gt;
+
+&lt;p&gt;The initialProducts JS variable is initialized with a JSON literal. This JSON literal is composed on the server in the controller, and exposed with the variable productJSON to the server-side template. Once the page is on the client, &lt;em&gt;it can use the client-side rendering logic without performing an AJAX request first&lt;/em&gt;. Other product pages are retrieved using AJAX calls, then using the same client-side rendering logic encapsulated in the updateProducts function. Observe the sequence diagram, with one less roundtrip to the server:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/pics/embedded-json-rendering.png&quot; alt=&quot;Diagram embedded JSON&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;With this trick it's possible to blend server and client-side rendering where appropriate, without any duplication. In the &lt;a href=&quot;https://github.com/sandermak/embedded-json-example&quot;&gt;complete example&lt;/a&gt; you will see that the pagination links are actually still rendered with a server-side forEach loop.&lt;/p&gt;
+
+&lt;p&gt;As an added bonus, it is trivial to revert to the initial state of the page without a roundtrip to the server (the embedded JSON never changes). Since that's not always appropriate I didn't implement it in this sample app.&lt;/p&gt;
+
+&lt;h3&gt;Drawbacks&lt;/h3&gt;
+
+&lt;p&gt;Of course after I 'discovered' this trick it turned out I wasn't &lt;a href=&quot;http://www.bennadel.com/blog/1603-jQuery-And-Script-Tags-As-Data-Containers.htm&quot;&gt;the first&lt;/a&gt;. There are some drawbacks you should keep in mind. The biggest disadvantage is that whenever your JSON contains the string '&lt;/script&gt;', this trick &lt;a href=&quot;http://stackoverflow.com/questions/4176511/embedding-json-objects-in-script-tags&quot;&gt;breaks&lt;/a&gt;. The browser closes the script block the moment it encounters this tag, whether it's a part of a JS string or object literal, regardless of context. Escaping on the server is in order, since cross-site scripting is otherwise &lt;a href=&quot;http://benalpert.com/2012/08/03/preventing-xss-json.html&quot;&gt;possible&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Because most webframeworks either render JSON or HTML as response, not a combination, you may have to look around for a solution. In my example I use the Jackson &lt;a href=&quot;http://jackson.codehaus.org/1.7.9/javadoc/org/codehaus/jackson/map/ObjectMapper.html&quot;&gt;ObjectMapper&lt;/a&gt; directly from &lt;a href=&quot;https://github.com/sandermak/embedded-json-example/blob/master/src/main/java/net/branchandbound/web/IndexController.java#L36-L39&quot;&gt;the controller&lt;/a&gt;, with some small trickery to force the result into a string. Other frameworks and languages provide similar capabilities, for example &lt;a href=&quot;http://simplejson.googlecode.com/svn/tags/simplejson-2.0.1/docs/index.html&quot;&gt;simplejson.dumps&lt;/a&gt; in Python.&lt;/p&gt;
+
+&lt;p&gt;One of the attractive properties of the &lt;a href=&quot;https://github.com/sandermak/embedded-json-example/tree/client-side-only&quot;&gt;client-side only&lt;/a&gt; approach is that you can do away with server-side rendered templates completely. Instead, HTML can be served from an edge node in a CDN for example. Obviously, when you want to embed dynamic JSON this won't fly. May be &lt;a href=&quot;http://en.wikipedia.org/wiki/Edge_Side_Includes&quot;&gt;Edge Side Includes&lt;/a&gt; can help, but it was never accepted by the W3C.&lt;/p&gt;
+
+&lt;p&gt;Lastly, when you're trying to unify client and server-side rendering for accessibility issues (i.e. the site must work without JS enabled), this is not the trick for you. Even though all information is provided in a single request, you still need JS to do the rendering. It's not progressive enhancement by any definition. If that's you want, you might enjoy LinkedIn engineering's &lt;a href=&quot;http://engineering.linkedin.com/frontend/leaving-jsps-dust-moving-linkedin-dustjs-client-side-templates&quot;&gt;blog post&lt;/a&gt; on how they went the other way around: falling back to 'client-side' templates on the server in these cases.&lt;/p&gt;
+
+&lt;p&gt;Like with any technique you'll have to weigh the pros and cons for each application. In my opinion, avoiding the ubiquitous first AJAX callback while still maintaining only a single template is worth a lot.&lt;/p&gt;
+
+   </content>
+ </entry>
+ 
+ <entry>
+   <author><name>Sander Mak</name></author>
+   <title>JFall 2012: Dutch Java awesomeness</title>
+   <link href="http://branchandbound.net/blog/conferences/2012/11/jfall-2012-dutch-java-awesomeness"/>
+   <updated>2012-11-01T00:00:00+01:00</updated>
+   <id>http://branchandbound.net/blog/conferences/2012/11/jfall-2012-dutch-java-awesomeness</id>
+   <content type="html">
+       &lt;p&gt;The J-Fall conference has been a stable factor in the Dutch Java community for many years now. The 2012 edition was again jam-packed with excellent content. But above all, it's a place where more than thousand like-minded developers can meet (again) and exchange fresh new ideas!&lt;/p&gt;
+
+       &lt;p&gt;Right from the beginning it was clear that this year's keynote would be much more dynamic than last year. Stephen Chin drove his motorcycle (yes, you read that right) into the keynote hall. What followed was a whirlwind of short presentations, outlining the major themes for Java in the coming years: Java 8/9, JavaFX 2.2, Java Embedded for ARM and Project Easel for deep HTML5 integration in NetBeans. Nothing that wasn't announced at JavaOne, but still a good overview.&lt;/p&gt;
+
+&lt;h3&gt;Morning sessions&lt;/h3&gt;
+
+&lt;p&gt;The &lt;a href=&quot;http://www.nljug.org/pages/events/content/jfall_2012/sessions/00096/&quot;&gt;first break-out session&lt;/a&gt; I attended was on Unfiltered. Wilfred Springer aptly called it an 'unframework' because it is so small, and focused solely on HTTP request handling. After some live coding (with audience participation where necessary) it became clear that this Scala framework is quite coherent and capable.&lt;/p&gt;
+
+&lt;p&gt;Next up was a &lt;a href=&quot;http://www.nljug.org/pages/events/content/jfall_2012/sessions/00081/&quot;&gt;'Calling time on performance measurement'&lt;/a&gt; by William Louth. I was half expecting a product pitch on JXInsight, but fortunately he focused not just on the tool but also on an interesting philosophy about adaptive systems in general. Most applications are fairly 'dumb' in a sense that they keep repeating sub-optimal behavior. Things like hammering a database that is down, or even fairly advanced cases like sub-optimal use of a HashMap by program code. Louth proposed &lt;a href=&quot;http://www.jinspired.com/solutions/open-api&quot;&gt;Signals&lt;/a&gt; as a way to build a runtime profile of such behaviors. In turn, the program can use these profiles to guide subsequent executions on a better path. Interesting, but I'm not sure how usable the whole Signals approach currently is. Even though the demo's were kind of jittery and (too) fast-paced, this session gave me some food for thought.&lt;/p&gt;
+
+&lt;h3&gt;NightHacking&lt;/h3&gt;
+
+&lt;p&gt;I 'missed' the second keynote by Microsoft because I was being interviewed by Stephen Chin about my upcoming &lt;a href=&quot;/blog/security/2012/03/crossbuild-injection-how-safe-is-your-build&quot;&gt;cross-build injection attacks&lt;/a&gt; session. Stephen is traveling Europe with a motorbike on his way to Devoxx 2012, called the &lt;a href=&quot;http://steveonjava.com/nighthacking&quot;&gt;NightHacking&lt;/a&gt; tour. Meanwhile he live-streams interviews with various Java experts. It was cool to be part of the NightHacking tour, and at least I have the sticker to prove it :)&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/pics/nighthacker.png&quot; alt=&quot;NightHacking sticker&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;You can watch the recorded interview here:&lt;/p&gt;
+
+&lt;iframe width=&quot;600&quot; height=&quot;338&quot; src=&quot;http://www.youtube.com/embed/44Ke-XxsgOc?feature=player_detailpage&quot; frameborder=&quot;0&quot; allowfullscreen=&quot;&quot;&gt;embed&lt;/iframe&gt;
+
+
+
+
+&lt;br&gt;
+
+
+&lt;br&gt;
+
+
+&lt;h3&gt;CQRS and event-sourcing&lt;/h3&gt;
+
+&lt;p&gt;One last talk I want to highlight is &lt;a href=&quot;http://www.nljug.org/pages/events/content/jfall_2012/sessions/00091/&quot;&gt;'High performance and scalable architecture'&lt;/a&gt; by Allard Buijze. He showed us a real-life example of a CQRS and event-sourcing based architecture for BridgeBig.com, an online bridge gaming site. The talk was very down-to-earth with some good examples on how to split up your system in functional areas that exchange (stateless) Commands and Events. Since Allard is the author of the Axon CQRS framework, it was used heavily in this system. Even in combination with the &lt;a href=&quot;http://lmax-exchange.github.com/disruptor/&quot;&gt;Disruptor&lt;/a&gt; pattern for high throughput within a single sub-system. I will have to investigate Axon, but think I think the same can be achieved with for example &lt;a href=&quot;http://akka.io/&quot;&gt;Akka&lt;/a&gt; actors and an accompanying &lt;a href=&quot;https://github.com/eligosource/eventsourced&quot;&gt;event-sourcing library&lt;/a&gt;. That would be my personal preferred stack, on top of Scala.&lt;/p&gt;
+
+&lt;h3&gt;Cross-build injection revisited&lt;/h3&gt;
+
+&lt;p&gt;For the fourth year in a row I was able to present at J-Fall. This year I did a (Dutch) re-run of my &lt;a href=&quot;https://oracleus.activeevents.com/connect/sessionDetail.ww?SESSION_ID=3892&quot;&gt;JavaOne talk&lt;/a&gt; 'Cross-build injection attacks: how safe is your Java build?'. The session was scheduled on the last slot of the conference. Some people already left the building, but still there was a nice crowd. I always ask how many people have heard about cross-build injection and build security. Typically about 2-3% of the audience raises their hand, which is heartening to me because I can teach something new. Good questions where asked on actual steps people should take to prevent cross-build injection. I believe developers are starting to see that what's most convenient for them in the build process is not necessarily what's in the best interest of the safety of the end-product.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/pics/jfall12.jpg&quot; alt=&quot;me at the start of the session&quot; /&gt;
+(me at the start of the session, photo courtesy of &lt;a href=&quot;https://twitter.com/byteheads&quot;&gt;@byteheads&lt;/a&gt;)&lt;/p&gt;
+
+&lt;p&gt;It was especially nice that I could point out that Maven Central is now &lt;a href=&quot;http://www.sonatype.com/people/2012/10/now-available-ssl-connectivity-to-central&quot;&gt;https accessible&lt;/a&gt; as well. This is a big step forward in comparison to the previous incarnation of this talk at JavaOne. I'll blog some more details about this later.&lt;/p&gt;
+
+&lt;h3&gt;See you next year&lt;/h3&gt;
+
+&lt;p&gt;Overall, I was impressed with the quality of content delivered by the Dutch Java community and the various international speakers at J-Fall. But it was also a great meeting point for old friends, (former) colleagues and many other interesting people. Until next year!&lt;/p&gt;
+
+   </content>
+ </entry>
+ 
+ <entry>
+   <author><name>Sander Mak</name></author>
+   <title>Cross-Build Injection in action</title>
+   <link href="http://branchandbound.net/blog/security/2012/10/cross-build-injection-in-action"/>
+   <updated>2012-10-08T00:00:00+02:00</updated>
+   <id>http://branchandbound.net/blog/security/2012/10/cross-build-injection-in-action</id>
+   <content type="html">
+       &lt;p&gt;A &lt;a href=&quot;/blog/security/2012/03/crossbuild-injection-how-safe-is-your-build&quot;&gt;previous post&lt;/a&gt; introduced Cross-Build Injection (XBI) attacks. Recently, I've had the opportunity to present this work at JavaOne. In that session, I used a live example to show what could go wrong. By popular request, this post outlines the example XBI attack that I used as demonstration.&lt;/p&gt;
+
+       &lt;p&gt;The setup consists of a trivial Maven project called 'hacked' (&lt;a href=&quot;/dl/xbi_code.zip&quot;&gt;download here&lt;/a&gt;) with a single class that prints the exciting message &quot;Hi there&quot;... or does it? Along the way, we'll introduce a nefarious version of the maven-compiler-plugin which mixes things up a bit!&lt;/p&gt;
+
+&lt;h3&gt;Hello world under attack&lt;/h3&gt;
+
+&lt;p&gt;So how do we get this innocent snippet of Java:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;java&quot;&gt;&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Test&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+
+  &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;...&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;args&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;System&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;out&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;println&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;Hi there&amp;quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt; 
+
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;to print &quot;Hi, you've been p0wned&quot; rather than the bland &quot;Hi there&quot; message using a Cross-Build Injection attack? The central premise of my &lt;a href=&quot;/blog/security/2012/03/crossbuild-injection-how-safe-is-your-build&quot;&gt;Cross-Build Injection Attacks&lt;/a&gt; talk is that this depends on how secure your build setup is. Let's take a look at a typical Maven-based setup. When we do a &quot;mvn clean install&quot; on the project containing the Test class, the following happens:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/pics/xbi_setup.png&quot; alt=&quot;Maven and XBI&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Maven downloads both the dependencies of your application (none in this case) and the plugins (including any dependencies) it needs for its own functioning. We defined version 2.5.1 of the maven-compiler-plugin in the pom.xml, so it is retrieved from Maven Central over a regular http connection. Of course this is prone to all kinds foul play, as discussed in the &lt;a href=&quot;/blog/security/2012/03/crossbuild-injection-how-safe-is-your-build&quot;&gt;original article&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3&gt;Use the source&lt;/h3&gt;
+
+&lt;p&gt;Rather than creating a network setup that intercepts and replaces Maven request/responses, let's just place a compromised artifact in our local repository manually, to simulate the effects of an XBI attack. Since the maven-compiler-plugin orchestrates the actual invocation of the Java compiler, it seems like a good place to subvert the build process. Fortunately the source is just an &lt;a href=&quot;http://svn.apache.org/repos/asf/maven/plugins/tags/maven-compiler-plugin-2.5.1&quot;&gt;svn checkout&lt;/a&gt; away. A little digging finds us the AbstractCompilerMojo class, containing an execute() method which ultimately invokes the compiler. So let's get to it and change it to our liking:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;java&quot;&gt;&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;abstract&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;AbstractCompilerMojo&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;extends&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;AbstractMojo&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+
+  &lt;span class=&quot;c1&quot;&gt;// ... snipped lots of code ...&lt;/span&gt;
+
+  &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;execute&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; 
+    &lt;span class=&quot;kd&quot;&gt;throws&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;MojoExecutionException&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;CompilationFailureException&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    
+    &lt;span class=&quot;n&quot;&gt;File&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;src&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;File&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;basedir&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;/src/main/java/Test.java&amp;quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;original&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;try&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;original&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;FileUtils&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;fileRead&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;src&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;replaced&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;original&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;replace&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot; there&amp;quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;, you been p0wned!&amp;quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;FileUtils&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;fileWrite&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;src&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;replaced&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;catch&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;IOException&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;throw&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;RuntimeException&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;try&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;// original body of execute() here, calling the &lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;// compiler with the replaced source...&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;finally&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;try&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;FileUtils&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;fileWrite&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;src&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;original&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;catch&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;IOException&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;throw&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;RuntimeException&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt; 
+
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;(For the lazy bunch, here's the code (including the modified maven-compiler-plugin) in a convenient &lt;a href=&quot;/dl/xbi_code.zip&quot;&gt;download&lt;/a&gt;.)&lt;/p&gt;
+
+&lt;p&gt;The first try-block reads the original source, stores it for later use and overwrites the original source with our replaced code. When the actual Java compiler later on reads the source, it sees our modified version. Of course, this is horribly hardcoded towards our example, but you can make this as smart as you want (discover and parse all sources, transform them conditionally et cetera). Then, the last try-block calls the original code of execute(). Since the original code has many return points, we use the finally-block to ensure we always write back the original source to Test.java. Nobody will see what just happened to the source being compiled...&lt;/p&gt;
+
+&lt;p&gt;To bring our version of the maven-compiler-plugin in place, execute&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;sh&quot;&gt;:maven-compiler-plugin&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;mvn clean install -DskipTests
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;in the maven-compiler-plugin project that we just 'improved'. The skipTests flag is necessary since our 'improvement' obviously fails any sensible unit test in the compiler plugin. Now this nefarious version of the compiler plugin lives in your local repository.&lt;/p&gt;
+
+&lt;h3&gt;Compile and behold&lt;/h3&gt;
+
+&lt;p&gt;Just two more steps to see our 'improved' compiler plugin in action. Perform a mvn clean install on the 'hacked' project, and run it:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;sh&quot;&gt;:hacked&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;mvn clean install
+.. snipped ..
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; --- maven-compiler-plugin:2.5.1:compile &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;default-compile&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; @ hacked ---
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; Compiling 1 &lt;span class=&quot;nb&quot;&gt;source &lt;/span&gt;file to .../hacked/target/classes
+.. snipped ..
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; -------------------------------------------------------------------
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; BUILD SUCCESS
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;INFO&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; -------------------------------------------------------------------
+.. snipped ..
+
+:hacked&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;java -cp ./target/classes Test
+Hi, you&lt;span class=&quot;err&quot;&gt;&amp;#39;&lt;/span&gt;ve been p0wned!
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;There you have it: when compiled using this maven-compiler-plugin implementation, our original class seems to be untouched but the resulting .class file will print the unexpected message. And remember, we use a plain and uncompromised install of both Maven and the Java compiler. However, because Maven downloads a plugin before compiling, arbitrary code may be executed if you are not careful!&lt;/p&gt;
+
+&lt;h3&gt;Exploiting XBI&lt;/h3&gt;
+
+&lt;p&gt;Now of course this example would be easily caught by your friendly QA department. But think about it. What could really happen if arbitrary code were injected into your build process, or into your application? How about a backdoor? Or, if a hacker is really smart... Replace an up-to-date library with a previous version containing a known vulnerability, while pretending it is the current version. As you can see, there's plenty of options. Here's some &lt;a href=&quot;http://www.koch.ro/blog/index.php?url=archives/153-On-distributing-binaries.html&quot;&gt;more inspiration&lt;/a&gt; if you're still not convinced. So make sure &lt;a href=&quot;/blog/security/2012/08/verify-dependencies-using-pgp/&quot;&gt;you verify&lt;/a&gt; what you put into your build system and application. Trust is in short supply. Use it sparingly.&lt;/p&gt;
+
+&lt;p&gt;For some more context, here are the slides of the talk I gave at JavaOne on Cross-Build Injection attacks:&lt;/p&gt;
+
+&lt;iframe src=&quot;http://www.slideshare.net/slideshow/embed_code/14579226&quot; width=&quot;425&quot; height=&quot;355&quot; frameborder=&quot;0&quot; marginwidth=&quot;0&quot; marginheight=&quot;0&quot; scrolling=&quot;no&quot;&gt;embed&lt;/iframe&gt;
+
+
+&lt;p&gt;Have fun, and remember: build safely!&lt;/p&gt;
+
+   </content>
+ </entry>
+ 
+ <entry>
+   <author><name>Sander Mak</name></author>
+   <title>Verify dependencies using PGP</title>
+   <link href="http://branchandbound.net/blog/security/2012/08/verify-dependencies-using-pgp"/>
+   <updated>2012-08-22T00:00:00+02:00</updated>
+   <id>http://branchandbound.net/blog/security/2012/08/verify-dependencies-using-pgp</id>
+   <content type="html">
+       &lt;p&gt;Many builds use automatic dependency retrieval from repositories like Maven Central. In an earlier post, I've outlined the dangers of so-called &lt;a href=&quot;/blog/security/2012/03/crossbuild-injection-how-safe-is-your-build&quot;&gt;cross-build injection attacks&lt;/a&gt; when using automatic dependency management. In this post, I'll show how you can counter such attacks by verifying PGP signatures of artifacts downloaded from Maven Central.&lt;/p&gt;
+
+       &lt;p&gt;There are &lt;a href=&quot;http://kohsuke.org/pgp-maven-plugin/&quot;&gt;various&lt;/a&gt; &lt;a href=&quot;http://www.sonatype.com/people/2010/01/how-to-generate-pgp-signatures-with-maven/&quot;&gt;articles&lt;/a&gt; that show how to sign your artifact before uploading it to Maven Central. However, we're more likely to be library users than library authors. Unfortunately, information on how to verify PGP signatures of artifacts is surprisingly scarce. Even StackOverflow seems to &lt;a href=&quot;http://stackoverflow.com/questions/3307146/verification-of-dependency-authenticy-in-automated-build-systems&quot;&gt;dodge the bullet&lt;/a&gt;. So let's fix that.&lt;/p&gt;
+
+&lt;h3&gt;Pretty Good Privacy&lt;/h3&gt;
+
+&lt;p&gt;Pretty Good Privacy (PGP) can be used to encrypt or sign data. It uses asymmetric public/private keypairs. Since libraries on Maven Central are open source, encryption is pointless. Signing, on the other hand, can be used to prove the authenticity of a library. We can use the library authors' public key to verify that the artifact is signed with the corresponding private key. This may sound easy, but in practice this is a multi-step process. If you want to follow along with the signature verification steps in this post, you'll have to install a PGP implementation. I'm using GnuPG ('brew install gpg' on OSX).&lt;/p&gt;
+
+&lt;h3&gt;Getting the signature&lt;/h3&gt;
+
+&lt;p&gt;Before we can verify an artifact, we must first obtain its signature. So let's say we want to use the plexus-cipher library. First, add the dependency to the build (groupId: org.sonatype.plexus, artifactId: plexus-cipher and version: 1.7). Any buildtool that uses Maven Central to retrieve dependencies will do. Of course this can be Maven itself, but also SBT, Gradle or even Ant+Ivy (I'll assume Maven for the remainder of this post). Adding this dependency will prompt Maven to download:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;http://repo1.maven.org/maven2/org/sonatype/plexus/plexus-cipher/1.7/plexus-cipher-1.7.jar
+http://repo1.maven.org/maven2/org/sonatype/plexus/plexus-cipher/1.7/plexus-cipher-1.7.pom
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;In order to get the accompanying signatures, append .asc to these urls and download them:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ wget http://repo1.maven.org/maven2/org/sonatype/plexus/plexus-cipher/1.7/plexus-cipher-1.7.jar.asc
+$ wget http://repo1.maven.org/maven2/org/sonatype/plexus/plexus-cipher/1.7/plexus-cipher-1.7.pom.asc
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Even though these signatures live alongside the artifacts themselves, Maven does not download them automatically. Also, beware that not all artifacts in Maven Central have .asc signatures. Up to three years ago, Maven Central did not require library authors to provide PGP signatures.&lt;/p&gt;
+
+&lt;h3&gt;Verifying the signature&lt;/h3&gt;
+
+&lt;p&gt;We have the artifact and the signature, but we still need to obtain the public key of the library author before we can continue. The gpg verify command dutifully tells us just that:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ gpg --verify plexus-cipher-1.7.jar.asc ~/.m2/.../plexus-chipher-1.7.jar
+
+gpg: Signature made Tue Jul 26 20:06:33 2011 CEST using DSA key ID 8DD1BDFD
+gpg: Can't check signature: public key not found 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now we could of course ask the author for his public key by email, or try to download it from the project's website. That's not really a scalable solution though... Fortunately, Maven Central also requires its uploaders to publish their public key to a PGP keyserver. Specifically, &lt;a href=&quot;http://pgp.mit.edu/&quot;&gt;MIT's keyserver&lt;/a&gt;. The following diagram shows how it works:
+&lt;img src=&quot;/pics/maven_pgp.png&quot; alt=&quot;Publishing signed library to Maven Central&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Armed with this knowledge, we can import the key with ID 8DD1BDFD (as we learned during our failed verification attempt) into our keyring:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ gpg --keyserver pgp.mit.edu --recv-key 8DD1BDFD
+
+gpg: requesting key 8DD1BDFD from hkp server pgp.mit.edu
+gpg: key 8DD1BDFD: public key &quot;Sonatype, Inc. (Sonatype release key) &amp;lt;dev@sonatype.com&amp;gt;&quot; imported
+gpg: no ultimately trusted keys found
+gpg: Total number processed: 1
+gpg:               imported: 1
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We can make our lives even easier (depending on your tolerance for long commandlines...) by telling gpg to find and import keys automatically as they are referenced in the signature. Note that the following command combines the previous two steps into one:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ gpg --auto-key-locate keyserver --keyserver pgp.mit.edu --keyserver-options auto-key-retrieve --verify plexus-cipher-1.7.jar.asc ~/.m2/.../plexus-chipher-1.7.jar
+
+gpg: Signature made Tue Jul 26 20:06:33 2011 CEST using DSA key ID 8DD1BDFD
+gpg: requesting key 8DD1BDFD from hkp server pgp.mit.edu
+gpg: key 8DD1BDFD: public key &quot;Sonatype, Inc. (Sonatype release key) &amp;lt;dev@sonatype.com&amp;gt;&quot; imported
+gpg: 3 marginal(s) needed, 1 complete(s) needed, PGP trust model
+gpg: depth: 0  valid:   1  signed:   0  trust: 0-, 0q, 0n, 0m, 0f, 1u
+gpg: Total number processed: 1
+gpg:               imported: 1
+gpg: Good signature from &quot;Sonatype, Inc. (Sonatype release key) &amp;lt;dev@sonatype.com&amp;gt;&quot;
+gpg: WARNING: This key is not certified with a trusted signature!
+gpg:          There is no indication that the signature belongs to the owner.
+Primary key fingerprint: 2BCB DD0F 23EA 1CAF CC11  D486 0374 CF2E 8DD1 BDFD
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Our long-winded command rewards us with an even longer output, telling that this is a 'good signature'. Victory! Congratulations, you're now part of a select elite who actually verifies what they download from the internet before putting it into their mission-critical application:
+&lt;a href=&quot;https://twitter.com/jvanzyl/status/212890726386774017&quot;&gt;&lt;img src=&quot;/pics/tweet_jason.png&quot; alt=&quot;Minority downloads sigs&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3&gt;Web of trust&lt;/h3&gt;
+
+&lt;p&gt;But all is not well. In case you missed it, there's a huge warning in the verification output, ending with 'There is no indication that the signature belongs to the owner'. This means that even though everything checks out, we can not be certain that the key is actually from 'Sonatype, Inc. (Sonatype release key) &amp;lt;dev@sonatype.com&amp;gt;'. Anyone could have uploaded such a key to the MIT keyserver. This is a hard problem&amp;trade; to solve. With SSL certificates, the other well-known public/private key infrastructure, this conondrum is solved by having ultimately trusted root Certificate Authorities. This creates a centralized system which only works because browsers  distribute the trusted certificates of these selected root CAs to end-users.&lt;/p&gt;
+
+&lt;p&gt;PGP takes a different, decentralized approach known as the &lt;a href=&quot;http://en.wikipedia.org/wiki/Web_of_trust&quot;&gt;web of trust&lt;/a&gt;. In essence, PGP allows public keys to be signed by other people. By doing so, they certify that that key is valid. This web of trust can work transitively. For example, if I sign person A's key, and person A signs person B's key, I transitively trust person B as well (there are different levels of trust, but I'll leave that aside for now). The idea is that we only sign another person's key if we met them in person and verified their identity. Obviously, it is benefial to have a large web of trust, to increase the chances that it contains a trusted someone close to yourself.&lt;/p&gt;
+
+&lt;p&gt;Let's try to visualize the situation in the case of Sonatype's release key:
+&lt;img src=&quot;/pics/pgp_weboftrust.png&quot; alt=&quot;Web of trust&quot; /&gt;
+Th red keys are private, the blue keys are public and arrows indicate signing. Three different individuals have signed the public Sonatype release with their private key. You can &lt;a href=&quot;http://pgp.mit.edu:11371/pks/lookup?op=vindex&amp;amp;search=0x0374CF2E8DD1BDFD&quot;&gt;lookup&lt;/a&gt; this information on the MIT keyserver. And, in turn, other people may have signed the public keys of these three individuals and so on. Now in order for gpg to fully trust the Sonatype release key, either we must sign it with our own key, or we must have signed any key that has a path in the web of trust to this release key. Signing the Sonatype release key directly would be the easiest, but not the most correct approach. How would we meet 'Sonatype, Inc.' and verify their identity? (hint: they might post their key fingerprint on a secure website). Let's assume instead that we know Brian F. Therefore, we can import and trust his key to put the web of trust in motion:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;gpg --keyserver pgp.mit.edu --recv-key 3C062231
+
+gpg: requesting key 3C062231 from hkp server pgp.mit.edu
+gpg: key 3C062231: public key &quot;Brian E Fox &amp;lt;brianf@apache.org&amp;gt;&quot; imported
+gpg: 3 marginal(s) needed, 1 complete(s) needed, PGP trust model
+gpg: depth: 0  valid:   1  signed:   0  trust: 0-, 0q, 0n, 0m, 0f, 1u
+gpg: Total number processed: 1
+gpg:               imported: 1 
+
+gpg --edit-key 3C06223
+
+&amp;lt;snipped some certificate details&amp;gt;
+gpg&amp;gt; trust
+&amp;lt;snipped some certificate details&amp;gt;
+Please decide how far you trust this user to correctly verify other users' keys
+(by looking at passports, checking fingerprints from different sources, etc.)
+
+  1 = I don't know or won't say
+  2 = I do NOT trust
+  3 = I trust marginally
+  4 = I trust fully
+  5 = I trust ultimately
+  m = back to the main menu
+
+Your decision? 4
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Instead of assigning trust to this key, we could have also signed it. Note that you need &lt;a href=&quot;http://www.gnupg.org/gph/en/manual.html#AEN26&quot;&gt;your own keypair&lt;/a&gt; to do this. Now lo and behold, no more warnings when verifying the signature:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ gpg --verify plexus-cipher-1.7.pom.asc  ~/.m2/.../plexus-cipher-1.7.pom
+
+gpg: Signature made Tue Jul 26 20:06:33 2011 CEST using DSA key ID 8DD1BDFD
+gpg: checking the trustdb
+gpg: 3 marginal(s) needed, 1 complete(s) needed, PGP trust model
+gpg: depth: 0  valid:   1  signed:   1  trust: 0-, 0q, 0n, 0m, 0f, 1u
+gpg: depth: 1  valid:   1  signed:   1  trust: 0-, 0q, 0n, 0m, 1f, 0u
+gpg: depth: 2  valid:   1  signed:   0  trust: 1-, 0q, 0n, 0m, 0f, 0u
+gpg: Good signature from &quot;Sonatype, Inc. (Sonatype release key) &amp;lt;dev@sonatype.com&amp;gt;&quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3&gt;Automatic verification?&lt;/h3&gt;
+
+&lt;p&gt;By now, you must be thinking 'that is an awful lot of work just to verify a single dependency'. And you're absolutely right. Applications typically use many dependencies, and checking them all by hand quickly becomes tedious. In my opinion, there is a huge opportunity for Maven-based build tools to support automatic PGP signature verification. Until that is the case though, you can also use Sonatype's Nexus repository manager as a proxy to Maven Central. It can automatically check the PGP signatures for proxied artifacts and refuse to serve them when the signature check fails. Unfortunately, this is only possible using the commercial version &lt;a href=&quot;http://www.sonatype.com/Products/Nexus-Professional&quot;&gt;Nexus Pro&lt;/a&gt;, not with the &lt;a href=&quot;http://www.sonatype.org/nexus/&quot;&gt;open source&lt;/a&gt; version.&lt;/p&gt;
+
+&lt;h3&gt;Wrapping up&lt;/h3&gt;
+
+&lt;p&gt;Before you dismiss everything above as wildly impractical, I urge you to read up on &lt;a href=&quot;/blog/security/2012/03/crossbuild-injection-how-safe-is-your-build&quot;&gt;cross-build injection attacks&lt;/a&gt;. Decide for yourself whether your applications constitute a target for such attacks, and what the impact will be. If you'd like to hear more about this, I'm also giving a talk called 'Cross-build injections attacks: how safe is your Java build' (&lt;a href=&quot;https://oracleus.activeevents.com/connect/sessionDetail.ww?SESSION_ID=3892&quot;&gt;CON3892&lt;/a&gt;) at JavaOne 2012. May your build be secure!&lt;/p&gt;
+
+   </content>
+ </entry>
+ 
+ <entry>
+   <author><name>Sander Mak</name></author>
+   <title>Book review: DSLs in Action</title>
+   <link href="http://branchandbound.net/blog/bookreview/2012/08/bookreview-dsls-in-action"/>
+   <updated>2012-08-04T00:00:00+02:00</updated>
+   <id>http://branchandbound.net/blog/bookreview/2012/08/bookreview-dsls-in-action</id>
+   <content type="html">
+       &lt;p&gt;Domain-Specific Languages are not the most used tools in the toolbox of developers. According to the author of 'DSLs in Action' this is a missed opportunity: these little languages can deliver lots of benefits. In this book he argues this position with fervor. But be warned: this is not a book for beginners.&lt;/p&gt;
+
+       &lt;p&gt;&lt;a href=&quot;http://www.amazon.com/gp/product/1935182455/ref=as_li_qf_sp_asin_il_tl?ie=UTF8&amp;amp;camp=1789&amp;amp;creative=9325&amp;amp;creativeASIN=1935182455&amp;amp;linkCode=as2&amp;amp;tag=branandboun-20&quot;&gt;DSLs in Action&lt;/a&gt; consists of three main parts and a well-filled appendix. The first part introduces the term DSL and shows the benefits of DSL-driven development. It's also made clear that the purpose of DSLs is not to allow the business to program, but to help developers write code that can be a means of communication with the business. Ultimately, a DSL is a way to achieve 'beautiful abstractions'. The introduction is followed by concrete examples of DSL implementations in Java and Groovy. But obviously, without a domain there is no DSL. Therefore, throughout the whole book the stock trading domain is used in all examples. The author takes the time to thoroughly describe this domain, so the examples are non-trivial and really fit the narrative.&lt;/p&gt;
+
+&lt;h3&gt;Internal DSLs&lt;/h3&gt;
+
+&lt;p&gt;In the second part the so-called 'internal DSLs' are described. These are languages ​​embedded in an existing programming language. Of course the expressiveness of the existing programming language determines how successful such an embedding can be. Examples are provided using both dynamic languages ​​and statically typed languages. The dynamic examples use concepts such as meta-programming, macros, and monkey-patching using Groovy, Clojure and Ruby. The statically typed examples are all written in Scala, and clearly demonstrate the value of the type-system for enforcing domain-specific rules. Fortunately you don't have to be an expert in those languages​​, because the book contains appendices with an introduction and a cheat sheet for each of the mentioned languages.&lt;/p&gt;
+
+&lt;h3&gt;External DSLs&lt;/h3&gt;
+
+&lt;p&gt;The second part then continues with 'external DSLs', which are separate languages with their own language definition and associated parser. This is often what people think of first when talking about DSLs. But it is not without reason that this alternative is discussed later. External DSLs require much more effort because you are not reusing the infrastructure of an existing programming language. Also, the added flexibility offered by external DSLs is not always necessary.&lt;/p&gt;
+
+&lt;p&gt;The first example of an external DSL is developed with ANTLR, a parser generator framework. Meanwhile, much is explained about parsing and grammars. The author doesn't shy away from the underlying theoretical foundations where necessary. Next, an example is given for the Eclipse XText framework. XText language definitions deliver both a language parser and an Eclipse editor plugin for your DSL, with syntax highlighting, code completion and everything you're used to with Eclipse for Java.&lt;/p&gt;
+
+&lt;p&gt;Finally parser combinator libraries are discussed. Parser combinators allow you to express a grammar as internal DSL in a general purpose language. Scala's parser combinator library is used to show how you can create a parser without code generation, unlike the previous two external DSL examples.&lt;/p&gt;
+
+&lt;h3&gt;Closing remarks&lt;/h3&gt;
+
+&lt;p&gt;The last part looks at expected developments in the field of domain-specific languages. It feels a bit strained and doesn't offer many new insights. But that's okay, since the previous parts are more than excellent. Seldom have I read a technical book which is both wide, deep and practical. Even if you do not believe in DSLs as a concept, then this book is packed with useful information. For example, it is also an excellent introduction to 'polyglot programming' (combining different programming languages).&lt;/p&gt;
+
+&lt;p&gt;A similar book has been published by Martin Fowler: &lt;a href=&quot;http://www.amazon.com/gp/product/0321712943/ref=as_li_qf_sp_asin_il_tl?ie=UTF8&amp;amp;camp=1789&amp;amp;creative=9325&amp;amp;creativeASIN=0321712943&amp;amp;linkCode=as2&amp;amp;tag=branandboun-20&quot;&gt;Domain-Specific Languages&lt;/a&gt;. However, Fowler explicitly focuses on an Object-Oriented approach to DSLs, whereas DSLs in Action takes both the OO and functional approach. In my opinion you can't ignore functional languages when talking about (internal) DSLs.&lt;/p&gt;
+
+&lt;p&gt;All in all, &lt;a href=&quot;http://www.amazon.com/gp/product/1935182455/ref=as_li_qf_sp_asin_il_tl?ie=UTF8&amp;amp;camp=1789&amp;amp;creative=9325&amp;amp;creativeASIN=1935182455&amp;amp;linkCode=as2&amp;amp;tag=branandboun-20&quot;&gt;DSLs in Action&lt;/a&gt; is a top-notch book that I heartily recommend.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;(a Dutch version of this article was print in the &lt;a href=&quot;http://javamagazine.nl/&quot;&gt;Dutch Java Magazine&lt;/a&gt;)&lt;/em&gt;&lt;/p&gt;
+
+   </content>
+ </entry>
+ 
+ <entry>
+   <author><name>Sander Mak</name></author>
+   <title>Modern concurrency and Java EE</title>
+   <link href="http://branchandbound.net/blog/java/2012/07/modern-concurrency-and-javaee"/>
+   <updated>2012-07-23T00:00:00+02:00</updated>
+   <id>http://branchandbound.net/blog/java/2012/07/modern-concurrency-and-javaee</id>
+   <content type="html">
+       &lt;p&gt;Managing your own threads within a Java EE container is not recommended and even illegal in some circumstances. But where does that leave us when we want to use the shiny new Java concurrency frameworks like Fork/Join and Akka in Java EE applications? The addition of new concurrency facilities to the Java EE 7 spec may open some doors.&lt;/p&gt;
+
+       &lt;p&gt;The past year I've been diving into new concurrency options on the JVM. Java SE 7 brought us &lt;a href=&quot;http://docs.oracle.com/javase/tutorial/essential/concurrency/forkjoin.html&quot;&gt;Fork/Join&lt;/a&gt; concurrency, and other other approaches like &lt;a href=&quot;http://akka.io&quot;&gt;actor-based&lt;/a&gt; concurrency with for example Akka gain popularity as well. I did some talks about Fork/Join (talk on &lt;a href=&quot;http://www.parleys.com/#st=5&amp;amp;id=3217&quot;&gt;Parleys&lt;/a&gt;, &lt;a href=&quot;http://www.slideshare.net/SanderMak/fork-join-bejug-2012&quot;&gt;slides&lt;/a&gt;) and Akka (talk on &lt;a href=&quot;http://www.parleys.com/#id=3218&amp;amp;st=5&quot;&gt;Parleys&lt;/a&gt;, &lt;a href=&quot;http://www.slideshare.net/SanderMak/akka-bejug/&quot;&gt;slides&lt;/a&gt;) and one question I always get is: 'can this be used in a Java EE applications?'&lt;/p&gt;
+
+&lt;p&gt;Since both Fork/Join and Akka start and stop their own thread(pool)s, the answer is: 'it usually works, but it is not recommended within Java EE containers'. Unsatisfactory answer? You bet. But fortunately things may change with the next release of Java EE.&lt;/p&gt;
+
+&lt;h3&gt;JSR-236: Concurrency Utilities for the Java EE platform&lt;/h3&gt;
+
+&lt;p&gt;Most application servers already offer the possibility to get a managed (sort-of, kind-of) threadpool through the &lt;a href=&quot;http://docs.oracle.com/javaee/1.4/api/javax/resource/spi/work/WorkManager.html&quot;&gt;WorkManager&lt;/a&gt; API. It was never standardized as part of Java EE though. And even if it was, it would not be enough for the Fork/Join framework. The only pluggability you get when instantiating a &lt;a href=&quot;http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/ForkJoinPool.html&quot;&gt;ForkJoinPool&lt;/a&gt; is a custom thread factory. For the record, it seems that Akka &lt;a href=&quot;http://blog.vasilrem.com/container-managed-actor-dispatchers&quot;&gt;can be configured&lt;/a&gt; with WorkManagers.&lt;/p&gt;
+
+&lt;p&gt;However, standardization of application-facing, container-managed threading may be upon us. Work on JSR-236 commenced in 2003. Yes, that's almost a decade ago. The first draft of the Concurrency EE spec appeared in 2006, but unfortunately it languished ever since. In April of this year, however, the JSR was resuscitated and an updated version was published last month. Even though the &lt;a href=&quot;http://java.net/downloads/concurrency-ee-spec/EE%20Concurrency%20Utilities%20Dec-20-2012-delta.pdf&quot;&gt;delta&lt;/a&gt; with the 2006 draft is minimal (e.g. 'update package name from javax.util.concurrent to javax.enterprise.concurrent'), it is good to see things are back on the agenda.&lt;/p&gt;
+
+&lt;h3&gt;javax.enterprise.concurrent&lt;/h3&gt;
+
+&lt;p&gt;So what's in this elusive new javax.enterprise.concurrent package? I salvaged the following diagram from a 2006 JavaOne &lt;a href=&quot;http://gee.cs.oswego.edu/dl/concurrencyee-interest/JavaOne-EEConcurrency.pdf&quot;&gt;presentation&lt;/a&gt;, with the new concurrency facilities marked yellow:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/pics/javaeeconcurrency.png&quot; alt=&quot;Java EE concurrency&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The two most important interfaces for enabling alternative concurrency frameworks are &lt;a href=&quot;http://concurrency-ee-spec.java.net/javadoc/javax/enterprise/concurrent/ManagedExecutorService.html&quot;&gt;ManagedExecutorService&lt;/a&gt; and &lt;a href=&quot;http://concurrency-ee-spec.java.net/javadoc/javax/enterprise/concurrent/ManagedThreadFactory.html&quot;&gt;ManagedThreadFactory&lt;/a&gt;, both extending their non-managed java.util.concurrent counterparts from Java SE. What does this Managed prefix buy us? It means that tasks submitted and threads created through these interfaces will be fully aware of the Java EE contextual services. Things like transaction management, security context and so on are all available when the task is executed or the thread is used. The container is fully aware of the lifecycle of these managed threads, and can offer generic monitoring and tuning options.&lt;/p&gt;
+
+&lt;p&gt;Another interesting aspect of the propesed ManagedExecutorService is that it must support distribution. One of the following properties can be configured:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;em&gt;Local:&lt;/em&gt; the task is run in the same process/server that submitted the task.&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;Distributable:&lt;/em&gt; the task may be run in any process/server including the one that submitted the task.&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;Distributable with Affinity:&lt;/em&gt; the task may be run in any process/server including the one that
+submitted the task. All tasks will then run on the selected process/server.&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;p&gt;Suddenly we have the building blocks for an asynchronous, distributed computation engine at our fingertips! Obviously, the tasks need to be Serializable for this to work.&lt;/p&gt;
+
+&lt;h3&gt;Connecting the dots&lt;/h3&gt;
+
+&lt;p&gt;You might be wondering why it is important to have these concurrency utilities, since Java EE 6 already provides the &lt;a href=&quot;http://docs.oracle.com/javaee/6/tutorial/doc/gkkqg.html&quot;&gt;@Asynchronous&lt;/a&gt; annotation on EJB's and &lt;a href=&quot;https://blogs.oracle.com/enterprisetechtips/entry/asynchronous_support_in_servlet_3&quot;&gt;async Servlet&lt;/a&gt; support is also available. However useful these are for application development, the constructs are not meant to bootstrap other concurrency libraries and frameworks. With the proposed utilities, however, you could construct your own java.util.concurrent.ThreadPoolExecutor backed with managed threads:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;java&quot;&gt; &lt;span class=&quot;c1&quot;&gt;// Can also use JNDI lookup in method instead of injection&lt;/span&gt;
+ &lt;span class=&quot;nd&quot;&gt;@Resource&lt;/span&gt;
+ &lt;span class=&quot;n&quot;&gt;ManagedThreadFactory&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mtf&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+
+ &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ExecutorService&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;getManagedThreadPool&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+   &lt;span class=&quot;c1&quot;&gt;// All threads created will be managed&lt;/span&gt;
+   &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;ThreadPoolExecutor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TimeUnit&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;SECONDS&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;
+       &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ArrayBlockingQueue&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Runnable&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tf&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+ &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Similarly, ForkJoinPool can be parameterized with a custom ForkJoinPool.ForkJoinWorkerThreadFactory implementation that delegates thread creation to the ManagedThreadFactory. While trying to implement such an adapter I unfortunately ran into the issue that Fork/Join uses a custom Thread subclass (&lt;a href=&quot;http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/ForkJoinWorkerThread.html&quot;&gt;ForkJoinWorkerThread&lt;/a&gt;). This makes the task a bit harder, it's constructor being package protected. And obviously I can't test the code, since I'm not aware of any (public) JSR-236 implementation. Furthermore, I believe such adapters for java.util.concurrent should be part of the spec. No need to force application developers to reinvent the wheel again and again!&lt;/p&gt;
+
+&lt;h3&gt;Now what?&lt;/h3&gt;
+
+&lt;p&gt;When reading the JSR-236 spec it is clear that it was crafted in the ancient J2EE times. Just look at the code examples in the draft spec (EJBHome interfaces, really?).  CDI is never mentioned, and neither is Fork/Join or other relevant newer technologies. Still, it's clear that this spec will lay the groundwork for integrating modern Java concurrency frameworks with Java EE. But exactly how this will work out is too early to tell.&lt;/p&gt;
+
+&lt;p&gt;Another obvious candidate for using the javax.enterprise.concurrent functionality is the &lt;a href=&quot;https://blogs.oracle.com/theaquarium/entry/new_java_ee&quot;&gt;Batch Processing&lt;/a&gt; JSR. There's lot's of work to do it seems. Let's hope that expert groups find enough time to join forces and move the Java EE platform forward.&lt;/p&gt;
+
+   </content>
+ </entry>
+ 
+ <entry>
+   <author><name>Sander Mak</name></author>
+   <title>Preparing a technical talk</title>
+   <link href="http://branchandbound.net/blog/conferences/2012/06/preparing-a-technical-talk"/>
+   <updated>2012-06-06T00:00:00+02:00</updated>
+   <id>http://branchandbound.net/blog/conferences/2012/06/preparing-a-technical-talk</id>
+   <content type="html">
+       &lt;p&gt;We software engineers love giving talks. Fortunately, the abundance of technical conferences shows that we like listening too. A lot of talks on these conferences are given by software engineers who love sharing knowledge, rather than professional speakers. This especially holds true for conferences organized by user groups. Since I'm one of those software engineers who likes to give talks, I'd like to share my thoughts on what you can do to prepare a technical talk.&lt;/p&gt;
+
+       &lt;p&gt;In the past few years I've gained some experience with presenting at conferences. In fact, I started writing this post en-route to JEEConf where I'll give two talks (trip report &lt;a href=&quot;/blog/conferences/2012/05/jeeconf-tripreport&quot;&gt;here&lt;/a&gt;). While I enjoy doing this, I'm by no means a professional speaker. It's really a matter of learning-by-doing. To me, giving a talk in front of a like-minded audience is exhilarating, and striking up interesting conversations afterwards can be really rewarding. But don't be fooled: even though your performance may last for only an hour, you'll be investing a lot of time to make it go just right.&lt;/p&gt;
+
+&lt;h3&gt;How to start&lt;/h3&gt;
+
+&lt;p&gt;Let's say you have a wonderful topic in mind for a talk: 'Peer-to-peer IDEs using Websockets and Git' (fictional of course, but it sounds cool. Someone should do this). You've worked on the topic for some time, but it's time to share it with the world. Now, what will be your first step? Making slides? Coming up with a witty title? Start hacking on your demos? No. You start by asking yourself the two very important questions:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Who is my audience?&lt;/li&gt;
+&lt;li&gt;What is my message?&lt;/li&gt;
+&lt;/ol&gt;
+
+
+&lt;p&gt;Is your audience into specific programming languages and frameworks? Does it consist of experienced coders, or a mix of technical and 'business'  people? What are their preconceptions? All of this information helps you determine the central message of your talk before you've made a single slide. For example, our topic is a bit out there and wouldn't really fit a conference with your typical 'enterprise developers' audience. You might tone down the topic a bit in this case, focusing on a single aspect, or simply choose a different audience...&lt;/p&gt;
+
+&lt;p&gt;After you've profiled the audience, it is time to formulate the message of your talk. No, your title is not your message: titles can be provocative teasers, whereas your message succinctly describes what you want to convey with your talk. Think of it as the core sentence of your abstract. Of course this core message must be tailored to your audience. The message defines the focus of all remaining efforts. Our fictional topic, for example, can be brought with several different messages:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;'Explain how Websockets enable cool applications like a collaborative P2P IDE that leverages Git'&lt;/li&gt;
+&lt;li&gt;'P2P collaborative IDEs are the way of the future, and here's how you could implement them using Websockets and Git'&lt;/li&gt;
+&lt;li&gt;'How Git can be used as building block for new applications'&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;p&gt;Each of these messages leads to a vastly different narrative. Reach back to the core message every time you need to decide whether to include or omit a sub-topic. Does it strengthen your message? Above all, remember: the message should answer a question that is relevant to your audience. If not, both you and the audience will be wasting time.&lt;/p&gt;
+
+&lt;h3&gt;Focus&lt;/h3&gt;
+
+&lt;p&gt;A big pitfall for me is that I tend to focus too hard on the subject. This may sound strange, so let me try to explain. Doing research is necessary when preparing a technical talk. However, it is very easy to overdo this. It's not necessary to read every single blogpost ever written on the topic at hand, to delve into the source of a library, or follow a framework's mailinglist religiously. You'll tell yourself that you are getting a deeper understanding by researching so much, but remember you're not doing this (just) for you!&lt;/p&gt;
+
+&lt;p&gt;In the end what counts is giving a clear and concise talk to your audience. Having more information in your head does not automatically lead to a better presentation. Let the message guide the direction and amount of research that you perform on each sub-topic. There will always be someone in the audience who knows more about the topic than you. It'll be fine, trust me.&lt;/p&gt;
+
+&lt;h3&gt;Slides&lt;/h3&gt;
+
+&lt;p&gt;There's lots of &lt;a href=&quot;http://www.presentationzen.com/&quot;&gt;excellent advice&lt;/a&gt; already on using and designing slides which I won't repeat here. A lot of it boils down to 'do less'. I have a lot of respect for speakers who deliver talks without a slide deck. But it's not for me, at least not now. Having &lt;a href=&quot;http://www.slideshare.net/sandermak&quot;&gt;slides&lt;/a&gt; to guide me through a talk is essential for me. Additionally, having visuals like diagrams and graphs always helps in technical talks. Avoid the stereotypical slides with endless bulleted lists and you're ahead of the pack already.&lt;/p&gt;
+
+&lt;h3&gt;Code examples&lt;/h3&gt;
+
+&lt;p&gt;Remember the P2P IDE using Websockets and Git? You can talk about it all you want, but showing code is infinitely more effective. That is, if done right. One of the worst presentations I ever saw was simply playing a screencast for the demo parts. Aside from the unreadable pixelated text (if you ever do this, use a proper codec) it was just plain boring to watch a pre-cooked movie. Keeping the narration in sync with the screencast was awkward. Just don't do this, however safe it may feel.&lt;/p&gt;
+
+&lt;p&gt;The other extreme is live coding. Doing live coding in front of an audience is risky, but the rewards can be commensurate. What's better than watching a skilled craftsman doing some awesome coding? Not every topic lends itself for this approach, though. You need to be able to build something from scratch without too much distracting boilerplate. Preferably building out a single example throughout the talk.&lt;/p&gt;
+
+&lt;p&gt;I tend to choose the happy medium: walking through some actual code in the IDE which is prepared beforehand, occasionally adding a bit. You run the risk of overwhelming the audience with this approach, so there's a few tricks I picked up. First, whenever possible introduce the demo with a diagram showing the big picture before switching to the IDE. Second, minimize the amount of scrolling back and forth and switching between files. This takes some careful planning, and IDE features such as code folding can really help in this regard. And, on a more practical note, make sure the font is readable throughout the whole room!&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/pics/codefolding.png&quot; alt=&quot;Code folding in Eclipse&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;When code is not really essential to the talk, or you just need to show some standalone snippets, put it into a slide. Yes, it's a bit more static, but not having to switch between slides and IDE all the time is worth something as well. Just promise me you'll leave the laserpointer at home. Number the lines and refer to these linenumbers if you need to. Anything is better than a jittery red dot on the screen.&lt;/p&gt;
+
+&lt;h3&gt;Showtime&lt;/h3&gt;
+
+&lt;p&gt;So you've got your slides and demos ready. Now what? Some people like to do a 'dry-run' of the presentation just by themselves. You'll familiarize yourself with the slides and the flow of the presentation, and find out whether you finish early or late. While this can be an excellent preparation, for me this doesn't really work. There's something slightly odd about talking to a void. If I decide to do a dry-run, I try to organize a few colleagues. As added bonus you'll get early feedback to polish your talk. When this is not feasible, I try to verbalize my talk for at least the first three slides. This makes me think less when getting up in front of the audience. Having a flying start is a real confidence booster for the rest of the talk.&lt;/p&gt;
+
+&lt;p&gt;In the end giving good technical talks is a matter of doing it often. Combining deep technical knowledge with the performance art of public speaking is a valuable skill, and not just in the context of giving talks at conferences. Whenever you communicate with your customers about software requirements and technical issues, you'll find yourself using the same skillset. So I urge you to just try and prepare a talk on a framework or programming language you love. Present it to your co-workers, or at a user group meeting and keep improving!&lt;/p&gt;
+
+   </content>
+ </entry>
+ 
+ <entry>
+   <author><name>Sander Mak</name></author>
+   <title>JEEConf 2012 trip report</title>
+   <link href="http://branchandbound.net/blog/conferences/2012/05/jeeconf-tripreport"/>
+   <updated>2012-05-20T00:00:00+02:00</updated>
+   <id>http://branchandbound.net/blog/conferences/2012/05/jeeconf-tripreport</id>
+   <content type="html">
+       &lt;p&gt;What do Eastern European developers do on their free Saturday? Well, at least 650 of them go and attend a technical conference: JEEConf in Kiev, Ukraine. This is the second year that JEEConf is organized, and they've already grown from 400 attendants last year to 650 this year, coming from 9 countries surrounding Ukraine. I was invited to give two talks, one on Hibernate Performance Tuning and another on Scala &amp;amp; Lift.&lt;/p&gt;
+
+       &lt;p&gt;How on earth does a Dutch guy end up on a Eastern European Java conference? Yeah, I had the same question. Turns out that the Hibernate Performance Tuning presentation I put &lt;a href=&quot;http://www.slideshare.net/SanderMak/hibernate-performance-tuning&quot;&gt;on Slideshare&lt;/a&gt; a while ago is quite popular: more than 12,000 views to date. Among those viewers was one of the organizers of JEEConf, who happened to stumble upon a Hibernate performance problem. And then he thought it might be a good idea to let me explain it in person. Thanks Mikalai!&lt;/p&gt;
+
+&lt;h3&gt;Conference day&lt;/h3&gt;
+
+&lt;p&gt;My first talk was at 11am, right after the opening by Oracle's Arun Gupta on the future of Java EE. The nice thing about my Hibernate Performance Tuning talk is that almost everyone can relate to it. Since Hibernate practically is the de facto standard implementation for Object Relational Mapping, almost the whole audience had experience with it. Whether those are good or bad experiences I'll leave up for discussion... This led to some nice discussions and questions afterwards. Below you can view the slides, it's a slightly updated version of the original presentation:&lt;/p&gt;
+
+&lt;iframe src=&quot;http://www.slideshare.net/slideshow/embed_code/13002821&quot; width=&quot;425&quot; height=&quot;355&quot; frameborder=&quot;0&quot; marginwidth=&quot;0&quot; marginheight=&quot;0&quot; scrolling=&quot;no&quot;&gt;embed&lt;/iframe&gt;
+
+
+&lt;p&gt;The Scala &amp;amp; Lift talk was scheduled later in the afternoon. Fortunately there were a few other talks in English, because any Russian beyond 'da', 'njet' and 'spasiba' is lost on me. I got lots of question during my session on Lift, people were really interested. It will be interesting to see how Lift usage develops now that Typesafe has 'officially blessed'  Play 2 as official webframework for Scala. Anyway, here are the slides:&lt;/p&gt;
+
+&lt;iframe src=&quot;http://www.slideshare.net/slideshow/embed_code/13002899&quot; width=&quot;425&quot; height=&quot;355&quot; frameborder=&quot;0&quot; marginwidth=&quot;0&quot; marginheight=&quot;0&quot; scrolling=&quot;no&quot;&gt;embed&lt;/iframe&gt;
+
+
+&lt;p&gt;A nice touch at JEEConf is the fact that every attendee gets some 'thank you' cards to write a comment on for the speakers. The idea is to hand them over directly after the talk. Therefore the act of giving feedback gets a personal touch!&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/pics/jeeconf_cards.jpg&quot; alt=&quot;Thank you cards&quot; /&gt;&lt;/p&gt;
+
+&lt;h3&gt;Meeting new people&lt;/h3&gt;
+
+&lt;p&gt;To me, the most interesting part of going to conferences is meeting new people and exchanging experiences. For example, I discovered that Marktplaats.nl (Dutch Craigslist equivalent) outsources a lot of its development to Ukraine. Interestingly, they're migrating from Java/Hibernate to Scala/Squeryl with great success.&lt;/p&gt;
+
+&lt;p&gt;Since we shared the same hotel, I also got to hang out with Dejan Bosanac. He works for FuseSource and is a committer on several Apache projects. We had great fun discussing topics ranging from the next-generation Scala-based implementation of ActiveMQ (&lt;a href=&quot;http://activemq.apache.org/apollo/&quot;&gt;ActiveMQ Apollo&lt;/a&gt;) to Serbian and Dutch politics.&lt;/p&gt;
+
+&lt;h3&gt;Kiev&lt;/h3&gt;
+
+&lt;p&gt;Since I arrived a day early and left the day after the conference, I had some spare time to explore the city. By the way, arriving in Ukraine is a sobering experience: I couldn't read a single sign (Cyrillic) or understand a single word. Fortunately the organisation arranged a taxi to take me to the hotel. After settling in I explored some of the sights in Kiev's city center. All in all it was a great experience, a great conference and met some cool new people. What more could you ask for? Well, may be for some pictures to finish this post:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/pics/jeeconf_venue.jpg&quot; alt=&quot;Conference venue&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The JEEConf venue&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/pics/jeeconf_arun.jpg&quot; alt=&quot;Arun Gupta presenting Java EE 7&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Arun Gupta presenting Java EE 7 to a packed room&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/pics/jeeconf_hibernate_audience.jpg&quot; alt=&quot;Audience assembling before my Hibernate Performance Tuning talk&quot; /&gt;
+Audience assembling before my Hibernate Performance Tuning talk&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/pics/kiev_church.jpg&quot; alt=&quot;Church in Kiev&quot; /&gt;
+Colorful churches enough in Kiev!&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/pics/kiev_closedmainstreet.jpg&quot; alt=&quot;Main street closed off for the weekend&quot; /&gt;
+Closing the main street for the weekend? Good idea!&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/pics/kiev_reduniversity.jpg&quot; alt=&quot;Red university building&quot; /&gt;
+Beautiful Kiev University building&lt;/p&gt;
+
+   </content>
+ </entry>
+ 
+ <entry>
+   <author><name>Sander Mak</name></author>
+   <title>Cross-build injection attacks: how safe is your build?</title>
+   <link href="http://branchandbound.net/blog/security/2012/03/crossbuild-injection-how-safe-is-your-build"/>
+   <updated>2012-03-23T00:00:00+01:00</updated>
+   <id>http://branchandbound.net/blog/security/2012/03/crossbuild-injection-how-safe-is-your-build</id>
+   <content type="html">
+       &lt;p&gt;Imagine a world in which people blindly trust binaries uploaded to the internet by random strangers. Certainly not a world in which we as software engineers want to live. Except that many of us, including myself, do exactly that.  On a regular  basis. In our most precious environment: the software build process.&lt;/p&gt;
+
+       &lt;p&gt;&lt;strong&gt;Update 2012-08-22: I've posted a &lt;a href=&quot;/blog/security/2012/08/verify-dependencies-using-pgp/&quot;&gt;follow-up&lt;/a&gt; on how to verify dependencies using PGP.&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;What follows is a tale of trust and naiveté, leading to vulnerabilities that we rarely talk about: the injection of malicious code into our own applications. Enter the wonderful world of 'Cross-build injection attacks' (XBI). Aptly named by &lt;a href=&quot;https://www.fortify.com/downloads2/public/fortify_attacking_the_build.pdf&quot;&gt;Fortify (pdf)&lt;/a&gt; after website attacks such  Cross-site Scripting and Cross-site Request Forgery, but without even nearly as much mindshare among developers.&lt;/p&gt;
+
+&lt;h3&gt;Typical builds&lt;/h3&gt;
+
+&lt;p&gt;Most software uses other software: libraries and frameworks enable us to quickly write the good stuff rather than the tedious and boring stuff. This implicitly means we trust the code inside these libraries, based on for example the credentials of the library authors or because we've used it before (or dare I say, because we've verified the sourcecode of said library...) But how do these libraries physically end up in our own software? Let's look at the typical setup of a Java project (the remainder of this post discusses XBI on the Java platform, but towards the end we'll see that other platforms have similar issues). Most projects use Maven as their build system, or one of the fancier new build tools like SBT or Gradle which rely on the same Maven repository infrastructure. This results in the following situation:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/pics/maven_builds.png&quot; alt=&quot;Typical Maven build setup&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Maven has, for all its warts, provided us with a centralized canonical repository called Maven Central that contains many popular Java libraries. That's a good thing. But how can we be sure that what Maven downloads into our local repository is actually what was put into Maven Central by the library authors?  Or, put differently, how would an attacker exploit this system in order to inject malicious code into our builds?&lt;/p&gt;
+
+&lt;h3&gt;Attacking a build&lt;/h3&gt;
+
+&lt;p&gt;The first obvious XBI attack is to man-in-the-middle requests to Maven Central. Since Maven Central only allows http access (I guess https is cost-prohibitive CPU-wise when you are streaming binaries to the world for free), this is relatively easy. Maven does have a checksum facility, but an attacker can just man-in-the-middle the file containing the checksum as well, which is stored alongside the binary in Maven Central. In this sense, the checksums only help to detect transport problems and cannot be relied on to verify the authenticity of the binary.&lt;/p&gt;
+
+&lt;p&gt;Another, more involved XBI attack would be to 'poison' Maven Central by replacing binaries that are served. This only works when the security of the Maven Central servers is somehow compromised, which would be a big deal for everyone.&lt;/p&gt;
+
+&lt;h3&gt;Cutting all ties&lt;/h3&gt;
+
+&lt;p&gt;One obvious reaction to these threats is to not depend on Maven Central. Many companies I've worked with setup their own internal Maven repository, so the build server needn't be connected to the internet. Of course, the next question is: how do dependencies end up in this internal repository?&lt;/p&gt;
+
+&lt;p&gt;Indeed, by downloading them from Maven Central. The good thing is that you've decreased the attack surface since you only need to download once. But it's still not really satisfactory, since the attacks mentioned earlier still apply, albeit less so. Additional checks and measures before placing dependencies into the internal repository can help, but these are rarely in place. Looking at &lt;a href=&quot;http://www.sonatype.com/people/2012/03/the-results-are-in-sonatype-2012-open-source-development-survey/&quot;&gt;this survey&lt;/a&gt; only 50% of the companies have an open-source policy in place, and if there is one it is mainly concerned with legal aspects, not technical.&lt;/p&gt;
+
+&lt;p&gt;No, in practice, someone is tasked to mindlessly perform the download and shove it into the internal repository. At least now you have someone to scapegoat should it be malicious code, but really, this solves nothing. Also, this 'offline' workflow is sort of annoying during development, especially when you have manually chase transitive dependencies and do other things Maven would normally do automatically. But then again, security always has a cost.&lt;/p&gt;
+
+&lt;h3&gt;Cryptography&lt;/h3&gt;
+
+&lt;p&gt;Can we do better? Fortunately, yes. Starting three years ago, Maven Central requires PGP signing of uploaded artifacts. An .asc file containing the cryptographic signature is added alongside the binary. This means we can use the public key of the uploader to verify the signature derived from the binary with the author's private key. Of course, the public key should be obtained from a trusted source (such as MIT's &lt;a href=&quot;http://pgp.mit.edu&quot;&gt;public key server&lt;/a&gt;). Now we can be sure that we download the exact file that was uploaded by the library author. We're safe, even if the repository we download from has been compromised! Unless the artifact is older than three years, that is...&lt;/p&gt;
+
+&lt;p&gt;There's one downside: Maven does not check these PGP signatures automatically. A fully automated solution is offered by Sonatype with Nexus Professional, a commercial repository manager that can be installed inside a company. Didn't I just mention that security always has a cost?&lt;/p&gt;
+
+&lt;h3&gt;Other platforms&lt;/h3&gt;
+
+&lt;p&gt;I took the example of Maven and Maven Central because it's the eco-system I'm most familiar with. However, all platforms with automatic dependency management have to deal with this issue. Look, for example at this quote from the Ruby Gems &lt;a href=&quot;http://docs.rubygems.org/read/chapter/14&quot;&gt;manual&lt;/a&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;1.3 Security Issues
+Doesn’t this open a huge security hole? How can I trust the Gems
+which are automatically downloaded from the net?
+
+The same way you can trust all other code you install.
+(I.e. ultimately, you can’t.)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Or take Perl's CPAN, which hosts Perl modules from just about anyone. Checksums are as good as it gets on CPAN. Many people even execute CPAN scripts as root for ease of use. Discussing this dire situation leads to nice quotes &lt;a href=&quot;http://www.mail-archive.com/beginners@perl.org/msg25697.html&quot;&gt;such as&lt;/a&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;'Over the last 7 years, we haven't had any problems of this nature and hopefully it will remain that way ...' 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://perl.find-info.ru/perl/029/ch08lev1sec1.html#ch08lev2sec2&quot;&gt;or&lt;/a&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;'How much can you trust code from CPAN? The bad news is that it is true that
+there is little quality control on CPAN .. Technically, someone could place
+malicious code on CPAN.' 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;In other words: don't sweat it, nobody would do such a thing, right?&lt;/p&gt;
+
+&lt;h3&gt;Really?&lt;/h3&gt;
+
+&lt;p&gt;I know, this whole post may sound far-fetched. But that doesn't make the threat less real. There are many high-profile software builds (think banks, government, law enforcement etc.) depending increasingly on open-source libraries distributed through the internet. In the end the only way to be really safe is to download the library sources, verify them by hand, build them from source and place them into your build. But then again, who has the resources to do that? I'm very curious if there have been actual XBI victims, either with Maven or similar build systems.&lt;/p&gt;
+
+   </content>
+ </entry>
+ 
  
 </feed>
