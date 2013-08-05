@@ -1,0 +1,266 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>JEEConf 2013 trip report - Branch and Bound</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Sander Mak">
+
+    <link href="http://feeds.feedburner.com/BranchAndBound" rel="alternate" title="Branch and Bound Blog Feed" type="application/atom+xml" />
+    <!-- Le styles -->
+    <link href="/assets/themes/sander/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="/assets/themes/sander/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="/assets/themes/sander/syntax.css" rel="stylesheet">
+    <link href="/assets/themes/sander/style.css" rel="stylesheet">
+
+    <style type="text/css">
+      body {
+        padding-top: 10px;
+        padding-bottom: 40px;
+      }
+    </style>
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="assets/bootstrap/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="assets/bootstrap/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/bootstrap/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="assets/bootstrap/ico/apple-touch-icon-57-precomposed.png">
+
+  </head>
+
+  <body>
+
+
+    <div class="container">
+      <div class="row">
+        <div class="span11">
+    <div class="navbar">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="/">Branch and Bound</a>
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li><a href="/">Home</a></li>
+              <li><a href="/about.html">About</a></li>
+              <li><a href="/talks.html">Talks</a></li>
+              <li><a href="/archive.html">Archive</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+        </div>
+      </div>
+      <div class="row">
+        <div class="span6 offset2">
+          
+<article>
+  <header>
+    <h1>JEEConf 2013 trip report</h1>
+    <strong><time datetime="2013-05-25" pubdate>25 May 2013</time></strong>
+
+    <br>
+    <br>
+
+    <p><em><p>Like <a href="/blog/conferences/2012/05/jeeconf-tripreport">last year</a>, I had the opportunity to speak at JEEConf Kiev, the leading Java conference in Eastern Europe. More than 700 people from countries like Ukraine, Russia and Belarus attended JEEConf. Most talks are therefore in Russian. However, there was just enough English content to keep me entertained as well.</p>
+</em></p>
+  </header>
+  
+
+  <section>
+   <p>This year, the conference lasted two days rather than one. Somehow, this provided a bit more relaxed atmosphere. Unfortunately I had to miss out on some good content the second day, since I had to leave early to catch my flight.</p>
+
+<p><img src="/pics/jeeconf13_venue.jpg" alt="The venue" /></p>
+
+<p><em>(the conference venue)</em></p>
+
+<h3>The content</h3>
+
+<p>JEEConf started with a keynote by Reza Rahman on Java EE 7 and 8. To be honest, I think this talk is getting a bit stale. Not that the content is bad, but I've heard (slight variations) of this talk by different Oracle people for more than two years now. It's good to tell a consistent story, but a bit excitement might be good for a change.</p>
+
+<p>I enjoyed the session on <a href="http://arquillian.org">Arquillian</a> and some of its extensions. Arquillian isn't really new to me, but I hadn't been actively following its development. This was a nice status update, showing many improvements that are very useful in integration test scenario's. For example, being able to have data-driven integration tests using the Persistence extension (based on DBUnit). Another cool extension is the Selenium integration of Arquillian, called Arquillian Drone. You can deploy your app with Arquillian, get the resulting URL injected into your test class and run Selenium tests for different browsers easily.</p>
+
+<p>Another highlight were the talks bij Venkat Subramaniam, also known as <a href="http://twitter.com/venkat_s">venkat_s</a>. His talks are packed with practical knowledge, an enormous amount of energy and humor as well. His performance was even more impressive given the fact that his laptop broke down minutes before the session. So Venkat did all his live coding on a borrowed machine from one of the participants. The first talk was a practical guide to picking a JVM language like Scala, Groovy or Clojure. This lead to a good discussion on whether such a switch is even feasible for 'typical' Java developers. Yakov Fain articulates his point in a <a href="http://yakovfain.com/2013/05/25/how-to-bring-scala-to-enterprise-it/">blog post</a>. Even though I don't fully agree with his conclusions, it is a good discussion.</p>
+
+<p><img src="/pics/jeeconf13_venkats.jpg" alt="Venkat_s in action" /></p>
+
+<p><em>(Venkat_s in action)</em></p>
+
+<p>The second talk by Venkat was on concurrency with <a href="http://akka.io">Akka actors</a>. While it's easy to label something as the Next Big Thing™, I believe Akka really is a big deal. It has solid engineering behind it and opens up new doors for highly concurrent applications. With their cluster-implementation maturing as well, we're going to hear a lot more about Akka in the near future.</p>
+
+<h3>Modularity in the Cloud</h3>
+
+<p>My talk 'Modularity in the Cloud: a case study' was on the fourth timeslot in the second biggest room. This was my first conference session as a representative of <a href="http://luminis-technologies.com">Luminis Technologies</a> which I joined March this year. Around 150 people attended the session and judging by the insightful questions and positive feedback, I think the message came across very well. Here are the slides:</p>
+
+<iframe src="http://www.slideshare.net/slideshow/embed_code/21834897" width="425" height="355" frameborder="0" marginwidth="0" marginheight="0" scrolling="no">embed</iframe>
+
+
+<p>The case study focussed on PulseOn, an educational system that Luminis Technologies is building. If you want to find out more about this system, check out the <a href="http://pulseon.nl/indexEN.php">PulseOn website</a>. On the technical side, the open-source <a href="http://www.amdatu.org">Amdatu</a> project is where you should look. I'll write a dedicated post on the actual content of the talk later. Applying modular architecture is a very relevant message for contemporary Java developers, even though there are no easy answers. So watch this space.</p>
+
+<h3>The people</h3>
+
+<p>Besides technical content, the other important part of a conference is meeting people and exchanging ideas. Unlike last year there was a speaker's dinner which provided ample opportunities for exchanging ideas and having a good time.</p>
+
+<p>It was nice to see <a href="http://twitter.com/yfain">Yakov Fain</a> again, whom I met previous year at JEEConf as well. I should also mention <a href="http://twitter.com/_tamanm">Mohamed Taman</a>, an active Java community member who is doing some <a href="http://tamanmohamed.blogspot.nl/search/label/JCP">great work</a> for the JCP. I also talked to <a href="http://twitter.com/trnl">Vladimir Miguro</a> (aka vova), who is working on the new MongoDB 3 Java driver. It's interesting to hear how it will to totally revamped to provide a more fluent and idiomatic Java interface. Fear not, there will be a v2 compatibility layer for those who have non-modular applications that cannot easily cope with changes in underlying API's :-)</p>
+
+<p>Last but not least, props to <a href="http://twitter/xpinjection">Mikalai</a> and Aleksey, who once again organized a great Java conference!</p>
+
+  </section>
+</article>
+<div>
+  <strong>If you liked this post, please share it!</strong>
+  <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://branchandbound.net/blog/conferences/2013/05/jeeconf-2013-tripreport" data-via="Sander_Mak" data-dnt="true">Tweet</a>
+  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</div>
+
+<br>
+<br>
+
+<div id="related">
+  <h3>Related Posts</h3>
+  <ul class="posts">
+    
+      <li><span>05 Aug 2013</span> &raquo; <a href="/blog/web/2013/08/some-angularjs-pitfalls">Some AngularJS pitfalls</a></li>
+    
+      <li><span>18 Jul 2013</span> &raquo; <a href="/blog/java/2013/07/java-modularity-story">The Java Modularity Story</a></li>
+    
+      <li><span>24 Jun 2013</span> &raquo; <a href="/blog/development/2013/06/annoyances-daily-life-developer">Annoyances in the daily life of a developer</a></li>
+    
+  </ul>
+</div>
+
+
+
+
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    
+    var disqus_shortname = 'branchandbound'; // required: replace example with your forum shortname
+    
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+
+
+
+        </div>
+        <div class="span3">
+         <div class="hero-unit sidebar">
+           <a href="http://feeds.feedburner.com/BranchAndBound"><img class="rss pull-right" title="Branch and Bound Blog RSS Feed" alt="RSS Feed" src="/assets/themes/sander/rss.png"></a>
+           <h4 class="sidebar"><strong>Branch and Bound Blog</strong></h4>
+           <em>... pruning the software universe</em> 
+           <hr>
+           <ul class="sidebar unstyled">
+             <li><a href="/about.html">About Sander</a></li>
+           </ul>
+           <span class="sidebar pull-right">
+             <a href="http://www.twitter.com/Sander_Mak" target="_blank"><img title="Twitter" alt="Twitter" class="small" src="/assets/themes/sander/twitter.png"></a>
+             <a href="http://nl.linkedin.com/in/SanderMak" target="_blank"><img title="Linkedin profile" alt="Linkedin profile" class="small" src="/assets/themes/sander/linkedin.png"><a>
+             <a href="http://www.github.com/SanderMak" target="_blank"><img  title="GitHub" alt="GitHub" class="small" src="/assets/themes/sander/github.png"></a>
+             <a href="http://www.slideshare.net/SanderMak/presentations" target="_blank"><img title="Slideshare presentations"  alt="Slideshare presentations" class="small" src="/assets/themes/sander/slideshare.png"></a>
+           </span>
+           <hr>
+           <h5 class="sidebar">&nbsp;View archive by:</h5>
+           <ul class="sidebar unstyled">
+             <li><a href="/archive.html">Date</a></li>
+             <li><a href="/categories.html">Category</a></li>
+             <li><a href="/tags.html">Tag</a></li>
+           </ul>
+          </div>
+          <div class="hero-unit twittersidebar">
+            <h5 class="sidebar">Featured articles:</h5>
+            <br>
+            <ul>
+              <li>&raquo; <a href="/blog/scala/2013/05/launching-scalabitz/?src=featured">Launching Scalabitz</a></li>
+              <li>&raquo; <a href="/blog/bookreview/2013/01/bookreview-infinity-and-the-mind/?src=featured">Infinity and the Mind</a></li>      
+  	          <li>&raquo; <a href="/blog/conferences/2012/06/preparing-a-technical-talk/?src=featured">Preparing a technical talk</a></li>
+            </ul>
+          </div>
+          <div class="hero-unit readingsidebar">
+            <h5 class="sidebar">Currently reading:</h5>
+            <br>
+            <ul>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/1933988916/ref=as_li_ss_tl?ie=UTF8&tag=branandboun-20&linkCode=as2&camp=1789&creative=390957&creativeASIN=1933988916" target="_blank">OSGi in action</a></li>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/1593273886/ref=as_li_ss_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=1593273886&linkCode=as2&tag=branandboun-20" target="_blank">The Tangled Web</a></li>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/0321125215/ref=as_li_ss_tl?ie=UTF8&tag=branandboun-20&linkCode=as2&camp=1789&creative=390957&creativeASIN=0321125215" target="_blank">Domain-driven design</a></li>
+            </ul>
+          </div>
+          <div class="hero-unit sidebar">
+           <a class="twitter-timeline" width="250" height="500" data-dnt=true href="https://twitter.com/Sander_Mak" data-widget-id="266609354059431938">Tweets by @Sander_Mak</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+
+                       
+          </div>
+        </div>
+       </div>
+      </div>
+     </div>
+
+
+      <footer>
+        <div class="container">
+         <div class="row">
+           <div class="span9 offset2">
+            <br>
+            <hr>
+           </div>
+         </div>
+         <div class="row">
+          <div class="span4 offset2">
+            <p>Branch and Bound - ... pruning the software universe</p>
+          </div>   
+          <div class="span5">  
+            <p class="pull-right">by Sander Mak</p>
+          </div>
+         </div>
+        </div>
+      </footer>
+
+    <!-- Scripts at the end for faster loading. -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
+    <script src="/assets/themes/sander/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="http://twitter.com/javascripts/blogger.js"></script>
+   
+
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-15335121-2']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+
+    </script>
+
+  </body>
+</html>
+
+
+

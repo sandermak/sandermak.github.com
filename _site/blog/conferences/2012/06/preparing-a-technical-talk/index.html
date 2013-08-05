@@ -1,0 +1,282 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Preparing a technical talk - Branch and Bound</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Sander Mak">
+
+    <link href="http://feeds.feedburner.com/BranchAndBound" rel="alternate" title="Branch and Bound Blog Feed" type="application/atom+xml" />
+    <!-- Le styles -->
+    <link href="/assets/themes/sander/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="/assets/themes/sander/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="/assets/themes/sander/syntax.css" rel="stylesheet">
+    <link href="/assets/themes/sander/style.css" rel="stylesheet">
+
+    <style type="text/css">
+      body {
+        padding-top: 10px;
+        padding-bottom: 40px;
+      }
+    </style>
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="assets/bootstrap/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="assets/bootstrap/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/bootstrap/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="assets/bootstrap/ico/apple-touch-icon-57-precomposed.png">
+
+  </head>
+
+  <body>
+
+
+    <div class="container">
+      <div class="row">
+        <div class="span11">
+    <div class="navbar">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="/">Branch and Bound</a>
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li><a href="/">Home</a></li>
+              <li><a href="/about.html">About</a></li>
+              <li><a href="/talks.html">Talks</a></li>
+              <li><a href="/archive.html">Archive</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+        </div>
+      </div>
+      <div class="row">
+        <div class="span6 offset2">
+          
+<article>
+  <header>
+    <h1>Preparing a technical talk</h1>
+    <strong><time datetime="2012-06-06" pubdate>06 June 2012</time></strong>
+
+    <br>
+    <br>
+
+    <p><em><p>We software engineers love giving talks. Fortunately, the abundance of technical conferences shows that we like listening too. A lot of talks on these conferences are given by software engineers who love sharing knowledge, rather than professional speakers. This especially holds true for conferences organized by user groups. Since I'm one of those software engineers who likes to give talks, I'd like to share my thoughts on what you can do to prepare a technical talk.</p>
+</em></p>
+  </header>
+  
+
+  <section>
+   <p>In the past few years I've gained some experience with presenting at conferences. In fact, I started writing this post en-route to JEEConf where I'll give two talks (trip report <a href="/blog/conferences/2012/05/jeeconf-tripreport">here</a>). While I enjoy doing this, I'm by no means a professional speaker. It's really a matter of learning-by-doing. To me, giving a talk in front of a like-minded audience is exhilarating, and striking up interesting conversations afterwards can be really rewarding. But don't be fooled: even though your performance may last for only an hour, you'll be investing a lot of time to make it go just right.</p>
+
+<h3>How to start</h3>
+
+<p>Let's say you have a wonderful topic in mind for a talk: 'Peer-to-peer IDEs using Websockets and Git' (fictional of course, but it sounds cool. Someone should do this). You've worked on the topic for some time, but it's time to share it with the world. Now, what will be your first step? Making slides? Coming up with a witty title? Start hacking on your demos? No. You start by asking yourself the two very important questions:</p>
+
+<ol>
+<li>Who is my audience?</li>
+<li>What is my message?</li>
+</ol>
+
+
+<p>Is your audience into specific programming languages and frameworks? Does it consist of experienced coders, or a mix of technical and 'business'  people? What are their preconceptions? All of this information helps you determine the central message of your talk before you've made a single slide. For example, our topic is a bit out there and wouldn't really fit a conference with your typical 'enterprise developers' audience. You might tone down the topic a bit in this case, focusing on a single aspect, or simply choose a different audience...</p>
+
+<p>After you've profiled the audience, it is time to formulate the message of your talk. No, your title is not your message: titles can be provocative teasers, whereas your message succinctly describes what you want to convey with your talk. Think of it as the core sentence of your abstract. Of course this core message must be tailored to your audience. The message defines the focus of all remaining efforts. Our fictional topic, for example, can be brought with several different messages:</p>
+
+<ul>
+<li>'Explain how Websockets enable cool applications like a collaborative P2P IDE that leverages Git'</li>
+<li>'P2P collaborative IDEs are the way of the future, and here's how you could implement them using Websockets and Git'</li>
+<li>'How Git can be used as building block for new applications'</li>
+</ul>
+
+
+<p>Each of these messages leads to a vastly different narrative. Reach back to the core message every time you need to decide whether to include or omit a sub-topic. Does it strengthen your message? Above all, remember: the message should answer a question that is relevant to your audience. If not, both you and the audience will be wasting time.</p>
+
+<h3>Focus</h3>
+
+<p>A big pitfall for me is that I tend to focus too hard on the subject. This may sound strange, so let me try to explain. Doing research is necessary when preparing a technical talk. However, it is very easy to overdo this. It's not necessary to read every single blogpost ever written on the topic at hand, to delve into the source of a library, or follow a framework's mailinglist religiously. You'll tell yourself that you are getting a deeper understanding by researching so much, but remember you're not doing this (just) for you!</p>
+
+<p>In the end what counts is giving a clear and concise talk to your audience. Having more information in your head does not automatically lead to a better presentation. Let the message guide the direction and amount of research that you perform on each sub-topic. There will always be someone in the audience who knows more about the topic than you. It'll be fine, trust me.</p>
+
+<h3>Slides</h3>
+
+<p>There's lots of <a href="http://www.presentationzen.com/">excellent advice</a> already on using and designing slides which I won't repeat here. A lot of it boils down to 'do less'. I have a lot of respect for speakers who deliver talks without a slide deck. But it's not for me, at least not now. Having <a href="http://www.slideshare.net/sandermak">slides</a> to guide me through a talk is essential for me. Additionally, having visuals like diagrams and graphs always helps in technical talks. Avoid the stereotypical slides with endless bulleted lists and you're ahead of the pack already.</p>
+
+<h3>Code examples</h3>
+
+<p>Remember the P2P IDE using Websockets and Git? You can talk about it all you want, but showing code is infinitely more effective. That is, if done right. One of the worst presentations I ever saw was simply playing a screencast for the demo parts. Aside from the unreadable pixelated text (if you ever do this, use a proper codec) it was just plain boring to watch a pre-cooked movie. Keeping the narration in sync with the screencast was awkward. Just don't do this, however safe it may feel.</p>
+
+<p>The other extreme is live coding. Doing live coding in front of an audience is risky, but the rewards can be commensurate. What's better than watching a skilled craftsman doing some awesome coding? Not every topic lends itself for this approach, though. You need to be able to build something from scratch without too much distracting boilerplate. Preferably building out a single example throughout the talk.</p>
+
+<p>I tend to choose the happy medium: walking through some actual code in the IDE which is prepared beforehand, occasionally adding a bit. You run the risk of overwhelming the audience with this approach, so there's a few tricks I picked up. First, whenever possible introduce the demo with a diagram showing the big picture before switching to the IDE. Second, minimize the amount of scrolling back and forth and switching between files. This takes some careful planning, and IDE features such as code folding can really help in this regard. And, on a more practical note, make sure the font is readable throughout the whole room!</p>
+
+<p><img src="/pics/codefolding.png" alt="Code folding in Eclipse" /></p>
+
+<p>When code is not really essential to the talk, or you just need to show some standalone snippets, put it into a slide. Yes, it's a bit more static, but not having to switch between slides and IDE all the time is worth something as well. Just promise me you'll leave the laserpointer at home. Number the lines and refer to these linenumbers if you need to. Anything is better than a jittery red dot on the screen.</p>
+
+<h3>Showtime</h3>
+
+<p>So you've got your slides and demos ready. Now what? Some people like to do a 'dry-run' of the presentation just by themselves. You'll familiarize yourself with the slides and the flow of the presentation, and find out whether you finish early or late. While this can be an excellent preparation, for me this doesn't really work. There's something slightly odd about talking to a void. If I decide to do a dry-run, I try to organize a few colleagues. As added bonus you'll get early feedback to polish your talk. When this is not feasible, I try to verbalize my talk for at least the first three slides. This makes me think less when getting up in front of the audience. Having a flying start is a real confidence booster for the rest of the talk.</p>
+
+<p>In the end giving good technical talks is a matter of doing it often. Combining deep technical knowledge with the performance art of public speaking is a valuable skill, and not just in the context of giving talks at conferences. Whenever you communicate with your customers about software requirements and technical issues, you'll find yourself using the same skillset. So I urge you to just try and prepare a talk on a framework or programming language you love. Present it to your co-workers, or at a user group meeting and keep improving!</p>
+
+  </section>
+</article>
+<div>
+  <strong>If you liked this post, please share it!</strong>
+  <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://branchandbound.net/blog/conferences/2012/06/preparing-a-technical-talk" data-via="Sander_Mak" data-dnt="true">Tweet</a>
+  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</div>
+
+<br>
+<br>
+
+<div id="related">
+  <h3>Related Posts</h3>
+  <ul class="posts">
+    
+      <li><span>05 Aug 2013</span> &raquo; <a href="/blog/web/2013/08/some-angularjs-pitfalls">Some AngularJS pitfalls</a></li>
+    
+      <li><span>18 Jul 2013</span> &raquo; <a href="/blog/java/2013/07/java-modularity-story">The Java Modularity Story</a></li>
+    
+      <li><span>24 Jun 2013</span> &raquo; <a href="/blog/development/2013/06/annoyances-daily-life-developer">Annoyances in the daily life of a developer</a></li>
+    
+  </ul>
+</div>
+
+
+
+
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    
+    var disqus_shortname = 'branchandbound'; // required: replace example with your forum shortname
+    
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+
+
+
+        </div>
+        <div class="span3">
+         <div class="hero-unit sidebar">
+           <a href="http://feeds.feedburner.com/BranchAndBound"><img class="rss pull-right" title="Branch and Bound Blog RSS Feed" alt="RSS Feed" src="/assets/themes/sander/rss.png"></a>
+           <h4 class="sidebar"><strong>Branch and Bound Blog</strong></h4>
+           <em>... pruning the software universe</em> 
+           <hr>
+           <ul class="sidebar unstyled">
+             <li><a href="/about.html">About Sander</a></li>
+           </ul>
+           <span class="sidebar pull-right">
+             <a href="http://www.twitter.com/Sander_Mak" target="_blank"><img title="Twitter" alt="Twitter" class="small" src="/assets/themes/sander/twitter.png"></a>
+             <a href="http://nl.linkedin.com/in/SanderMak" target="_blank"><img title="Linkedin profile" alt="Linkedin profile" class="small" src="/assets/themes/sander/linkedin.png"><a>
+             <a href="http://www.github.com/SanderMak" target="_blank"><img  title="GitHub" alt="GitHub" class="small" src="/assets/themes/sander/github.png"></a>
+             <a href="http://www.slideshare.net/SanderMak/presentations" target="_blank"><img title="Slideshare presentations"  alt="Slideshare presentations" class="small" src="/assets/themes/sander/slideshare.png"></a>
+           </span>
+           <hr>
+           <h5 class="sidebar">&nbsp;View archive by:</h5>
+           <ul class="sidebar unstyled">
+             <li><a href="/archive.html">Date</a></li>
+             <li><a href="/categories.html">Category</a></li>
+             <li><a href="/tags.html">Tag</a></li>
+           </ul>
+          </div>
+          <div class="hero-unit twittersidebar">
+            <h5 class="sidebar">Featured articles:</h5>
+            <br>
+            <ul>
+              <li>&raquo; <a href="/blog/scala/2013/05/launching-scalabitz/?src=featured">Launching Scalabitz</a></li>
+              <li>&raquo; <a href="/blog/bookreview/2013/01/bookreview-infinity-and-the-mind/?src=featured">Infinity and the Mind</a></li>      
+  	          <li>&raquo; <a href="/blog/conferences/2012/06/preparing-a-technical-talk/?src=featured">Preparing a technical talk</a></li>
+            </ul>
+          </div>
+          <div class="hero-unit readingsidebar">
+            <h5 class="sidebar">Currently reading:</h5>
+            <br>
+            <ul>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/1933988916/ref=as_li_ss_tl?ie=UTF8&tag=branandboun-20&linkCode=as2&camp=1789&creative=390957&creativeASIN=1933988916" target="_blank">OSGi in action</a></li>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/1593273886/ref=as_li_ss_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=1593273886&linkCode=as2&tag=branandboun-20" target="_blank">The Tangled Web</a></li>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/0321125215/ref=as_li_ss_tl?ie=UTF8&tag=branandboun-20&linkCode=as2&camp=1789&creative=390957&creativeASIN=0321125215" target="_blank">Domain-driven design</a></li>
+            </ul>
+          </div>
+          <div class="hero-unit sidebar">
+           <a class="twitter-timeline" width="250" height="500" data-dnt=true href="https://twitter.com/Sander_Mak" data-widget-id="266609354059431938">Tweets by @Sander_Mak</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+
+                       
+          </div>
+        </div>
+       </div>
+      </div>
+     </div>
+
+
+      <footer>
+        <div class="container">
+         <div class="row">
+           <div class="span9 offset2">
+            <br>
+            <hr>
+           </div>
+         </div>
+         <div class="row">
+          <div class="span4 offset2">
+            <p>Branch and Bound - ... pruning the software universe</p>
+          </div>   
+          <div class="span5">  
+            <p class="pull-right">by Sander Mak</p>
+          </div>
+         </div>
+        </div>
+      </footer>
+
+    <!-- Scripts at the end for faster loading. -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
+    <script src="/assets/themes/sander/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="http://twitter.com/javascripts/blogger.js"></script>
+   
+
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-15335121-2']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+
+    </script>
+
+  </body>
+</html>
+
+
+

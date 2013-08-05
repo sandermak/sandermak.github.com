@@ -1,0 +1,283 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Modern concurrency and Java EE - Branch and Bound</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Sander Mak">
+
+    <link href="http://feeds.feedburner.com/BranchAndBound" rel="alternate" title="Branch and Bound Blog Feed" type="application/atom+xml" />
+    <!-- Le styles -->
+    <link href="/assets/themes/sander/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="/assets/themes/sander/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="/assets/themes/sander/syntax.css" rel="stylesheet">
+    <link href="/assets/themes/sander/style.css" rel="stylesheet">
+
+    <style type="text/css">
+      body {
+        padding-top: 10px;
+        padding-bottom: 40px;
+      }
+    </style>
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="assets/bootstrap/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="assets/bootstrap/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/bootstrap/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="assets/bootstrap/ico/apple-touch-icon-57-precomposed.png">
+
+  </head>
+
+  <body>
+
+
+    <div class="container">
+      <div class="row">
+        <div class="span11">
+    <div class="navbar">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="/">Branch and Bound</a>
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li><a href="/">Home</a></li>
+              <li><a href="/about.html">About</a></li>
+              <li><a href="/talks.html">Talks</a></li>
+              <li><a href="/archive.html">Archive</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+        </div>
+      </div>
+      <div class="row">
+        <div class="span6 offset2">
+          
+<article>
+  <header>
+    <h1>Modern concurrency and Java EE</h1>
+    <strong><time datetime="2012-07-23" pubdate>23 July 2012</time></strong>
+
+    <br>
+    <br>
+
+    <p><em><p>Managing your own threads within a Java EE container is not recommended and even illegal in some circumstances. But where does that leave us when we want to use the shiny new Java concurrency frameworks like Fork/Join and Akka in Java EE applications? The addition of new concurrency facilities to the Java EE 7 spec may open some doors.</p>
+</em></p>
+  </header>
+  
+
+  <section>
+   <p>The past year I've been diving into new concurrency options on the JVM. Java SE 7 brought us <a href="http://docs.oracle.com/javase/tutorial/essential/concurrency/forkjoin.html">Fork/Join</a> concurrency, and other other approaches like <a href="http://akka.io">actor-based</a> concurrency with for example Akka gain popularity as well. I did some talks about Fork/Join (talk on <a href="http://www.parleys.com/#st=5&amp;id=3217">Parleys</a>, <a href="http://www.slideshare.net/SanderMak/fork-join-bejug-2012">slides</a>) and Akka (talk on <a href="http://www.parleys.com/#id=3218&amp;st=5">Parleys</a>, <a href="http://www.slideshare.net/SanderMak/akka-bejug/">slides</a>) and one question I always get is: 'can this be used in a Java EE applications?'</p>
+
+<p>Since both Fork/Join and Akka start and stop their own thread(pool)s, the answer is: 'it usually works, but it is not recommended within Java EE containers'. Unsatisfactory answer? You bet. But fortunately things may change with the next release of Java EE.</p>
+
+<h3>JSR-236: Concurrency Utilities for the Java EE platform</h3>
+
+<p>Most application servers already offer the possibility to get a managed (sort-of, kind-of) threadpool through the <a href="http://docs.oracle.com/javaee/1.4/api/javax/resource/spi/work/WorkManager.html">WorkManager</a> API. It was never standardized as part of Java EE though. And even if it was, it would not be enough for the Fork/Join framework. The only pluggability you get when instantiating a <a href="http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/ForkJoinPool.html">ForkJoinPool</a> is a custom thread factory. For the record, it seems that Akka <a href="http://blog.vasilrem.com/container-managed-actor-dispatchers">can be configured</a> with WorkManagers.</p>
+
+<p>However, standardization of application-facing, container-managed threading may be upon us. Work on JSR-236 commenced in 2003. Yes, that's almost a decade ago. The first draft of the Concurrency EE spec appeared in 2006, but unfortunately it languished ever since. In April of this year, however, the JSR was resuscitated and an updated version was published last month. Even though the <a href="http://java.net/downloads/concurrency-ee-spec/EE%20Concurrency%20Utilities%20Dec-20-2012-delta.pdf">delta</a> with the 2006 draft is minimal (e.g. 'update package name from javax.util.concurrent to javax.enterprise.concurrent'), it is good to see things are back on the agenda.</p>
+
+<h3>javax.enterprise.concurrent</h3>
+
+<p>So what's in this elusive new javax.enterprise.concurrent package? I salvaged the following diagram from a 2006 JavaOne <a href="http://gee.cs.oswego.edu/dl/concurrencyee-interest/JavaOne-EEConcurrency.pdf">presentation</a>, with the new concurrency facilities marked yellow:</p>
+
+<p><img src="/pics/javaeeconcurrency.png" alt="Java EE concurrency" /></p>
+
+<p>The two most important interfaces for enabling alternative concurrency frameworks are <a href="http://concurrency-ee-spec.java.net/javadoc/javax/enterprise/concurrent/ManagedExecutorService.html">ManagedExecutorService</a> and <a href="http://concurrency-ee-spec.java.net/javadoc/javax/enterprise/concurrent/ManagedThreadFactory.html">ManagedThreadFactory</a>, both extending their non-managed java.util.concurrent counterparts from Java SE. What does this Managed prefix buy us? It means that tasks submitted and threads created through these interfaces will be fully aware of the Java EE contextual services. Things like transaction management, security context and so on are all available when the task is executed or the thread is used. The container is fully aware of the lifecycle of these managed threads, and can offer generic monitoring and tuning options.</p>
+
+<p>Another interesting aspect of the propesed ManagedExecutorService is that it must support distribution. One of the following properties can be configured:</p>
+
+<ul>
+<li><em>Local:</em> the task is run in the same process/server that submitted the task.</li>
+<li><em>Distributable:</em> the task may be run in any process/server including the one that submitted the task.</li>
+<li><em>Distributable with Affinity:</em> the task may be run in any process/server including the one that
+submitted the task. All tasks will then run on the selected process/server.</li>
+</ul>
+
+
+<p>Suddenly we have the building blocks for an asynchronous, distributed computation engine at our fingertips! Obviously, the tasks need to be Serializable for this to work.</p>
+
+<h3>Connecting the dots</h3>
+
+<p>You might be wondering why it is important to have these concurrency utilities, since Java EE 6 already provides the <a href="http://docs.oracle.com/javaee/6/tutorial/doc/gkkqg.html">@Asynchronous</a> annotation on EJB's and <a href="https://blogs.oracle.com/enterprisetechtips/entry/asynchronous_support_in_servlet_3">async Servlet</a> support is also available. However useful these are for application development, the constructs are not meant to bootstrap other concurrency libraries and frameworks. With the proposed utilities, however, you could construct your own java.util.concurrent.ThreadPoolExecutor backed with managed threads:</p>
+
+<div class="highlight"><pre><code class="java"> <span class="c1">// Can also use JNDI lookup in method instead of injection</span>
+ <span class="nd">@Resource</span>
+ <span class="n">ManagedThreadFactory</span> <span class="n">mtf</span><span class="o">;</span>
+
+ <span class="kd">public</span> <span class="n">ExecutorService</span> <span class="nf">getManagedThreadPool</span><span class="o">()</span> <span class="o">{</span>
+   <span class="c1">// All threads created will be managed</span>
+   <span class="k">return</span> <span class="k">new</span> <span class="nf">ThreadPoolExecutor</span><span class="o">(</span><span class="mi">5</span><span class="o">,</span> <span class="mi">10</span><span class="o">,</span> <span class="mi">5</span><span class="o">,</span> <span class="n">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">,</span>
+       <span class="k">new</span> <span class="n">ArrayBlockingQueue</span><span class="o">&lt;</span><span class="n">Runnable</span><span class="o">&gt;(</span><span class="mi">10</span><span class="o">),</span> <span class="n">tf</span><span class="o">);</span>
+ <span class="o">}</span>
+</code></pre></div>
+
+
+<p>Similarly, ForkJoinPool can be parameterized with a custom ForkJoinPool.ForkJoinWorkerThreadFactory implementation that delegates thread creation to the ManagedThreadFactory. While trying to implement such an adapter I unfortunately ran into the issue that Fork/Join uses a custom Thread subclass (<a href="http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/ForkJoinWorkerThread.html">ForkJoinWorkerThread</a>). This makes the task a bit harder, it's constructor being package protected. And obviously I can't test the code, since I'm not aware of any (public) JSR-236 implementation. Furthermore, I believe such adapters for java.util.concurrent should be part of the spec. No need to force application developers to reinvent the wheel again and again!</p>
+
+<h3>Now what?</h3>
+
+<p>When reading the JSR-236 spec it is clear that it was crafted in the ancient J2EE times. Just look at the code examples in the draft spec (EJBHome interfaces, really?).  CDI is never mentioned, and neither is Fork/Join or other relevant newer technologies. Still, it's clear that this spec will lay the groundwork for integrating modern Java concurrency frameworks with Java EE. But exactly how this will work out is too early to tell.</p>
+
+<p>Another obvious candidate for using the javax.enterprise.concurrent functionality is the <a href="https://blogs.oracle.com/theaquarium/entry/new_java_ee">Batch Processing</a> JSR. There's lot's of work to do it seems. Let's hope that expert groups find enough time to join forces and move the Java EE platform forward.</p>
+
+  </section>
+</article>
+<div>
+  <strong>If you liked this post, please share it!</strong>
+  <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://branchandbound.net/blog/java/2012/07/modern-concurrency-and-javaee" data-via="Sander_Mak" data-dnt="true">Tweet</a>
+  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</div>
+
+<br>
+<br>
+
+<div id="related">
+  <h3>Related Posts</h3>
+  <ul class="posts">
+    
+      <li><span>05 Aug 2013</span> &raquo; <a href="/blog/web/2013/08/some-angularjs-pitfalls">Some AngularJS pitfalls</a></li>
+    
+      <li><span>18 Jul 2013</span> &raquo; <a href="/blog/java/2013/07/java-modularity-story">The Java Modularity Story</a></li>
+    
+      <li><span>24 Jun 2013</span> &raquo; <a href="/blog/development/2013/06/annoyances-daily-life-developer">Annoyances in the daily life of a developer</a></li>
+    
+  </ul>
+</div>
+
+
+
+
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    
+    var disqus_shortname = 'branchandbound'; // required: replace example with your forum shortname
+    
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+
+
+
+        </div>
+        <div class="span3">
+         <div class="hero-unit sidebar">
+           <a href="http://feeds.feedburner.com/BranchAndBound"><img class="rss pull-right" title="Branch and Bound Blog RSS Feed" alt="RSS Feed" src="/assets/themes/sander/rss.png"></a>
+           <h4 class="sidebar"><strong>Branch and Bound Blog</strong></h4>
+           <em>... pruning the software universe</em> 
+           <hr>
+           <ul class="sidebar unstyled">
+             <li><a href="/about.html">About Sander</a></li>
+           </ul>
+           <span class="sidebar pull-right">
+             <a href="http://www.twitter.com/Sander_Mak" target="_blank"><img title="Twitter" alt="Twitter" class="small" src="/assets/themes/sander/twitter.png"></a>
+             <a href="http://nl.linkedin.com/in/SanderMak" target="_blank"><img title="Linkedin profile" alt="Linkedin profile" class="small" src="/assets/themes/sander/linkedin.png"><a>
+             <a href="http://www.github.com/SanderMak" target="_blank"><img  title="GitHub" alt="GitHub" class="small" src="/assets/themes/sander/github.png"></a>
+             <a href="http://www.slideshare.net/SanderMak/presentations" target="_blank"><img title="Slideshare presentations"  alt="Slideshare presentations" class="small" src="/assets/themes/sander/slideshare.png"></a>
+           </span>
+           <hr>
+           <h5 class="sidebar">&nbsp;View archive by:</h5>
+           <ul class="sidebar unstyled">
+             <li><a href="/archive.html">Date</a></li>
+             <li><a href="/categories.html">Category</a></li>
+             <li><a href="/tags.html">Tag</a></li>
+           </ul>
+          </div>
+          <div class="hero-unit twittersidebar">
+            <h5 class="sidebar">Featured articles:</h5>
+            <br>
+            <ul>
+              <li>&raquo; <a href="/blog/scala/2013/05/launching-scalabitz/?src=featured">Launching Scalabitz</a></li>
+              <li>&raquo; <a href="/blog/bookreview/2013/01/bookreview-infinity-and-the-mind/?src=featured">Infinity and the Mind</a></li>      
+  	          <li>&raquo; <a href="/blog/conferences/2012/06/preparing-a-technical-talk/?src=featured">Preparing a technical talk</a></li>
+            </ul>
+          </div>
+          <div class="hero-unit readingsidebar">
+            <h5 class="sidebar">Currently reading:</h5>
+            <br>
+            <ul>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/1933988916/ref=as_li_ss_tl?ie=UTF8&tag=branandboun-20&linkCode=as2&camp=1789&creative=390957&creativeASIN=1933988916" target="_blank">OSGi in action</a></li>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/1593273886/ref=as_li_ss_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=1593273886&linkCode=as2&tag=branandboun-20" target="_blank">The Tangled Web</a></li>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/0321125215/ref=as_li_ss_tl?ie=UTF8&tag=branandboun-20&linkCode=as2&camp=1789&creative=390957&creativeASIN=0321125215" target="_blank">Domain-driven design</a></li>
+            </ul>
+          </div>
+          <div class="hero-unit sidebar">
+           <a class="twitter-timeline" width="250" height="500" data-dnt=true href="https://twitter.com/Sander_Mak" data-widget-id="266609354059431938">Tweets by @Sander_Mak</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+
+                       
+          </div>
+        </div>
+       </div>
+      </div>
+     </div>
+
+
+      <footer>
+        <div class="container">
+         <div class="row">
+           <div class="span9 offset2">
+            <br>
+            <hr>
+           </div>
+         </div>
+         <div class="row">
+          <div class="span4 offset2">
+            <p>Branch and Bound - ... pruning the software universe</p>
+          </div>   
+          <div class="span5">  
+            <p class="pull-right">by Sander Mak</p>
+          </div>
+         </div>
+        </div>
+      </footer>
+
+    <!-- Scripts at the end for faster loading. -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
+    <script src="/assets/themes/sander/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="http://twitter.com/javascripts/blogger.js"></script>
+   
+
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-15335121-2']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+
+    </script>
+
+  </body>
+</html>
+
+
+

@@ -1,0 +1,432 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>A year of blogging analyzed with R - Branch and Bound</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Sander Mak">
+
+    <link href="http://feeds.feedburner.com/BranchAndBound" rel="alternate" title="Branch and Bound Blog Feed" type="application/atom+xml" />
+    <!-- Le styles -->
+    <link href="/assets/themes/sander/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="/assets/themes/sander/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="/assets/themes/sander/syntax.css" rel="stylesheet">
+    <link href="/assets/themes/sander/style.css" rel="stylesheet">
+
+    <style type="text/css">
+      body {
+        padding-top: 10px;
+        padding-bottom: 40px;
+      }
+    </style>
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="assets/bootstrap/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="assets/bootstrap/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/bootstrap/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="assets/bootstrap/ico/apple-touch-icon-57-precomposed.png">
+
+  </head>
+
+  <body>
+
+
+    <div class="container">
+      <div class="row">
+        <div class="span11">
+    <div class="navbar">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="/">Branch and Bound</a>
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li><a href="/">Home</a></li>
+              <li><a href="/about.html">About</a></li>
+              <li><a href="/talks.html">Talks</a></li>
+              <li><a href="/archive.html">Archive</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+        </div>
+      </div>
+      <div class="row">
+        <div class="span6 offset2">
+          
+<article>
+  <header>
+    <h1>A year of blogging analyzed with R</h1>
+    <strong><time datetime="2013-03-23" pubdate>23 March 2013</time></strong>
+
+    <br>
+    <br>
+
+    <p><em><p>Today it's exactly one year ago that I published my first blogpost on branchandbound.net. During this year I've written 12 posts, including this one. Since we live in the age of analytics, I thought it would be nice to show how this blog has fared during its first year.</p>
+</em></p>
+  </header>
+  
+
+  <section>
+   <p>Like most people I use Google Analytics to track what's happening on this site. However, I'm not going to show you screenshots of the GA Dashboard. Not that it's bad (it's actually pretty good), but where's the fun in that? Since this is a programming blog we're going to hook into the <a href="https://developers.google.com/analytics/devguides/reporting/core/v3/">Google Analytics API</a>. And this time, without using my standard tools of trade. Instead of using a JVM based language, I'm turning to R to do some number crunching.</p>
+
+<h3>Learning R</h3>
+
+<p><a href="http://www.r-project.org/">The R language</a> is geared towards statistical programming and data analysis. Someone described it to me as a headless version of Excel on steroids. I think this gives the right feeling for what R is. If you're coming from a statically-typed background or expect a perfectly crafted language, you're in for a culture shock. R lives firmly in the camp of 'shut up, it works' and its virtues lie in the vast amount of statistical libraries that are available. Let's just say that the intersection on the Venn diagram covering statisticians and kick-ass language designers/software engineers is very small:</p>
+
+<p><img src="/pics/statisticians_langdesigners_venn.png" alt="Statisticians vs. Language Designers :)" /></p>
+
+<p>(the intersection <em>is</em> inhabited though: check the <a href="http://www.johnmyleswhite.com/notebook/2012/03/31/julia-i-love-you/">Julia</a> language)</p>
+
+<p>I picked up R while following two Coursera courses that both use R as main language: <a href="https://www.coursera.org/course/compdata">Computing for Data Analysis</a>  and <a href="https://www.coursera.org/course/dataanalysis">Data Analysis</a>. The former is more an introduction to programming with R, whereas the latter course focuses on applied statistics and machine learning with R. I don't have a formal background in statistics, hence Data Analysis course was much more of a challenge for me.</p>
+
+<h3>Setup Google Analytics with R</h3>
+
+<p>Enough about learning R, let's try to load some analytics data. If you want to jump right into the code and results, you can view the RMarkdown output of <a href="/analytics/blog_analytics.html">my exploratory analysis</a>. RMarkdown enables literate programming, by combining Markdown syntax with R code. You can see that it shows my narrative interspersed with actual code and the output that it produces. For the remainder of this post I'll discuss some of the results from this exploratory analysis without diving too deep into the mechanics behind it.</p>
+
+<p>How do you get the Google Analytics data into R? We could work with the Analytics REST API directly in R, but there is also a nice wrapper library call <a href="http://skardhamar.github.com/rga/">rga</a>. Did I mention there's a package for everything in R? Here's how you call the Google Analytics API:</p>
+
+<div class="highlight"><pre><code class="r">library<span class="p">(</span>rga<span class="p">)</span> 
+rga.open<span class="p">(</span>instance <span class="o">=</span> <span class="s">&quot;ga&quot;</span><span class="p">,</span> where <span class="o">=</span> <span class="s">&quot;~/temp/ga-api&quot;</span><span class="p">)</span>
+<span class="c1"># the call above triggers the oAuth flow, and the resulting  </span>
+<span class="c1"># key is cached in the specified file.</span>
+
+ga.df <span class="o">&lt;-</span> ga<span class="o">$</span>getData<span class="p">(</span><span class="s">&quot;XXXXXXXX&quot;</span><span class="p">,</span> <span class="c1"># replace with your GA profile id</span>
+                    start.date <span class="o">=</span> <span class="s">&quot;2012-03-23&quot;</span><span class="p">,</span>
+                    end.date <span class="o">=</span> <span class="s">&quot;2013-03-23&quot;</span><span class="p">,</span>
+                    metrics <span class="o">=</span> <span class="s">&quot;ga:visits&quot;</span><span class="p">,</span>
+                    dimensions <span class="o">=</span> <span class="s">&quot;ga:date&quot;</span><span class="p">,</span>
+                    max <span class="o">=</span> <span class="m">1500</span><span class="p">,</span>
+                    sort <span class="o">=</span> <span class="s">&quot;ga:date&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+
+<p>Yes, that <code>instance="ga"</code> on the second line specifies the name of a variable that will pop into existence, later to be used in <code>ga$getData()</code>. Life's full of dynamic surprises with R.</p>
+
+<p>We're assigning the result of the ga$getData call to a variable called <code>ga.df</code>. Here, df is short for dataframe, a handy datatype which resembles the familiar relational table. Because R has named parameters, the actual call is more or less self-explanatory. It returns the visits by date over the specified period. All parameters with "ga:" prefixes follow the <a href="https://developers.google.com/analytics/devguides/reporting/core/dimsmets">dimension and metrics</a> name from the Google Analytics API directly.</p>
+
+<p>Actually, the hardest part was finding out the right profile id to use for calling the API. Just so you know, this id is not the same as the tracking id you use on your page. Anyway, a quick way to find all your profile id's is to head to Google's <a href="https://developers.google.com/oauthplayground/">OAuth2 playground</a>, authorize the Analytics API and call:</p>
+
+<div class="highlight"><pre><code class="html">https://www.googleapis.com/analytics/v3/management/accounts/~all/webproperties/~all/profiles
+</code></pre></div>
+
+
+<h3>Visitors</h3>
+
+<p>Now on to some actual numbers. In the past year, this blog received 23,903 visits (from 18724 unique visitors), generating 27,860 pageviews. As you can see, there are some huge spikes in the number of visitors:</p>
+
+<p><img src="/analytics/figure/visitsperday.png" alt="Visits per day" /></p>
+
+<p>(again, check the <a href="/analytics/blog_analytics.html">RMarkdown</a> to see how the graphs are generated)</p>
+
+<p>The highest datapoint was measured in December 2012 when <a href="https://twitter.com/odersky">Martin Odersky</a> tweeted my <a href="/blog/scala/2012/12/scala-is-like-git/">Scala is like Git</a> post, driving a record 2077 visits to my blog in one day. The other peaks can all be explained by referral traffic from social link sharing sites such as Reddit and DZone. Alas, 15, the median number of visits per day paints a better picture of the actual events for most days. Fortunately, the trendline (a linear regression line) is sloped upwards.</p>
+
+<p>It's also interesting to see how the visits are distributed over the days of the week, using a boxplot on the same data:
+<img src="/analytics/figure/visitsperweekday.png" alt="Visits per day of week" /></p>
+
+<p>The horizontal lines inside the boxes represent the median number of visitors for that particular weekday. The boxplot is deliberately zoomed in on the y-axis to show the interesting parts. You can imagine the outlier of 2077 visits on a single day (it was on a Thursday) otherwise makes the plot unreadable. It's pretty clear that my blog is not as popular on the weekends as it is during weekdays. Apparently programming blogs are read mostly at work, which makes sense. Mondays and Thursdays are the best performing weekdays. Are people reading away their Monday blues on a programming blog? I don't have an explanation why Tuesday is relatively weak in comparison to the other weekdays.</p>
+
+<h3>Popular articles</h3>
+
+<p>Writing blog articles is a funny thing. You have complete freedom to write whatever is on your mind. Still you can't keep yourself from wondering 'who would read this?' The answer to this question is oftentimes surprising, at least to me. After a year of blogging I'm starting to find my tone of voice. I tend to write longer posts. Preferably ones that require some research and are not just short rants or opinion pieces. This approach seems to resonate with a lot of people. The following table shows exactly what was most popular on this blog last year:</p>
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th align="left"> Post (pagetitle)  </th>
+<th align="right"> Pageviews   </th>
+<th align="right"> Visits       </th>
+<th align="right"> Visitors </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td align="left">                                            <a href="/blog/scala/2012/12/scala-is-like-git/">Scala is like Git</a>  </td>
+<td align="right">    9383  </td>
+<td align="right"> 8124   </td>
+<td align="right">  7936|</td>
+</tr>
+<tr>
+<td></td>
+<td align="left">                               <a href="/blog/java/2012/07/modern-concurrency-and-javaee/">Modern concurrency and Java EE</a>  </td>
+<td align="right">    4300  </td>
+<td align="right"> 3849   </td>
+<td align="right">  3695|</td>
+</tr>
+<tr>
+<td></td>
+<td align="left"><a href="/blog/web/2012/11/unify-server-side-client-side-rendering-embedding-json/">Unify client-side and server-side rendering by embedding JSON</a>  </td>
+<td align="right">    3141  </td>
+<td align="right"> 2807   </td>
+<td align="right">  2769|</td>
+</tr>
+<tr>
+<td></td>
+<td align="left">                              <a href="/blog/security/2012/10/cross-build-injection-in-action/">Cross-Build Injection in action</a>  </td>
+<td align="right">    2355  </td>
+<td align="right"> 2111   </td>
+<td align="right">  2148|</td>
+</tr>
+<tr>
+<td></td>
+<td align="left">                                   <a href="/blog/conferences/2012/06/preparing-a-technical-talk/">Preparing a technical talk</a>  </td>
+<td align="right">    2343  </td>
+<td align="right"> 2104   </td>
+<td align="right">  1995|</td>
+</tr>
+<tr>
+<td></td>
+<td align="left">                           <a href="/">Branch and Bound Blog - Sander Mak (homepage)</a>  </td>
+<td align="right">    1225  </td>
+<td align="right">  791   </td>
+<td align="right">   948|</td>
+</tr>
+<tr>
+<td></td>
+<td align="left">       <a href="/blog/security/2012/03/crossbuild-injection-how-safe-is-your-build/">Cross-build injection attacks: how safe is your build?</a>  </td>
+<td align="right">    1218  </td>
+<td align="right">  883   </td>
+<td align="right">  1051|</td>
+</tr>
+<tr>
+<td></td>
+<td align="left">                                <a href="/blog/security/2012/08/verify-dependencies-using-pgp/">Verify dependencies using PGP</a>  </td>
+<td align="right">     784  </td>
+<td align="right">  628   </td>
+<td align="right">   680|</td>
+</tr>
+<tr>
+<td></td>
+<td align="left">                           <a href="/blog/conferences/2012/11/jfall-2012-dutch-java-awesomeness/">JFall 2012: Dutch Java awesomeness</a>  </td>
+<td align="right">     729  </td>
+<td align="right">  620   </td>
+<td align="right">   648|</td>
+</tr>
+<tr>
+<td></td>
+<td align="left">                                  <a href="/blog/bookreview/2012/08/bookreview-dsls-in-action/">Book review: DSLs in Action</a>  </td>
+<td align="right">     633  </td>
+<td align="right">  575   </td>
+<td align="right">   598|</td>
+</tr>
+<tr>
+<td></td>
+<td align="left">                                     <a href="/blog/conferences/2012/05/jeeconf-tripreport/">JEEConf 2012 trip report</a>  </td>
+<td align="right">     505  </td>
+<td align="right">  442   </td>
+<td align="right">   446|</td>
+</tr>
+<tr>
+<td></td>
+<td align="left">                                             <a href="/about.html">About Sander Mak</a>  </td>
+<td align="right">     277  </td>
+<td align="right">   21   </td>
+<td align="right">   231|</td>
+</tr>
+<tr>
+<td></td>
+<td align="left">                                                      <a href="/archive.html">Archive</a>  </td>
+<td align="right">     188  </td>
+<td align="right">   10   </td>
+<td align="right">   162|</td>
+</tr>
+<tr>
+<td></td>
+<td align="left">                                          <a href="/talks.html">Talks by Sander Mak</a>  </td>
+<td align="right">      90  </td>
+<td align="right">    4   </td>
+<td align="right">    79|</td>
+</tr>
+<tr>
+<td></td>
+<td align="left">                           <a href="/blog/bookreview/2013/01/bookreview-infinity-and-the-mind/">Book review: Infinity and the Mind</a>  </td>
+<td align="right">      70  </td>
+<td align="right">   50   </td>
+<td align="right">    55|</td>
+</tr>
+</tbody>
+</table>
+
+
+<p>(in some rows the visitor count exceeds the number of visits. Not sure what is up with that...)</p>
+
+<p><a href="/blog/scala/2012/12/scala-is-like-git/">'Scala is like Git'</a> is the undeniable winner here, accounting for approximately a third of all pageviews in this year of blogging. I honestly did not expect this post to take off like that. On the other end of the spectrum we find <a href="/blog/bookreview/2013/01/bookreview-infinity-and-the-mind/">'Book review: Infinity and the Mind'</a>. While it is also the most recent post, I don't expect it go anywhere. I still think it's a great book though, and certainly don't regret the time it has taken me to write a thorough review.</p>
+
+<p>During the year, I also became part of DZone's 'Most Valuable Blogger' program. Through this program, some of the posts from above have been republished on DZone. My <a href="http://architects.dzone.com/users/sammy8306">DZone profile</a> shows that these republished articles garnered another 18k pageviews, which are obviously not present in my dataset.</p>
+
+<h3>Traffic patterns</h3>
+
+<p>Most of the traffic originates from social sharing sites. This becomes clear by looking at the percentage of visits by medium, over time:
+<img src="/analytics/figure/trafficpercentages.png" alt="Visits per day of week" /></p>
+
+<p>The blue area represents referral traffic. On the Google Analytics dashboard I can see that Reddit is the top referrer (29%), followed by Twitter (11%) and DZone (9%). Some posts were submitted to Hacker News as well, but unfortunately never really gained traction.</p>
+
+<p>What's more interesting to me is that the percentage of "organic" traffic (ie. search traffic) is steadily increasing. That makes sense, since I started out with virtually no content and zero PageRank, but that has changed in the course of the year. In the <a href="/analytics/blog_analytics.html">complete analysis</a> you can also find a graph that corroborates this finding using absolute numbers of search traffic.</p>
+
+<h3>Keep on blogging</h3>
+
+<p>It certainly was a good learning experience to free myself from the Google Analytics dashboard and try to work with the analytics data directly in R. Obviously, there's plenty more to explore. I'll get to that when my statistics and R knowledge has made sufficient progress.</p>
+
+<p>While it's nice to put some numbers on what's happening with this blog, in the end it doesn't really matter. It's not a business and I'll keep writing anyway. It's fun, engaging and helps me to verbalize my thoughts whether someone reads it or not. Meanwhile, I hope this post has provided some inspiration on how to use R for analyzing and visualizing Google Analytics data.</p>
+
+  </section>
+</article>
+<div>
+  <strong>If you liked this post, please share it!</strong>
+  <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://branchandbound.net/blog/data/2013/03/year-blogging-analyzed-r" data-via="Sander_Mak" data-dnt="true">Tweet</a>
+  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</div>
+
+<br>
+<br>
+
+<div id="related">
+  <h3>Related Posts</h3>
+  <ul class="posts">
+    
+      <li><span>05 Aug 2013</span> &raquo; <a href="/blog/web/2013/08/some-angularjs-pitfalls">Some AngularJS pitfalls</a></li>
+    
+      <li><span>18 Jul 2013</span> &raquo; <a href="/blog/java/2013/07/java-modularity-story">The Java Modularity Story</a></li>
+    
+      <li><span>24 Jun 2013</span> &raquo; <a href="/blog/development/2013/06/annoyances-daily-life-developer">Annoyances in the daily life of a developer</a></li>
+    
+  </ul>
+</div>
+
+
+
+
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    
+    var disqus_shortname = 'branchandbound'; // required: replace example with your forum shortname
+    
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+
+
+
+        </div>
+        <div class="span3">
+         <div class="hero-unit sidebar">
+           <a href="http://feeds.feedburner.com/BranchAndBound"><img class="rss pull-right" title="Branch and Bound Blog RSS Feed" alt="RSS Feed" src="/assets/themes/sander/rss.png"></a>
+           <h4 class="sidebar"><strong>Branch and Bound Blog</strong></h4>
+           <em>... pruning the software universe</em> 
+           <hr>
+           <ul class="sidebar unstyled">
+             <li><a href="/about.html">About Sander</a></li>
+           </ul>
+           <span class="sidebar pull-right">
+             <a href="http://www.twitter.com/Sander_Mak" target="_blank"><img title="Twitter" alt="Twitter" class="small" src="/assets/themes/sander/twitter.png"></a>
+             <a href="http://nl.linkedin.com/in/SanderMak" target="_blank"><img title="Linkedin profile" alt="Linkedin profile" class="small" src="/assets/themes/sander/linkedin.png"><a>
+             <a href="http://www.github.com/SanderMak" target="_blank"><img  title="GitHub" alt="GitHub" class="small" src="/assets/themes/sander/github.png"></a>
+             <a href="http://www.slideshare.net/SanderMak/presentations" target="_blank"><img title="Slideshare presentations"  alt="Slideshare presentations" class="small" src="/assets/themes/sander/slideshare.png"></a>
+           </span>
+           <hr>
+           <h5 class="sidebar">&nbsp;View archive by:</h5>
+           <ul class="sidebar unstyled">
+             <li><a href="/archive.html">Date</a></li>
+             <li><a href="/categories.html">Category</a></li>
+             <li><a href="/tags.html">Tag</a></li>
+           </ul>
+          </div>
+          <div class="hero-unit twittersidebar">
+            <h5 class="sidebar">Featured articles:</h5>
+            <br>
+            <ul>
+              <li>&raquo; <a href="/blog/scala/2013/05/launching-scalabitz/?src=featured">Launching Scalabitz</a></li>
+              <li>&raquo; <a href="/blog/bookreview/2013/01/bookreview-infinity-and-the-mind/?src=featured">Infinity and the Mind</a></li>      
+  	          <li>&raquo; <a href="/blog/conferences/2012/06/preparing-a-technical-talk/?src=featured">Preparing a technical talk</a></li>
+            </ul>
+          </div>
+          <div class="hero-unit readingsidebar">
+            <h5 class="sidebar">Currently reading:</h5>
+            <br>
+            <ul>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/1933988916/ref=as_li_ss_tl?ie=UTF8&tag=branandboun-20&linkCode=as2&camp=1789&creative=390957&creativeASIN=1933988916" target="_blank">OSGi in action</a></li>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/1593273886/ref=as_li_ss_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=1593273886&linkCode=as2&tag=branandboun-20" target="_blank">The Tangled Web</a></li>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/0321125215/ref=as_li_ss_tl?ie=UTF8&tag=branandboun-20&linkCode=as2&camp=1789&creative=390957&creativeASIN=0321125215" target="_blank">Domain-driven design</a></li>
+            </ul>
+          </div>
+          <div class="hero-unit sidebar">
+           <a class="twitter-timeline" width="250" height="500" data-dnt=true href="https://twitter.com/Sander_Mak" data-widget-id="266609354059431938">Tweets by @Sander_Mak</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+
+                       
+          </div>
+        </div>
+       </div>
+      </div>
+     </div>
+
+
+      <footer>
+        <div class="container">
+         <div class="row">
+           <div class="span9 offset2">
+            <br>
+            <hr>
+           </div>
+         </div>
+         <div class="row">
+          <div class="span4 offset2">
+            <p>Branch and Bound - ... pruning the software universe</p>
+          </div>   
+          <div class="span5">  
+            <p class="pull-right">by Sander Mak</p>
+          </div>
+         </div>
+        </div>
+      </footer>
+
+    <!-- Scripts at the end for faster loading. -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
+    <script src="/assets/themes/sander/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="http://twitter.com/javascripts/blogger.js"></script>
+   
+
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-15335121-2']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+
+    </script>
+
+  </body>
+</html>
+
+
+

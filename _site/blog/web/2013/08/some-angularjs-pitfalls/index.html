@@ -1,0 +1,362 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Some AngularJS pitfalls - Branch and Bound</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Sander Mak">
+
+    <link href="http://feeds.feedburner.com/BranchAndBound" rel="alternate" title="Branch and Bound Blog Feed" type="application/atom+xml" />
+    <!-- Le styles -->
+    <link href="/assets/themes/sander/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="/assets/themes/sander/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="/assets/themes/sander/syntax.css" rel="stylesheet">
+    <link href="/assets/themes/sander/style.css" rel="stylesheet">
+
+    <style type="text/css">
+      body {
+        padding-top: 10px;
+        padding-bottom: 40px;
+      }
+    </style>
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="assets/bootstrap/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="assets/bootstrap/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/bootstrap/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="assets/bootstrap/ico/apple-touch-icon-57-precomposed.png">
+
+  </head>
+
+  <body>
+
+
+    <div class="container">
+      <div class="row">
+        <div class="span11">
+    <div class="navbar">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="/">Branch and Bound</a>
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li><a href="/">Home</a></li>
+              <li><a href="/about.html">About</a></li>
+              <li><a href="/talks.html">Talks</a></li>
+              <li><a href="/archive.html">Archive</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+        </div>
+      </div>
+      <div class="row">
+        <div class="span6 offset2">
+          
+<article>
+  <header>
+    <h1>Some AngularJS pitfalls</h1>
+    <strong><time datetime="2013-08-05" pubdate>05 August 2013</time></strong>
+
+    <br>
+    <br>
+
+    <p><em><p>In the past few months I've been heavily using AngularJS. It's a marvelous framework for modern web applications. But as with every new toy, there are some rough edges that you have to be aware of. In this post I'll round up some gotcha's I encountered. Assuming you already know your way around Angular, these may be helpful.</p>
+</em></p>
+  </header>
+  
+
+  <section>
+   <h3>The flickering UI</h3>
+
+<p>Angular's automatic data-binding feature is awesome. However, it does have a flipside: before Angular is initialized, your page may show unparsed expressions to the user. When the DOM is ready and Angular calculates and replaces the values, this results in an ugly flickering effect:</p>
+
+<p><img src="/pics/angular_flicker.png" alt="Unparsed Angular expression" /></p>
+
+<p>The above situation is a direct result of rendering this example from the <a href="http://docs.angularjs.org/tutorial/step_02">Angular tutorial</a>:</p>
+
+<div class="highlight"><pre><code class="html"><span class="nt">&lt;body</span> <span class="na">ng-controller=</span><span class="s">&quot;PhoneListCtrl&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;ul&gt;</span>
+    <span class="nt">&lt;li</span> <span class="na">ng-repeat=</span><span class="s">&quot;phone in phones&quot;</span><span class="nt">&gt;</span>
+      {{ phone.name }}
+      <span class="nt">&lt;p&gt;</span>{{ phone.snippet }}<span class="nt">&lt;/p&gt;</span>
+    <span class="nt">&lt;/li&gt;</span>
+  <span class="nt">&lt;/ul&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+</code></pre></div>
+
+
+<p>If you have a single page application, this problem only occurs on the first page-load. Fortunately, it's easily prevented: don't use inline <code>{{ }}</code> expressions. Instead, use the ng-bind directive:</p>
+
+<div class="highlight"><pre><code class="html"><span class="nt">&lt;body</span> <span class="na">ng-controller=</span><span class="s">&quot;PhoneListCtrl&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;ul&gt;</span>
+    <span class="nt">&lt;li</span> <span class="na">ng-repeat=</span><span class="s">&quot;phone in phones&quot;</span><span class="nt">&gt;</span>
+      <span class="nt">&lt;span</span> <span class="na">ng-bind=</span><span class="s">&quot;phone.name&quot;</span><span class="nt">&gt;&lt;/span&gt;</span>
+      <span class="nt">&lt;p</span> <span class="na">ng-bind=</span><span class="s">&quot;phone.snippet&quot;</span><span class="nt">&gt;</span>Optional: visually pleasing placeholder<span class="nt">&lt;/p&gt;</span>
+    <span class="nt">&lt;/li&gt;</span>
+  <span class="nt">&lt;/ul&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+</code></pre></div>
+
+
+<p>You need a tag to apply this directive, so I added a <code>&lt;span&gt;</code> around the phone name. What happens is that initially, the value inside the tag is shown (but you can choose to leave it empty.) Then, when Angular initializes and replaces the innards of the bound tag with the result of the expression. Note that you don't need to add the curly braces inside the <a href="http://docs.angularjs.org/api/ng.directive:ngBind">ng-bind</a> property. Much cleaner! If you need a compound expression, use <a href="http://docs.angularjs.org/api/ng.directive:ngBindTemplate">ng-bind-template</a> instead. With this variant you do need the curly braces though, in order to differentiate between string literals and expressions.</p>
+
+<p>Another option is to completely hide elements, or even your whole application, until Angular is ready. Angular provides <a href="http://docs.angularjs.org/api/ng.directive:ngCloak">ng-cloak</a> to this end. It works by injecting a CSS rule very early in the initialization phase into the page. Alternatively you can include this CSS hiding rule in your own stylesheet so it loads early. Angular will the remove the cloak style when it is ready to roll, unveiling your application (or designated elements) at once and fully rendered.</p>
+
+<h3>jQuery and Angular</h3>
+
+<p>Angular doesn't depend on jQuery. In fact, the Angular source contains an embedded lightweight alternative: <a href="http://docs.angularjs.org/api/angular.element">jqLite</a>. Still, when Angular detects the presence of a jQuery version in your page, it uses that full jQuery implementation in lieu of jqLite. One direct way in which this manifests itself is with Angular's element abstraction. For example, in a directive you get access to the element that the directive applies to:</p>
+
+<div class="highlight"><pre><code class="javascript"><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;jqdependency&#39;</span><span class="p">,</span> <span class="p">[])</span>
+  <span class="p">.</span><span class="nx">directive</span><span class="p">(</span><span class="s1">&#39;failswithoutjquery&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="nx">restrict</span> <span class="o">:</span> <span class="s1">&#39;A&#39;</span><span class="p">,</span>
+      <span class="nx">link</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">scope</span><span class="p">,</span> <span class="nx">element</span><span class="p">,</span> <span class="nx">attrs</span><span class="p">)</span> <span class="p">{</span>
+               <span class="nx">element</span><span class="p">.</span><span class="nx">hide</span><span class="p">(</span><span class="mi">4000</span><span class="p">)</span>
+             <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</code></pre></div>
+
+
+<p>(see this example in action in <a href="http://plunker.co/edit/aqeDikqd6O2QaqH3eaIq?p=preview">this plunkr</a>)</p>
+
+<p>but is this <code>element</code> a jqLite or jQuery element? It depends. The manual states:</p>
+
+<blockquote><p> All element references in Angular are always wrapped with jQuery or jqLite; they are never raw DOM references.</p></blockquote>
+
+<p>So it will be a jqLite element only if jQuery was not detected by Angular. The <code>hide()</code> method only exists for jQuery elements, meaning this example only works when Angular uses jQuery. If you (accidentally) switch the order of AngularJS and jQuery script tags in your page, this code breaks! Shuffling script tags around may not happen very often, but it bit me when I started modularizing our codebase. Especially when you start using a module loader (like <a href="http://requirejs.org">RequireJS</a>), this can rear it's ugly head. For RequireJS, I solved it by explicitly declaring that Angular does in fact depend on JQuery in the <a href="http://requirejs.org/docs/api.html#config-shim">shim config</a>.</p>
+
+<p>Another takeaway might be that you shouldn't call jQuery specific methods through Angular's element wrapper. Instead you can use <code>$(element).hide(4000)</code> to make it abundantly clear that you do, in fact, depend on jQuery. In that case, changing the script tag order won't break the directive.</p>
+
+<h3>Minification</h3>
+
+<p>Special care should be taken for Angular applications that need to be minified. Otherwise error messages like <code>'Unknown provider: aProvider &lt;- a'</code> will hound you. Like with so many things, this information is hidden somewhere in the <a href="http://docs.angularjs.org/tutorial/step_05">official documentation</a>. In short, Angular depends on function parameter names to perform dependency injection. The minifier,  blissfully unaware of the special semantics of formal parameter names in Angular, mangles them to the shortest possible identifier. Solution? Use the minify-friendly method of method injection. From this:</p>
+
+<div class="highlight"><pre><code class="javascript"><span class="nx">module</span><span class="p">.</span><span class="nx">service</span><span class="p">(</span><span class="s1">&#39;myservice&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$http</span><span class="p">,</span> <span class="nx">$q</span><span class="p">)</span> <span class="p">{</span> 
+   <span class="c1">// This breaks when minified</span>
+<span class="p">});</span>
+</code></pre></div>
+
+
+<p>to this:</p>
+
+<div class="highlight"><pre><code class="javascript"><span class="nx">module</span><span class="p">.</span><span class="nx">service</span><span class="p">(</span><span class="s1">&#39;myservice&#39;</span><span class="p">,</span> <span class="p">[</span> <span class="s1">&#39;$http&#39;</span><span class="p">,</span> <span class="s1">&#39;$q&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$http</span><span class="p">,</span> <span class="nx">$q</span><span class="p">)</span> <span class="p">{</span> 
+   <span class="c1">// Using the array syntax to declare dependencies works with minification!</span>
+<span class="p">}]);</span>
+</code></pre></div>
+
+
+<p>The array syntax is accepted wherever a to-be-injected function is accepted. My advise is to use this syntax from the get-go. It will prevent a lot of pain later on if you decice to minify your JavaScript. There also seems to be a <a href="https://github.com/btford/ngmin">automatic rewriter</a>, although I don't know how well it works.</p>
+
+<p>One last bit of advice: when you need to rewrite your functions using the array syntax, apply it at every location where Angular injects dependencies. This includes directives, but also controllers on directives. A spot that is easily missed (speaking from experience):</p>
+
+<div class="highlight"><pre><code class="javascript"><span class="c1">// the directive itself needs array injection syntax:</span>
+<span class="nx">module</span><span class="p">.</span><span class="nx">directive</span><span class="p">(</span><span class="s1">&#39;directive-with-controller&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;myservice&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">myservice</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="nx">controller</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;$timeout&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$timeout</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">//  but this controller needs array injection syntax, too!  </span>
+      <span class="p">}],</span>
+      <span class="nx">link</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">scope</span><span class="p">,</span> <span class="nx">element</span><span class="p">,</span> <span class="nx">attrs</span><span class="p">,</span> <span class="nx">ctrl</span><span class="p">)</span> <span class="p">{</span>
+                
+      <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}]);</span>
+</code></pre></div>
+
+
+<p>Note that the link function doesn't need the array syntax, since it is not actually an injection target. It is a fixed-arity function called directly by Angular. Injections from the directive level can be used inside the link function though.</p>
+
+<h3>Directives are never 'done'</h3>
+
+<p>One irritating issue with directives is that you don't get a hook for when the directive is 'done'. When integrating a jQuery plugin inside a directive, such a hook would be very helpful. Let's say you want to display a table with dynamic (ng-repeat) data as a jQuery datatable. You need to call <code>$('.mytable').dataTable()</code> at some point when all data is actually materialized in an HTML table (and preferably before it is inserted into the DOM), but you can't.</p>
+
+<p>Why is that? Angular's data-binding is powered by a continuous digest-cycle which can lead to updates and re-rendering of directives. As such, there is never really a moment that the framework is 'at-rest' when applying directives. One (admittedly ugly) workaround is to schedule the jQuery dataTable call outside the current digest-cycle by using timeout:</p>
+
+<div class="highlight"><pre><code class="javascript"><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;table&#39;</span><span class="p">,[]).</span><span class="nx">directive</span><span class="p">(</span><span class="s1">&#39;mytable&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;$timeout&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$timeout</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="nx">restrict</span> <span class="o">:</span> <span class="s1">&#39;E&#39;</span><span class="p">,</span>
+      <span class="nx">template</span><span class="o">:</span> <span class="s1">&#39;&lt;table class=&quot;mytable&quot;&gt;&#39;</span> <span class="o">+</span>
+                   <span class="s1">&#39;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;counting&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&#39;</span> <span class="o">+</span>
+                   <span class="s1">&#39;&lt;tr ng-repeat=&quot;data in datas&quot;&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&#39;</span> <span class="o">+</span>
+                <span class="s1">&#39;&lt;/table&gt;&#39;</span><span class="p">,</span>
+      <span class="nx">link</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">scope</span><span class="p">,</span> <span class="nx">element</span><span class="p">,</span> <span class="nx">attrs</span><span class="p">,</span> <span class="nx">ctrl</span><span class="p">)</span> <span class="p">{</span>
+         <span class="nx">scope</span><span class="p">.</span><span class="nx">datas</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;one&quot;</span><span class="p">,</span> <span class="s2">&quot;two&quot;</span><span class="p">,</span> <span class="s2">&quot;three&quot;</span><span class="p">]</span>
+         <span class="c1">// Doesn&#39;t work, shows an empty table:</span>
+         <span class="c1">// $(&#39;.mytable&#39;, element).dataTable()   </span>
+         <span class="c1">// But this does:</span>
+         <span class="nx">$timeout</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span> 
+           <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;.mytable&#39;</span><span class="p">,</span> <span class="nx">element</span><span class="p">).</span><span class="nx">dataTable</span><span class="p">();</span> 
+         <span class="p">},</span> <span class="mi">0</span><span class="p">)</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}]);</span>
+</code></pre></div>
+
+
+<p>(see this example in action in <a href="http://plnkr.co/edit/ir7U3h1C26NTUpPgyeqG?p=preview">this plunkr</a>)</p>
+
+<p>In our codebase we've even encountered a situation where a doubly-nested <code>$timeout</code> was necessary. Another crazy work around is to add a <code>&lt;script&gt;</code> tag in the template which does a callback to an Angular function using <code>scope.$apply()</code>. Suffice to say, it's less than ideal. Due to Angular's nature this is <a href="https://github.com/angular/angular.js/issues/734">unlikely</a> to change.</p>
+
+<p>All this being said, Angular is still my favorite client-side JS framework. Did you encounter other pitfalls while using Angular? Or did you solve similar problems in a different way? Leave a comment!</p>
+
+  </section>
+</article>
+<div>
+  <strong>If you liked this post, please share it!</strong>
+  <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://branchandbound.net/blog/web/2013/08/some-angularjs-pitfalls" data-via="Sander_Mak" data-dnt="true">Tweet</a>
+  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</div>
+
+<br>
+<br>
+
+<div id="related">
+  <h3>Related Posts</h3>
+  <ul class="posts">
+    
+      <li><span>18 Jul 2013</span> &raquo; <a href="/blog/java/2013/07/java-modularity-story">The Java Modularity Story</a></li>
+    
+      <li><span>24 Jun 2013</span> &raquo; <a href="/blog/development/2013/06/annoyances-daily-life-developer">Annoyances in the daily life of a developer</a></li>
+    
+      <li><span>25 May 2013</span> &raquo; <a href="/blog/conferences/2013/05/jeeconf-2013-tripreport">JEEConf 2013 trip report</a></li>
+    
+  </ul>
+</div>
+
+
+
+
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    
+    var disqus_shortname = 'branchandbound'; // required: replace example with your forum shortname
+    
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+
+
+
+        </div>
+        <div class="span3">
+         <div class="hero-unit sidebar">
+           <a href="http://feeds.feedburner.com/BranchAndBound"><img class="rss pull-right" title="Branch and Bound Blog RSS Feed" alt="RSS Feed" src="/assets/themes/sander/rss.png"></a>
+           <h4 class="sidebar"><strong>Branch and Bound Blog</strong></h4>
+           <em>... pruning the software universe</em> 
+           <hr>
+           <ul class="sidebar unstyled">
+             <li><a href="/about.html">About Sander</a></li>
+           </ul>
+           <span class="sidebar pull-right">
+             <a href="http://www.twitter.com/Sander_Mak" target="_blank"><img title="Twitter" alt="Twitter" class="small" src="/assets/themes/sander/twitter.png"></a>
+             <a href="http://nl.linkedin.com/in/SanderMak" target="_blank"><img title="Linkedin profile" alt="Linkedin profile" class="small" src="/assets/themes/sander/linkedin.png"><a>
+             <a href="http://www.github.com/SanderMak" target="_blank"><img  title="GitHub" alt="GitHub" class="small" src="/assets/themes/sander/github.png"></a>
+             <a href="http://www.slideshare.net/SanderMak/presentations" target="_blank"><img title="Slideshare presentations"  alt="Slideshare presentations" class="small" src="/assets/themes/sander/slideshare.png"></a>
+           </span>
+           <hr>
+           <h5 class="sidebar">&nbsp;View archive by:</h5>
+           <ul class="sidebar unstyled">
+             <li><a href="/archive.html">Date</a></li>
+             <li><a href="/categories.html">Category</a></li>
+             <li><a href="/tags.html">Tag</a></li>
+           </ul>
+          </div>
+          <div class="hero-unit twittersidebar">
+            <h5 class="sidebar">Featured articles:</h5>
+            <br>
+            <ul>
+              <li>&raquo; <a href="/blog/scala/2013/05/launching-scalabitz/?src=featured">Launching Scalabitz</a></li>
+              <li>&raquo; <a href="/blog/bookreview/2013/01/bookreview-infinity-and-the-mind/?src=featured">Infinity and the Mind</a></li>      
+  	          <li>&raquo; <a href="/blog/conferences/2012/06/preparing-a-technical-talk/?src=featured">Preparing a technical talk</a></li>
+            </ul>
+          </div>
+          <div class="hero-unit readingsidebar">
+            <h5 class="sidebar">Currently reading:</h5>
+            <br>
+            <ul>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/1933988916/ref=as_li_ss_tl?ie=UTF8&tag=branandboun-20&linkCode=as2&camp=1789&creative=390957&creativeASIN=1933988916" target="_blank">OSGi in action</a></li>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/1593273886/ref=as_li_ss_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=1593273886&linkCode=as2&tag=branandboun-20" target="_blank">The Tangled Web</a></li>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/0321125215/ref=as_li_ss_tl?ie=UTF8&tag=branandboun-20&linkCode=as2&camp=1789&creative=390957&creativeASIN=0321125215" target="_blank">Domain-driven design</a></li>
+            </ul>
+          </div>
+          <div class="hero-unit sidebar">
+           <a class="twitter-timeline" width="250" height="500" data-dnt=true href="https://twitter.com/Sander_Mak" data-widget-id="266609354059431938">Tweets by @Sander_Mak</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+
+                       
+          </div>
+        </div>
+       </div>
+      </div>
+     </div>
+
+
+      <footer>
+        <div class="container">
+         <div class="row">
+           <div class="span9 offset2">
+            <br>
+            <hr>
+           </div>
+         </div>
+         <div class="row">
+          <div class="span4 offset2">
+            <p>Branch and Bound - ... pruning the software universe</p>
+          </div>   
+          <div class="span5">  
+            <p class="pull-right">by Sander Mak</p>
+          </div>
+         </div>
+        </div>
+      </footer>
+
+    <!-- Scripts at the end for faster loading. -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
+    <script src="/assets/themes/sander/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="http://twitter.com/javascripts/blogger.js"></script>
+   
+
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-15335121-2']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+
+    </script>
+
+  </body>
+</html>
+
+
+

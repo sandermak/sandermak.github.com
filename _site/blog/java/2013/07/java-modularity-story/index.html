@@ -1,0 +1,311 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>The Java Modularity Story - Branch and Bound</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Sander Mak">
+
+    <link href="http://feeds.feedburner.com/BranchAndBound" rel="alternate" title="Branch and Bound Blog Feed" type="application/atom+xml" />
+    <!-- Le styles -->
+    <link href="/assets/themes/sander/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="/assets/themes/sander/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="/assets/themes/sander/syntax.css" rel="stylesheet">
+    <link href="/assets/themes/sander/style.css" rel="stylesheet">
+
+    <style type="text/css">
+      body {
+        padding-top: 10px;
+        padding-bottom: 40px;
+      }
+    </style>
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="assets/bootstrap/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="assets/bootstrap/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/bootstrap/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="assets/bootstrap/ico/apple-touch-icon-57-precomposed.png">
+
+  </head>
+
+  <body>
+
+
+    <div class="container">
+      <div class="row">
+        <div class="span11">
+    <div class="navbar">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="/">Branch and Bound</a>
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li><a href="/">Home</a></li>
+              <li><a href="/about.html">About</a></li>
+              <li><a href="/talks.html">Talks</a></li>
+              <li><a href="/archive.html">Archive</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+        </div>
+      </div>
+      <div class="row">
+        <div class="span6 offset2">
+          
+<article>
+  <header>
+    <h1>The Java Modularity Story</h1>
+    <strong><time datetime="2013-07-18" pubdate>18 July 2013</time></strong>
+
+    <br>
+    <br>
+
+    <p><em><p>So you've got a growing Java application with a nice feature set. Unfortunately adding new features gets harder over time and things start breaking in unexpected places. Chances are that your applications is not as modular as it could be. Relax, it's not (just) your fault. Plain Java is notoriously lacking in the modularity department. But it doesn't have be this way.</p>
+</em></p>
+  </header>
+  
+
+  <section>
+   <p>Modularity leads to more maintainable, composable and extensible systems. When you have clearly demarcated module boundaries and explicit contracts between modules, life is good. Functionality can be tested in isolation, and divide-and-conquer can be applied at the code and team-level. This speeds up development, not just in the first year of the system, but throughout its whole lifecycle.</p>
+
+<h3>From architecture to software</h3>
+
+<p>So how do you get to that point? We'll get to a specific solution later, but first I want to take the time to define the problem clearly. Modularity plays a big role at many levels of abstractions. At the systems architecture level, we have Service Oriented Architecture. When done right, SOA means explicit and versioned public interfaces (mostly webservices) between loosely coupled subsystems that hide their internal details. These subsystems possibly even run on completely disparate technology stacks and are easily replaceable on an individual basis.</p>
+
+<p>However, when building the individual services or subsystems in Java, a monolithic approach is often irresistible. Java's own runtime, rt.jar is unfortunately <a href="https://blogs.oracle.com/mr/entry/massive_monolithic_jdk">a prime example</a>. Sure, you may partition your monolithic application into the three obligatory layers, but that's a far cry from <em>true modularity</em>. Just ask yourself what it would take to swap out the lowest layer of your application for a completely different implementation. Oftentimes, this would ripple through the whole application. Now, try thinking of how you would do this without disrupting the other parts of your application, when hot-swapping at run-time. Because why should this be possible in a SOA context, but not inside our applications?</p>
+
+<h3>True modularity</h3>
+
+<p>So what is this true modularity I alluded to in the preceding paragraph? Let me state some defining characteristics of a <em>true module</em>:</p>
+
+<ul>
+<li>a module is an independent unit of deployment (reusable in any context),</li>
+<li>it has a stable, reified identity (for example name and version),</li>
+<li>it states requirements (dependencies),</li>
+<li>it advertises capabilities for other modules to use while hiding implementation details.</li>
+</ul>
+
+
+<p>Ideally, these modules live in a lightweight runtime environment that matches up the requirements and capabilities of modules for us according to our desired composition. In short, we want our application to use modules to get the good parts of a Service Oriented Architecture on a smaller scale. And not just on the whiteboard, but also while coding and running the application. We want our physical implementation to follow our logical design all the way through production. What's more, the composition of modules shouldn't be static: applications need to be resilient and extensible without downtime or full redeployment.</p>
+
+<h3>Objects: true modules?</h3>
+
+<p>What about the lowest layer of structural abstraction in Java: classes and objects. Doesn't OO provide identity, information hiding and loose coupling through interfaces in Java? Yes it does, to a degree. However, object identity is ephemeral and interfaces are unversioned. Classes are most certainly not an independent unit of deployment in Java. In practice, classes tend to get way too familiar with each other. Public means visible to literally every other class on the JVM's classpath. Which is probably not what you want for anything but truly public interfaces. To make matters worse, Java's visibility modifiers are weakly enforced (think reflection) at runtime.</p>
+
+<p>Reuse of classes outside their original context is hard when nobody forces the cost of their implicit external dependencies on you. I can practically hear the words 'Dependency Injection' and 'Inversion of Control' racing through your mind now. Yes, these principles help to make dependencies of a class explicit. Unfortunately their <a href="http://www.springsource.org/spring-framework">archetypical</a> <a href="http://www.oracle.com/technetwork/java/javaee/ejb-141389.html">implementations</a> in Java still leave your application as a big ball of objects wired together statically at runtime by a big ball of configuration. I highly recommend reading <a href="http://www.amazon.com/gp/product/0321247132/ref=as_li_qf_sp_asin_il_tl?ie=UTF8&amp;camp=1789&amp;creative=9325&amp;creativeASIN=0321247132&amp;linkCode=as2&amp;tag=branandboun-20">'Java Application Architecture: Modularity Patterns'</a> if you wan to learn more about modular design patterns. But you'll also find that applying these patterns in Java without additional runtime enforcement of modularity is fighting an uphill battle.</p>
+
+<h3>Packages: true modules?</h3>
+
+<p>But then what is the unit of modularity in Java inbetween applications and objects? You could argue that packages must be it. The combination of package names, import statements and visibility modifiers (e.g. public/protected/private) gives the illusion that at least some of the characteristics of true modules are present. Unfortunately packages are purely a cosmetic construct, providing namespacing for classes. Even their apparent hierarchy is actually <a href="http://stackoverflow.com/questions/1764078/apparent-hierarchies-of-packages">an illusion</a>.</p>
+
+<p>So yes, by all means use packages to structure your code base in logical chunks. Just don't count on packages to improve modularity beyond pretty names. To be fair, there are <a href="http://structure101.com/">tools</a> that can help with enforcing package dependencies through static verification at development time. But that's hardly a satisfying solution.</p>
+
+<h3>JAR files: true modules?</h3>
+
+<p>Surely the true unit of modularity for Java applications then must be JAR files (Jars). Well, yes and no. Yes, because Jars are the independent units of deployment for Java applications. No, because they fail on the three other characteristics. Jars have a filename, and sometimes a version in the MANIFEST.MF. Neither are part of the runtime model and hence do not form an explicit reified identity. Dependencies on other Jars can't be declared. <strong>You</strong> have to make sure any dependencies are on the classpath. Which, by the way, is just a flat collection of classes: gone is the link to the originating Jars. This also explains another big problem: any public class in a Jar is visible to the whole classpath. There is no 'jar-scope' modifier to hide implementation details inside a Jar.</p>
+
+<p>All of the above means that Jars are a necessary, but not sufficient mechanism for modular applications. Many people are successfully building systems out of lots of Jars (by applying <a href="http://www.amazon.com/gp/product/0321247132/ref=as_li_qf_sp_asin_il_tl?ie=UTF8&amp;camp=1789&amp;creative=9325&amp;creativeASIN=0321247132&amp;linkCode=as2&amp;tag=branandboun-20">modular architecture patterns</a>), managing the identities and dependencies with their favorite compile-time dependency management tool. Take for example the Netflix API, which is <a href="http://www.slideshare.net/danieljacobson/scaling-the-netflix-api/76">composed of 500 JARs</a>. Unfortunately, your compile-time and run-time classpath <em>will</em> diverge in unforeseen ways, giving rise to the <a href="http://stackoverflow.com/questions/6909306/jar-hell-how-to-use-a-classloader-to-replace-one-jar-library-version-with-anoth">JAR-hell</a>. Alas, we can do better than this.</p>
+
+<h3>OSGi bundles</h3>
+
+<p>Clearly, plain Java doesn't offer enough in terms of modularity. It's an acknowledged problem and with <a href="http://openjdk.java.net/projects/jigsaw/">project Jigsaw</a> there might be a native solution on the way. However, it has <a href="http://mreinhold.org/blog/late-for-the-train">missed the Java 8 train</a> (and Java 7 before that), so it will be quite some time before we can use it. If it ever arrives. Enter <a href="http://www.osgi.org/Technology/WhatIsOSGi">OSGi</a>: a modular Java platform that's mature and battle-hardened. It is used by the likes of <a href="https://wikis.oracle.com/display/GlassFish/OSGi">application</a> <a href="https://www.ibmdw.net/wasdev/docs/introducing_the_liberty_profile/">servers</a> and <a href="http://www.eclipse.org/osgi/">IDEs</a> as the basis for their extensible architectures.</p>
+
+<p><img src="/pics/osgi_alliance.png" alt="OSGi alliance" /></p>
+
+<p>OSGi adds modularity as a first-class citizen to the JVM by amending Jars and packages with the necessary semantics to achieve all of our stated goals for true modularity. An OSGi bundle (module) is a Jar++. It defines additional fields inside a Jar's manifest for a (preferably <a href="http://semver.org">semantic</a>) version, bundle-name and which packages of the bundle should be exported. Exporting a package means you give the package a version, and all public classes of the package are visible to other bundles. All classes in non-exported packages are only visible inside the bundle. OSGi enforces this at runtime as well by having a separate classloader per bundle. A bundle can choose to import packages exported by another bundle, again by defining its imported dependencies in the Jar's manifest. Of course such an import must define a version (range) to get meaningful dependencies and guide the OSGi bundle resolving process. This way, you can even have multiple versions of package and its classes running simultaneously. A small example of a manifest with some OSGi parameters:</p>
+
+<p><img src="/pics/osgi_bundles.png" alt="OSGi bundles" /></p>
+
+<p>And the accompanying manifest for the service bundle:</p>
+
+<div class="highlight"><pre><code class="properties"><span class="na">Manifest-Version</span><span class="o">:</span> <span class="s">1.0</span>
+<span class="na">Bundle-ManifestVersion</span><span class="o">:</span> <span class="s">2</span>
+<span class="na">Bundle-Name</span><span class="o">:</span> <span class="s">MyService bundle</span>
+<span class="na">Bundle-SymbolicName</span><span class="o">:</span> <span class="s">com.foo.service</span>
+<span class="na">Bundle-Version</span><span class="o">:</span> <span class="s">1.0.0</span>
+<span class="na">Import-Package</span><span class="o">:</span>  <span class="s">org.apache.commons.logging;version=&quot;[1.0.4, 2.0.0)&quot;</span>
+<span class="na">Export-Package</span><span class="o">:</span>  <span class="s">com.foo.service.api;version=&quot;1.0.0&quot;</span>
+</code></pre></div>
+
+
+<p>And there you have it: OSGi provides an independently deployable Jar with a stable identity, and the possibility to require or advertise dependencies (ie. versioned packages). Everything else is strictly contained inside bundles. The OSGi runtime takes care of all the gritty details to enforce this strict separation at runtime. It even allows bundles to be added, removed and hot-swapped at run-time!</p>
+
+<h3>OSGi services</h3>
+
+<p>So, OSGi bundles take care of dependencies defined on the package level, and defines a <a href="http://devangelist.blogspot.nl/2011/04/osgi-bundle-lifecycles.html">dynamic lifecycle</a> for bundles containing these packages. Is that all we need to create a SOA-like solution in the small? Almost. There is one more crucial concept before we can really have modular <em>micro-services</em> with OSGi bundles.</p>
+
+<p>With OSGi bundles, you can program to an interface that is exported by a bundle. But, how do you obtain an implementation of this interface? It would be bad to export the implementing class, just so you can instantiate it in consuming bundles. You could use the factory pattern and export the factory as part of the API. But having to write a factory for every interface sounds… boiler-platey. Not good. Fortunately, there's a solution: OSGi services. OSGi provides a service-registry mechanism, where you can register your implementation under its interface in the service registry. Typically, you register your service when the bundle containing the implementation is started. Other bundles can request an implementation for a given public interface from the service-registry. They will get an implementation from the registry without ever needing to know the underlying implementation class in their code. Dependencies between service consumers and providers are automatically managed by OSGi in much the same way as the package-level dependencies are.</p>
+
+<p><img src="/pics/osgi_services.png" alt="OSGi services" /></p>
+
+<p>Sounds good, right? There's one slight bump in the road: using the low-level OSGi service API correctly <a href="http://blog.osgi.org/2013/07/real-men-dont-use-ds.html">is hard and verbose</a>, since services can come and go at runtime. This is because bundles that expose services can be started and stopped at-will and even running bundles can decide to start and their services at any time. That's extremely powerful when you want to build resilient and long-lived applications, but as a developer you have to stand your ground. Lucky for us, many higher-level abstractions have been created to take care of this problem. So, when using OSGi services, use something like <a href="http://www.vogella.com/articles/OSGiServices/article.html">Declarative Services</a> or <a href="http://felix.apache.org/site/apache-felix-dependency-manager-background.html">Felix Dependency Manager</a> (which is what <a href="http://luminis-technologies.com">we</a> use in our projects) and create and consume micro-services with ease. You can thank me later.</p>
+
+<h3>Is it worth it?</h3>
+
+<p>I hope you agree with me that having a modular codebase is a worthy goal. And no, you don't <strong>need</strong> OSGi to modularize a codebase. Conversely, modular runtimes like OSGi can't rescue a non-modular codebase. In the end, modularity is an architectural principle that can be applied in almost any environment, given enough willpower. It takes additional effort to create a modular design. It's only natural to use runtime in which modules and their dependencies are first-class citizens from design-time through run-time to ease the burden.</p>
+
+<p>Is it hard in practice? There definitely is a learning curve, but it's not as bad as some people make it out to be. Tooling for OSGi-based development has improved tremendously the past few years. Especially <a href="http://www.aqute.biz/Bnd/Bnd">bnd</a> and <a href="http://bndtools.org/">bndtools</a> deserve a mention for this. If you'd like to get a feel for what it means to develop a modular Java application, watch this <a href="http://amdatu.org/howto/ide.html">screencast</a> from my co-worker <a href="https://twitter.com/pbakker">Paul Bakker</a>. He is also the co-author of an upcoming O'reilly book on this topic that you can <a href="http://www.amazon.com/gp/product/1449345158/ref=as_li_qf_sp_asin_il_tl?ie=UTF8&amp;camp=1789&amp;creative=9325&amp;creativeASIN=1449345158&amp;linkCode=as2&amp;tag=branandboun-20">preorder here</a>.</p>
+
+<p>Modular architectures and designs are increasingly getting attention. If you want to apply this <strong>now</strong> in your Java environment I encourage you to follow some of the links in this article and give OSGi a spin. Again, it won't come from for free. But remember: OSGi isn't hard, true modularity is.</p>
+
+  </section>
+</article>
+<div>
+  <strong>If you liked this post, please share it!</strong>
+  <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://branchandbound.net/blog/java/2013/07/java-modularity-story" data-via="Sander_Mak" data-dnt="true">Tweet</a>
+  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</div>
+
+<br>
+<br>
+
+<div id="related">
+  <h3>Related Posts</h3>
+  <ul class="posts">
+    
+      <li><span>05 Aug 2013</span> &raquo; <a href="/blog/web/2013/08/some-angularjs-pitfalls">Some AngularJS pitfalls</a></li>
+    
+      <li><span>24 Jun 2013</span> &raquo; <a href="/blog/development/2013/06/annoyances-daily-life-developer">Annoyances in the daily life of a developer</a></li>
+    
+      <li><span>25 May 2013</span> &raquo; <a href="/blog/conferences/2013/05/jeeconf-2013-tripreport">JEEConf 2013 trip report</a></li>
+    
+  </ul>
+</div>
+
+
+
+
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    
+    var disqus_shortname = 'branchandbound'; // required: replace example with your forum shortname
+    
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+
+
+
+        </div>
+        <div class="span3">
+         <div class="hero-unit sidebar">
+           <a href="http://feeds.feedburner.com/BranchAndBound"><img class="rss pull-right" title="Branch and Bound Blog RSS Feed" alt="RSS Feed" src="/assets/themes/sander/rss.png"></a>
+           <h4 class="sidebar"><strong>Branch and Bound Blog</strong></h4>
+           <em>... pruning the software universe</em> 
+           <hr>
+           <ul class="sidebar unstyled">
+             <li><a href="/about.html">About Sander</a></li>
+           </ul>
+           <span class="sidebar pull-right">
+             <a href="http://www.twitter.com/Sander_Mak" target="_blank"><img title="Twitter" alt="Twitter" class="small" src="/assets/themes/sander/twitter.png"></a>
+             <a href="http://nl.linkedin.com/in/SanderMak" target="_blank"><img title="Linkedin profile" alt="Linkedin profile" class="small" src="/assets/themes/sander/linkedin.png"><a>
+             <a href="http://www.github.com/SanderMak" target="_blank"><img  title="GitHub" alt="GitHub" class="small" src="/assets/themes/sander/github.png"></a>
+             <a href="http://www.slideshare.net/SanderMak/presentations" target="_blank"><img title="Slideshare presentations"  alt="Slideshare presentations" class="small" src="/assets/themes/sander/slideshare.png"></a>
+           </span>
+           <hr>
+           <h5 class="sidebar">&nbsp;View archive by:</h5>
+           <ul class="sidebar unstyled">
+             <li><a href="/archive.html">Date</a></li>
+             <li><a href="/categories.html">Category</a></li>
+             <li><a href="/tags.html">Tag</a></li>
+           </ul>
+          </div>
+          <div class="hero-unit twittersidebar">
+            <h5 class="sidebar">Featured articles:</h5>
+            <br>
+            <ul>
+              <li>&raquo; <a href="/blog/scala/2013/05/launching-scalabitz/?src=featured">Launching Scalabitz</a></li>
+              <li>&raquo; <a href="/blog/bookreview/2013/01/bookreview-infinity-and-the-mind/?src=featured">Infinity and the Mind</a></li>      
+  	          <li>&raquo; <a href="/blog/conferences/2012/06/preparing-a-technical-talk/?src=featured">Preparing a technical talk</a></li>
+            </ul>
+          </div>
+          <div class="hero-unit readingsidebar">
+            <h5 class="sidebar">Currently reading:</h5>
+            <br>
+            <ul>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/1933988916/ref=as_li_ss_tl?ie=UTF8&tag=branandboun-20&linkCode=as2&camp=1789&creative=390957&creativeASIN=1933988916" target="_blank">OSGi in action</a></li>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/1593273886/ref=as_li_ss_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=1593273886&linkCode=as2&tag=branandboun-20" target="_blank">The Tangled Web</a></li>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/0321125215/ref=as_li_ss_tl?ie=UTF8&tag=branandboun-20&linkCode=as2&camp=1789&creative=390957&creativeASIN=0321125215" target="_blank">Domain-driven design</a></li>
+            </ul>
+          </div>
+          <div class="hero-unit sidebar">
+           <a class="twitter-timeline" width="250" height="500" data-dnt=true href="https://twitter.com/Sander_Mak" data-widget-id="266609354059431938">Tweets by @Sander_Mak</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+
+                       
+          </div>
+        </div>
+       </div>
+      </div>
+     </div>
+
+
+      <footer>
+        <div class="container">
+         <div class="row">
+           <div class="span9 offset2">
+            <br>
+            <hr>
+           </div>
+         </div>
+         <div class="row">
+          <div class="span4 offset2">
+            <p>Branch and Bound - ... pruning the software universe</p>
+          </div>   
+          <div class="span5">  
+            <p class="pull-right">by Sander Mak</p>
+          </div>
+         </div>
+        </div>
+      </footer>
+
+    <!-- Scripts at the end for faster loading. -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
+    <script src="/assets/themes/sander/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="http://twitter.com/javascripts/blogger.js"></script>
+   
+
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-15335121-2']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+
+    </script>
+
+  </body>
+</html>
+
+
+

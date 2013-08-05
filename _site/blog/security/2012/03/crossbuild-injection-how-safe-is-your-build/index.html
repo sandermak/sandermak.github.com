@@ -1,0 +1,291 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Cross-build injection attacks: how safe is your build? - Branch and Bound</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Sander Mak">
+
+    <link href="http://feeds.feedburner.com/BranchAndBound" rel="alternate" title="Branch and Bound Blog Feed" type="application/atom+xml" />
+    <!-- Le styles -->
+    <link href="/assets/themes/sander/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="/assets/themes/sander/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="/assets/themes/sander/syntax.css" rel="stylesheet">
+    <link href="/assets/themes/sander/style.css" rel="stylesheet">
+
+    <style type="text/css">
+      body {
+        padding-top: 10px;
+        padding-bottom: 40px;
+      }
+    </style>
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="assets/bootstrap/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="assets/bootstrap/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/bootstrap/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="assets/bootstrap/ico/apple-touch-icon-57-precomposed.png">
+
+  </head>
+
+  <body>
+
+
+    <div class="container">
+      <div class="row">
+        <div class="span11">
+    <div class="navbar">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="/">Branch and Bound</a>
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li><a href="/">Home</a></li>
+              <li><a href="/about.html">About</a></li>
+              <li><a href="/talks.html">Talks</a></li>
+              <li><a href="/archive.html">Archive</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+        </div>
+      </div>
+      <div class="row">
+        <div class="span6 offset2">
+          
+<article>
+  <header>
+    <h1>Cross-build injection attacks: how safe is your build?</h1>
+    <strong><time datetime="2012-03-23" pubdate>23 March 2012</time></strong>
+
+    <br>
+    <br>
+
+    <p><em><p>Imagine a world in which people blindly trust binaries uploaded to the internet by random strangers. Certainly not a world in which we as software engineers want to live. Except that many of us, including myself, do exactly that.  On a regular  basis. In our most precious environment: the software build process.</p>
+</em></p>
+  </header>
+  
+
+  <section>
+   <p><strong>Update 2012-08-22: I've posted a <a href="/blog/security/2012/08/verify-dependencies-using-pgp/">follow-up</a> on how to verify dependencies using PGP.</strong></p>
+
+<p>What follows is a tale of trust and naiveté, leading to vulnerabilities that we rarely talk about: the injection of malicious code into our own applications. Enter the wonderful world of 'Cross-build injection attacks' (XBI). Aptly named by <a href="https://www.fortify.com/downloads2/public/fortify_attacking_the_build.pdf">Fortify (pdf)</a> after website attacks such  Cross-site Scripting and Cross-site Request Forgery, but without even nearly as much mindshare among developers.</p>
+
+<h3>Typical builds</h3>
+
+<p>Most software uses other software: libraries and frameworks enable us to quickly write the good stuff rather than the tedious and boring stuff. This implicitly means we trust the code inside these libraries, based on for example the credentials of the library authors or because we've used it before (or dare I say, because we've verified the sourcecode of said library...) But how do these libraries physically end up in our own software? Let's look at the typical setup of a Java project (the remainder of this post discusses XBI on the Java platform, but towards the end we'll see that other platforms have similar issues). Most projects use Maven as their build system, or one of the fancier new build tools like SBT or Gradle which rely on the same Maven repository infrastructure. This results in the following situation:</p>
+
+<p><img src="/pics/maven_builds.png" alt="Typical Maven build setup" /></p>
+
+<p>Maven has, for all its warts, provided us with a centralized canonical repository called Maven Central that contains many popular Java libraries. That's a good thing. But how can we be sure that what Maven downloads into our local repository is actually what was put into Maven Central by the library authors?  Or, put differently, how would an attacker exploit this system in order to inject malicious code into our builds?</p>
+
+<h3>Attacking a build</h3>
+
+<p>The first obvious XBI attack is to man-in-the-middle requests to Maven Central. Since Maven Central only allows http access (I guess https is cost-prohibitive CPU-wise when you are streaming binaries to the world for free), this is relatively easy. Maven does have a checksum facility, but an attacker can just man-in-the-middle the file containing the checksum as well, which is stored alongside the binary in Maven Central. In this sense, the checksums only help to detect transport problems and cannot be relied on to verify the authenticity of the binary.</p>
+
+<p>Another, more involved XBI attack would be to 'poison' Maven Central by replacing binaries that are served. This only works when the security of the Maven Central servers is somehow compromised, which would be a big deal for everyone.</p>
+
+<h3>Cutting all ties</h3>
+
+<p>One obvious reaction to these threats is to not depend on Maven Central. Many companies I've worked with setup their own internal Maven repository, so the build server needn't be connected to the internet. Of course, the next question is: how do dependencies end up in this internal repository?</p>
+
+<p>Indeed, by downloading them from Maven Central. The good thing is that you've decreased the attack surface since you only need to download once. But it's still not really satisfactory, since the attacks mentioned earlier still apply, albeit less so. Additional checks and measures before placing dependencies into the internal repository can help, but these are rarely in place. Looking at <a href="http://www.sonatype.com/people/2012/03/the-results-are-in-sonatype-2012-open-source-development-survey/">this survey</a> only 50% of the companies have an open-source policy in place, and if there is one it is mainly concerned with legal aspects, not technical.</p>
+
+<p>No, in practice, someone is tasked to mindlessly perform the download and shove it into the internal repository. At least now you have someone to scapegoat should it be malicious code, but really, this solves nothing. Also, this 'offline' workflow is sort of annoying during development, especially when you have manually chase transitive dependencies and do other things Maven would normally do automatically. But then again, security always has a cost.</p>
+
+<h3>Cryptography</h3>
+
+<p>Can we do better? Fortunately, yes. Starting three years ago, Maven Central requires PGP signing of uploaded artifacts. An .asc file containing the cryptographic signature is added alongside the binary. This means we can use the public key of the uploader to verify the signature derived from the binary with the author's private key. Of course, the public key should be obtained from a trusted source (such as MIT's <a href="http://pgp.mit.edu">public key server</a>). Now we can be sure that we download the exact file that was uploaded by the library author. We're safe, even if the repository we download from has been compromised! Unless the artifact is older than three years, that is...</p>
+
+<p>There's one downside: Maven does not check these PGP signatures automatically. A fully automated solution is offered by Sonatype with Nexus Professional, a commercial repository manager that can be installed inside a company. Didn't I just mention that security always has a cost?</p>
+
+<h3>Other platforms</h3>
+
+<p>I took the example of Maven and Maven Central because it's the eco-system I'm most familiar with. However, all platforms with automatic dependency management have to deal with this issue. Look, for example at this quote from the Ruby Gems <a href="http://docs.rubygems.org/read/chapter/14">manual</a>:</p>
+
+<pre><code>1.3 Security Issues
+Doesn’t this open a huge security hole? How can I trust the Gems
+which are automatically downloaded from the net?
+
+The same way you can trust all other code you install.
+(I.e. ultimately, you can’t.)
+</code></pre>
+
+<p>Or take Perl's CPAN, which hosts Perl modules from just about anyone. Checksums are as good as it gets on CPAN. Many people even execute CPAN scripts as root for ease of use. Discussing this dire situation leads to nice quotes <a href="http://www.mail-archive.com/beginners@perl.org/msg25697.html">such as</a>:</p>
+
+<pre><code>'Over the last 7 years, we haven't had any problems of this nature and hopefully it will remain that way ...' 
+</code></pre>
+
+<p><a href="http://perl.find-info.ru/perl/029/ch08lev1sec1.html#ch08lev2sec2">or</a>:</p>
+
+<pre><code>'How much can you trust code from CPAN? The bad news is that it is true that
+there is little quality control on CPAN .. Technically, someone could place
+malicious code on CPAN.' 
+</code></pre>
+
+<p>In other words: don't sweat it, nobody would do such a thing, right?</p>
+
+<h3>Really?</h3>
+
+<p>I know, this whole post may sound far-fetched. But that doesn't make the threat less real. There are many high-profile software builds (think banks, government, law enforcement etc.) depending increasingly on open-source libraries distributed through the internet. In the end the only way to be really safe is to download the library sources, verify them by hand, build them from source and place them into your build. But then again, who has the resources to do that? I'm very curious if there have been actual XBI victims, either with Maven or similar build systems.</p>
+
+  </section>
+</article>
+<div>
+  <strong>If you liked this post, please share it!</strong>
+  <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://branchandbound.net/blog/security/2012/03/crossbuild-injection-how-safe-is-your-build" data-via="Sander_Mak" data-dnt="true">Tweet</a>
+  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</div>
+
+<br>
+<br>
+
+<div id="related">
+  <h3>Related Posts</h3>
+  <ul class="posts">
+    
+      <li><span>05 Aug 2013</span> &raquo; <a href="/blog/web/2013/08/some-angularjs-pitfalls">Some AngularJS pitfalls</a></li>
+    
+      <li><span>18 Jul 2013</span> &raquo; <a href="/blog/java/2013/07/java-modularity-story">The Java Modularity Story</a></li>
+    
+      <li><span>24 Jun 2013</span> &raquo; <a href="/blog/development/2013/06/annoyances-daily-life-developer">Annoyances in the daily life of a developer</a></li>
+    
+  </ul>
+</div>
+
+
+
+
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    
+    var disqus_shortname = 'branchandbound'; // required: replace example with your forum shortname
+    
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+
+
+
+        </div>
+        <div class="span3">
+         <div class="hero-unit sidebar">
+           <a href="http://feeds.feedburner.com/BranchAndBound"><img class="rss pull-right" title="Branch and Bound Blog RSS Feed" alt="RSS Feed" src="/assets/themes/sander/rss.png"></a>
+           <h4 class="sidebar"><strong>Branch and Bound Blog</strong></h4>
+           <em>... pruning the software universe</em> 
+           <hr>
+           <ul class="sidebar unstyled">
+             <li><a href="/about.html">About Sander</a></li>
+           </ul>
+           <span class="sidebar pull-right">
+             <a href="http://www.twitter.com/Sander_Mak" target="_blank"><img title="Twitter" alt="Twitter" class="small" src="/assets/themes/sander/twitter.png"></a>
+             <a href="http://nl.linkedin.com/in/SanderMak" target="_blank"><img title="Linkedin profile" alt="Linkedin profile" class="small" src="/assets/themes/sander/linkedin.png"><a>
+             <a href="http://www.github.com/SanderMak" target="_blank"><img  title="GitHub" alt="GitHub" class="small" src="/assets/themes/sander/github.png"></a>
+             <a href="http://www.slideshare.net/SanderMak/presentations" target="_blank"><img title="Slideshare presentations"  alt="Slideshare presentations" class="small" src="/assets/themes/sander/slideshare.png"></a>
+           </span>
+           <hr>
+           <h5 class="sidebar">&nbsp;View archive by:</h5>
+           <ul class="sidebar unstyled">
+             <li><a href="/archive.html">Date</a></li>
+             <li><a href="/categories.html">Category</a></li>
+             <li><a href="/tags.html">Tag</a></li>
+           </ul>
+          </div>
+          <div class="hero-unit twittersidebar">
+            <h5 class="sidebar">Featured articles:</h5>
+            <br>
+            <ul>
+              <li>&raquo; <a href="/blog/scala/2013/05/launching-scalabitz/?src=featured">Launching Scalabitz</a></li>
+              <li>&raquo; <a href="/blog/bookreview/2013/01/bookreview-infinity-and-the-mind/?src=featured">Infinity and the Mind</a></li>      
+  	          <li>&raquo; <a href="/blog/conferences/2012/06/preparing-a-technical-talk/?src=featured">Preparing a technical talk</a></li>
+            </ul>
+          </div>
+          <div class="hero-unit readingsidebar">
+            <h5 class="sidebar">Currently reading:</h5>
+            <br>
+            <ul>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/1933988916/ref=as_li_ss_tl?ie=UTF8&tag=branandboun-20&linkCode=as2&camp=1789&creative=390957&creativeASIN=1933988916" target="_blank">OSGi in action</a></li>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/1593273886/ref=as_li_ss_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=1593273886&linkCode=as2&tag=branandboun-20" target="_blank">The Tangled Web</a></li>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/0321125215/ref=as_li_ss_tl?ie=UTF8&tag=branandboun-20&linkCode=as2&camp=1789&creative=390957&creativeASIN=0321125215" target="_blank">Domain-driven design</a></li>
+            </ul>
+          </div>
+          <div class="hero-unit sidebar">
+           <a class="twitter-timeline" width="250" height="500" data-dnt=true href="https://twitter.com/Sander_Mak" data-widget-id="266609354059431938">Tweets by @Sander_Mak</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+
+                       
+          </div>
+        </div>
+       </div>
+      </div>
+     </div>
+
+
+      <footer>
+        <div class="container">
+         <div class="row">
+           <div class="span9 offset2">
+            <br>
+            <hr>
+           </div>
+         </div>
+         <div class="row">
+          <div class="span4 offset2">
+            <p>Branch and Bound - ... pruning the software universe</p>
+          </div>   
+          <div class="span5">  
+            <p class="pull-right">by Sander Mak</p>
+          </div>
+         </div>
+        </div>
+      </footer>
+
+    <!-- Scripts at the end for faster loading. -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
+    <script src="/assets/themes/sander/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="http://twitter.com/javascripts/blogger.js"></script>
+   
+
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-15335121-2']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+
+    </script>
+
+  </body>
+</html>
+
+
+

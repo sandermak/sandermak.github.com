@@ -1,0 +1,271 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Scala is like Git - Branch and Bound</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Sander Mak">
+
+    <link href="http://feeds.feedburner.com/BranchAndBound" rel="alternate" title="Branch and Bound Blog Feed" type="application/atom+xml" />
+    <!-- Le styles -->
+    <link href="/assets/themes/sander/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="/assets/themes/sander/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="/assets/themes/sander/syntax.css" rel="stylesheet">
+    <link href="/assets/themes/sander/style.css" rel="stylesheet">
+
+    <style type="text/css">
+      body {
+        padding-top: 10px;
+        padding-bottom: 40px;
+      }
+    </style>
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="assets/bootstrap/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="assets/bootstrap/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/bootstrap/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="assets/bootstrap/ico/apple-touch-icon-57-precomposed.png">
+
+  </head>
+
+  <body>
+
+
+    <div class="container">
+      <div class="row">
+        <div class="span11">
+    <div class="navbar">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="/">Branch and Bound</a>
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li><a href="/">Home</a></li>
+              <li><a href="/about.html">About</a></li>
+              <li><a href="/talks.html">Talks</a></li>
+              <li><a href="/archive.html">Archive</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+        </div>
+      </div>
+      <div class="row">
+        <div class="span6 offset2">
+          
+<article>
+  <header>
+    <h1>Scala is like Git</h1>
+    <strong><time datetime="2012-12-20" pubdate>20 December 2012</time></strong>
+
+    <br>
+    <br>
+
+    <p><em><p>Scala is often portrayed as being too complex. Many times these discussions about complexity remind me of similar arguments around the complexity of Git. I know, the comparison between a source control system and a programming language falls flat quickly when pushed too hard. But bear with me, because I do believe it can put the Scala complexity discussion in a new perspective.</p>
+</em></p>
+  </header>
+  
+
+  <section>
+   <p>Both Git and Scala are power tools, meant to disrupt the status quo rather than incrementally improving it. Git isn't just a better CVS/Subversion: its distributed nature makes it fundamentally different. The same goes for Scala: it's not just a better Java, but a daring entrant into the hybrid FP/OO arena. Interestingly, the complexity arguments are often framed by comparing Git or Scala to fundamentally more limited technologies. Yes, obviously whatever you were doing in Subversion or Java may be much simpler. What should be at the forefront of these discussions though, is what more you can achieve using Git or Scala. It's not just about the (complexity) costs, but also about the benefits. Do you buy into the vision behind these power tools?</p>
+
+<h3>Power tools require investment</h3>
+
+<p>It has taken me a solid year of actually working with Git in a team-setting to appreciate all the advantages it has to offer. Before this period, I played around with it, mainly using GitHub, but many questions remained (why do I need a staging area? Why are there three ways to do the same thing?). Trusting people who went before me and embracing Git brought me a whole new level of productivity in the end. Scala's learning curve is similar. Even though I have a background in functional programming from my university days, there still was a lot to take in. But like with Git, for me the advantages far outweigh this awkward period of embracing a tool you don't fully 'get' yet.</p>
+
+<p>Such an investment definitely poses a barrier to entry. However, Git has overcome this barrier by offering something very desirable: effortless branching and merging (or <a href="http://git-scm.com/book/en/Git-Branching-Rebasing">rebasing</a>, love that). Likewise, Scala's gateway drug is <a href="http://lampwww.epfl.ch/~phaller/upmarc/">pervasive parallelization</a> and an <a href="http://typesafe.com/stack">integrated stack</a> of Scala, Akka and Play.</p>
+
+<h3>Clean core</h3>
+
+<p>What I like most about Git and Scala is that both embrace the approach of having a clean core of basic concepts. Git has its <a href="http://eagain.net/articles/git-for-computer-scientists/">Directed Acyclic Graph</a> of commits, trees and blobs. Every operation is essentially a transformation of the graph (and/or refs into the graph, to be precise) . Complex? Maybe, but once you grasp it, you have so much power. A similar case can be made for Scala. Even though the amount of concepts is larger - it is a programming language after all, not a VCS - to me all language features show regularity both in the small and in the large. Everything can be nested and composed just like you would expect.</p>
+
+<p>That Scala has a relatively small core is illustrated by the fact that the Scala Language Specification is quarter the size of the Java Language Specification. Scala's grammar is smaller as well. Let me be quick to add that specification size is by no means a token of superiority in and of itself (cf. <a href="http://progopedia.com/language/brainfuck/">Brainfuck</a>). But it is congruent with this great quote by Martin Odersky:</p>
+
+<blockquote><p>I have always tried to make Scala a very powerful but at the same beautifully simple language, by trying to find unifications of formerly disparate concepts.</p></blockquote>
+
+<p>This philosophy really resonates with me. Admittedly Scala doesn't fully unify everything that it could. It's also a very practical language with practical tradeoffs, for example concerning Java interop. Such is life.</p>
+
+<h3>Complexity</h3>
+
+<p>Even though Git and Scala have clean and composable primitives, the <em>surfaced complexity</em> is relatively high. Git's CLI has an <a href="http://stackoverflow.com/questions/7866353/git-list-all-available-commands">abundance of commands</a> and is <a href="http://steveko.wordpress.com/2012/02/24/10-things-i-hate-about-git/">notorious</a> for its inconsistent flag usage. Scala's syntax has some <a href="http://www.slideshare.net/normation/scala-dreaded">surprises</a> for newcomers as well. And yes, Scala may have a <a href="http://programmers.stackexchange.com/questions/179699/whats-the-problem-with-scalas-xml-literals">feature</a> or <a href="http://stackoverflow.com/questions/13011204/scalas-postfix-ops">two</a> too many. If you know the underlying core model that ties everything together, such issues are annoying but you'll get over them. It's a form of <a href="http://c2.com/cgi/wiki?AccidentalComplexity">accidental complexity</a>. I do applaud the efforts of the Scala team to <a href="http://docs.scala-lang.org/sips/pending/modularizing-language-features.html">modularize language features</a>, since it allows for gradual rectification of these issues!</p>
+
+<p>In the end, being able to work with the elegant core models of these tools is worth the price of admission to me and many others. Yes, you will have some rope to hang yourself with both Git and Scala. Deal with it.</p>
+
+<h3>GUIs</h3>
+
+<p>But it doesn't stop there. One of the most important things for wide adoption, especially when taking into account the 'enterprise crowd', is having good GUI support. Git GUIs and IDE support for Scala have long been an afterthought. And I'm not even sure whether GUIs for Git actually reduce complexity. I tried <a href="http://code.google.com/p/gitextensions/">a</a> <a href="http://code.google.com/p/tortoisegit/">few</a>, but didn't like it. For Scala IDE plugins though, it's a no-brainer. Being able to navigate types and implicits in large codebases is invaluable. Fortunately, the Scala Eclipse plugin is now backed by <a href="http://typesafe.com/">Typesafe</a> and is moving forward quickly. IntelliJ's Scala plugin is still going strong as well. I'd say Scala is ahead of Git in this regard, though not ahead of other programming languages to be fair.</p>
+
+<h3>Real-world usage</h3>
+
+<p>One thing that becomes apparent when adopting Git is that it doesn't prescribe a particular workflow. Hence, many different workflows have been championed. Some even including tool support, like git-flow and Legit. Does this indicate a shortcoming with Git? Is it too complex on its own? I don't believe so. It's just that people are looking for common ground and don't want to reinvent the wheel. But it is telling that none of these workflows and supporting tools have really won out. Diversity is key it seems.</p>
+
+<p>For Scala, things are a bit different. Adoption is increasing, but the community is still looking for a common 'tone-of-voice'. For a programming language this is much more crucial, especially an expressive one like Scala. Java, by contrast, has had almost two decades to mature and develop widely accepted idioms and accompanying styleguides. I believe Scala needs to go through a similar process. The signs that this process has started <a href="http://docs.scala-lang.org/style/">are there</a>. What we need is a definitive Effective Scala book that can lead the way, like <a href="http://www.amazon.com/gp/product/0321356683/ref=as_li_qf_sp_asin_tl?ie=UTF8&amp;camp=1789&amp;creative=9325&amp;creativeASIN=0321356683&amp;linkCode=as2&amp;tag=branandboun-20">Effective Java</a> did for Java.</p>
+
+<h3>The enemy of good is good enough</h3>
+
+<p>Why should people switch from SVN to Git, or from Java to Scala? After all, Subversion got merge-tracking and Java 8 will get lambdas. The point is that these additions do not change the fundamental core model of the 'older generation' tools. If anything, it adds unanticipated complexity without truly reaching the next level. It will be good enough for a lot of people though, and I recognize that changing VCS or programming language is not something to be taken lightly. I do urge you to explore new possibilities and see if good enough still cuts it for you.</p>
+
+<p>Then there are the 'current generation' competing technologies. Git had to battle Mercurial and Bazaar. Scala faces potential competition from Kotlin and Ceylon. All these alternatives advertise simplicity or 'intuitiveness' as big selling point. And they may very well be more intuitive initially. I'm very curious whether they have to compromise on their core model and internal design philosophy to surface this intuitiveness. Fusing object-orientation and functional programming is a hard job. I'll definitely revisit this once these new languages are properly released.</p>
+
+<p>In the end, Git has succeeded because it offers tangible benefits, despite its surfaced complexity. So can Scala.</p>
+
+  </section>
+</article>
+<div>
+  <strong>If you liked this post, please share it!</strong>
+  <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://branchandbound.net/blog/scala/2012/12/scala-is-like-git" data-via="Sander_Mak" data-dnt="true">Tweet</a>
+  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</div>
+
+<br>
+<br>
+
+<div id="related">
+  <h3>Related Posts</h3>
+  <ul class="posts">
+    
+      <li><span>05 Aug 2013</span> &raquo; <a href="/blog/web/2013/08/some-angularjs-pitfalls">Some AngularJS pitfalls</a></li>
+    
+      <li><span>18 Jul 2013</span> &raquo; <a href="/blog/java/2013/07/java-modularity-story">The Java Modularity Story</a></li>
+    
+      <li><span>24 Jun 2013</span> &raquo; <a href="/blog/development/2013/06/annoyances-daily-life-developer">Annoyances in the daily life of a developer</a></li>
+    
+  </ul>
+</div>
+
+
+
+
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    
+    var disqus_shortname = 'branchandbound'; // required: replace example with your forum shortname
+    
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+
+
+
+        </div>
+        <div class="span3">
+         <div class="hero-unit sidebar">
+           <a href="http://feeds.feedburner.com/BranchAndBound"><img class="rss pull-right" title="Branch and Bound Blog RSS Feed" alt="RSS Feed" src="/assets/themes/sander/rss.png"></a>
+           <h4 class="sidebar"><strong>Branch and Bound Blog</strong></h4>
+           <em>... pruning the software universe</em> 
+           <hr>
+           <ul class="sidebar unstyled">
+             <li><a href="/about.html">About Sander</a></li>
+           </ul>
+           <span class="sidebar pull-right">
+             <a href="http://www.twitter.com/Sander_Mak" target="_blank"><img title="Twitter" alt="Twitter" class="small" src="/assets/themes/sander/twitter.png"></a>
+             <a href="http://nl.linkedin.com/in/SanderMak" target="_blank"><img title="Linkedin profile" alt="Linkedin profile" class="small" src="/assets/themes/sander/linkedin.png"><a>
+             <a href="http://www.github.com/SanderMak" target="_blank"><img  title="GitHub" alt="GitHub" class="small" src="/assets/themes/sander/github.png"></a>
+             <a href="http://www.slideshare.net/SanderMak/presentations" target="_blank"><img title="Slideshare presentations"  alt="Slideshare presentations" class="small" src="/assets/themes/sander/slideshare.png"></a>
+           </span>
+           <hr>
+           <h5 class="sidebar">&nbsp;View archive by:</h5>
+           <ul class="sidebar unstyled">
+             <li><a href="/archive.html">Date</a></li>
+             <li><a href="/categories.html">Category</a></li>
+             <li><a href="/tags.html">Tag</a></li>
+           </ul>
+          </div>
+          <div class="hero-unit twittersidebar">
+            <h5 class="sidebar">Featured articles:</h5>
+            <br>
+            <ul>
+              <li>&raquo; <a href="/blog/scala/2013/05/launching-scalabitz/?src=featured">Launching Scalabitz</a></li>
+              <li>&raquo; <a href="/blog/bookreview/2013/01/bookreview-infinity-and-the-mind/?src=featured">Infinity and the Mind</a></li>      
+  	          <li>&raquo; <a href="/blog/conferences/2012/06/preparing-a-technical-talk/?src=featured">Preparing a technical talk</a></li>
+            </ul>
+          </div>
+          <div class="hero-unit readingsidebar">
+            <h5 class="sidebar">Currently reading:</h5>
+            <br>
+            <ul>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/1933988916/ref=as_li_ss_tl?ie=UTF8&tag=branandboun-20&linkCode=as2&camp=1789&creative=390957&creativeASIN=1933988916" target="_blank">OSGi in action</a></li>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/1593273886/ref=as_li_ss_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=1593273886&linkCode=as2&tag=branandboun-20" target="_blank">The Tangled Web</a></li>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/0321125215/ref=as_li_ss_tl?ie=UTF8&tag=branandboun-20&linkCode=as2&camp=1789&creative=390957&creativeASIN=0321125215" target="_blank">Domain-driven design</a></li>
+            </ul>
+          </div>
+          <div class="hero-unit sidebar">
+           <a class="twitter-timeline" width="250" height="500" data-dnt=true href="https://twitter.com/Sander_Mak" data-widget-id="266609354059431938">Tweets by @Sander_Mak</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+
+                       
+          </div>
+        </div>
+       </div>
+      </div>
+     </div>
+
+
+      <footer>
+        <div class="container">
+         <div class="row">
+           <div class="span9 offset2">
+            <br>
+            <hr>
+           </div>
+         </div>
+         <div class="row">
+          <div class="span4 offset2">
+            <p>Branch and Bound - ... pruning the software universe</p>
+          </div>   
+          <div class="span5">  
+            <p class="pull-right">by Sander Mak</p>
+          </div>
+         </div>
+        </div>
+      </footer>
+
+    <!-- Scripts at the end for faster loading. -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
+    <script src="/assets/themes/sander/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="http://twitter.com/javascripts/blogger.js"></script>
+   
+
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-15335121-2']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+
+    </script>
+
+  </body>
+</html>
+
+
+

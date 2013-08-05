@@ -1,0 +1,273 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>JFall 2012: Dutch Java awesomeness - Branch and Bound</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Sander Mak">
+
+    <link href="http://feeds.feedburner.com/BranchAndBound" rel="alternate" title="Branch and Bound Blog Feed" type="application/atom+xml" />
+    <!-- Le styles -->
+    <link href="/assets/themes/sander/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="/assets/themes/sander/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="/assets/themes/sander/syntax.css" rel="stylesheet">
+    <link href="/assets/themes/sander/style.css" rel="stylesheet">
+
+    <style type="text/css">
+      body {
+        padding-top: 10px;
+        padding-bottom: 40px;
+      }
+    </style>
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="assets/bootstrap/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="assets/bootstrap/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/bootstrap/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="assets/bootstrap/ico/apple-touch-icon-57-precomposed.png">
+
+  </head>
+
+  <body>
+
+
+    <div class="container">
+      <div class="row">
+        <div class="span11">
+    <div class="navbar">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="/">Branch and Bound</a>
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li><a href="/">Home</a></li>
+              <li><a href="/about.html">About</a></li>
+              <li><a href="/talks.html">Talks</a></li>
+              <li><a href="/archive.html">Archive</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+        </div>
+      </div>
+      <div class="row">
+        <div class="span6 offset2">
+          
+<article>
+  <header>
+    <h1>JFall 2012: Dutch Java awesomeness</h1>
+    <strong><time datetime="2012-11-01" pubdate>01 November 2012</time></strong>
+
+    <br>
+    <br>
+
+    <p><em><p>The J-Fall conference has been a stable factor in the Dutch Java community for many years now. The 2012 edition was again jam-packed with excellent content. But above all, it's a place where more than thousand like-minded developers can meet (again) and exchange fresh new ideas!</p>
+</em></p>
+  </header>
+  
+
+  <section>
+   <p>Right from the beginning it was clear that this year's keynote would be much more dynamic than last year. Stephen Chin drove his motorcycle (yes, you read that right) into the keynote hall. What followed was a whirlwind of short presentations, outlining the major themes for Java in the coming years: Java 8/9, JavaFX 2.2, Java Embedded for ARM and Project Easel for deep HTML5 integration in NetBeans. Nothing that wasn't announced at JavaOne, but still a good overview.</p>
+
+<h3>Morning sessions</h3>
+
+<p>The <a href="http://www.nljug.org/pages/events/content/jfall_2012/sessions/00096/">first break-out session</a> I attended was on Unfiltered. Wilfred Springer aptly called it an 'unframework' because it is so small, and focused solely on HTTP request handling. After some live coding (with audience participation where necessary) it became clear that this Scala framework is quite coherent and capable.</p>
+
+<p>Next up was a <a href="http://www.nljug.org/pages/events/content/jfall_2012/sessions/00081/">'Calling time on performance measurement'</a> by William Louth. I was half expecting a product pitch on JXInsight, but fortunately he focused not just on the tool but also on an interesting philosophy about adaptive systems in general. Most applications are fairly 'dumb' in a sense that they keep repeating sub-optimal behavior. Things like hammering a database that is down, or even fairly advanced cases like sub-optimal use of a HashMap by program code. Louth proposed <a href="http://www.jinspired.com/solutions/open-api">Signals</a> as a way to build a runtime profile of such behaviors. In turn, the program can use these profiles to guide subsequent executions on a better path. Interesting, but I'm not sure how usable the whole Signals approach currently is. Even though the demo's were kind of jittery and (too) fast-paced, this session gave me some food for thought.</p>
+
+<h3>NightHacking</h3>
+
+<p>I 'missed' the second keynote by Microsoft because I was being interviewed by Stephen Chin about my upcoming <a href="/blog/security/2012/03/crossbuild-injection-how-safe-is-your-build">cross-build injection attacks</a> session. Stephen is traveling Europe with a motorbike on his way to Devoxx 2012, called the <a href="http://steveonjava.com/nighthacking">NightHacking</a> tour. Meanwhile he live-streams interviews with various Java experts. It was cool to be part of the NightHacking tour, and at least I have the sticker to prove it :)</p>
+
+<p><img src="/pics/nighthacker.png" alt="NightHacking sticker" /></p>
+
+<p>You can watch the recorded interview here:</p>
+
+<iframe width="600" height="338" src="http://www.youtube.com/embed/44Ke-XxsgOc?feature=player_detailpage" frameborder="0" allowfullscreen="">embed</iframe>
+
+
+
+
+<br>
+
+
+<br>
+
+
+<h3>CQRS and event-sourcing</h3>
+
+<p>One last talk I want to highlight is <a href="http://www.nljug.org/pages/events/content/jfall_2012/sessions/00091/">'High performance and scalable architecture'</a> by Allard Buijze. He showed us a real-life example of a CQRS and event-sourcing based architecture for BridgeBig.com, an online bridge gaming site. The talk was very down-to-earth with some good examples on how to split up your system in functional areas that exchange (stateless) Commands and Events. Since Allard is the author of the Axon CQRS framework, it was used heavily in this system. Even in combination with the <a href="http://lmax-exchange.github.com/disruptor/">Disruptor</a> pattern for high throughput within a single sub-system. I will have to investigate Axon, but think I think the same can be achieved with for example <a href="http://akka.io/">Akka</a> actors and an accompanying <a href="https://github.com/eligosource/eventsourced">event-sourcing library</a>. That would be my personal preferred stack, on top of Scala.</p>
+
+<h3>Cross-build injection revisited</h3>
+
+<p>For the fourth year in a row I was able to present at J-Fall. This year I did a (Dutch) re-run of my <a href="https://oracleus.activeevents.com/connect/sessionDetail.ww?SESSION_ID=3892">JavaOne talk</a> 'Cross-build injection attacks: how safe is your Java build?'. The session was scheduled on the last slot of the conference. Some people already left the building, but still there was a nice crowd. I always ask how many people have heard about cross-build injection and build security. Typically about 2-3% of the audience raises their hand, which is heartening to me because I can teach something new. Good questions where asked on actual steps people should take to prevent cross-build injection. I believe developers are starting to see that what's most convenient for them in the build process is not necessarily what's in the best interest of the safety of the end-product.</p>
+
+<p><img src="/pics/jfall12.jpg" alt="me at the start of the session" />
+(me at the start of the session, photo courtesy of <a href="https://twitter.com/byteheads">@byteheads</a>)</p>
+
+<p>It was especially nice that I could point out that Maven Central is now <a href="http://www.sonatype.com/people/2012/10/now-available-ssl-connectivity-to-central">https accessible</a> as well. This is a big step forward in comparison to the previous incarnation of this talk at JavaOne. I'll blog some more details about this later.</p>
+
+<h3>See you next year</h3>
+
+<p>Overall, I was impressed with the quality of content delivered by the Dutch Java community and the various international speakers at J-Fall. But it was also a great meeting point for old friends, (former) colleagues and many other interesting people. Until next year!</p>
+
+  </section>
+</article>
+<div>
+  <strong>If you liked this post, please share it!</strong>
+  <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://branchandbound.net/blog/conferences/2012/11/jfall-2012-dutch-java-awesomeness" data-via="Sander_Mak" data-dnt="true">Tweet</a>
+  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</div>
+
+<br>
+<br>
+
+<div id="related">
+  <h3>Related Posts</h3>
+  <ul class="posts">
+    
+      <li><span>05 Aug 2013</span> &raquo; <a href="/blog/web/2013/08/some-angularjs-pitfalls">Some AngularJS pitfalls</a></li>
+    
+      <li><span>18 Jul 2013</span> &raquo; <a href="/blog/java/2013/07/java-modularity-story">The Java Modularity Story</a></li>
+    
+      <li><span>24 Jun 2013</span> &raquo; <a href="/blog/development/2013/06/annoyances-daily-life-developer">Annoyances in the daily life of a developer</a></li>
+    
+  </ul>
+</div>
+
+
+
+
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    
+    var disqus_shortname = 'branchandbound'; // required: replace example with your forum shortname
+    
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+
+
+
+        </div>
+        <div class="span3">
+         <div class="hero-unit sidebar">
+           <a href="http://feeds.feedburner.com/BranchAndBound"><img class="rss pull-right" title="Branch and Bound Blog RSS Feed" alt="RSS Feed" src="/assets/themes/sander/rss.png"></a>
+           <h4 class="sidebar"><strong>Branch and Bound Blog</strong></h4>
+           <em>... pruning the software universe</em> 
+           <hr>
+           <ul class="sidebar unstyled">
+             <li><a href="/about.html">About Sander</a></li>
+           </ul>
+           <span class="sidebar pull-right">
+             <a href="http://www.twitter.com/Sander_Mak" target="_blank"><img title="Twitter" alt="Twitter" class="small" src="/assets/themes/sander/twitter.png"></a>
+             <a href="http://nl.linkedin.com/in/SanderMak" target="_blank"><img title="Linkedin profile" alt="Linkedin profile" class="small" src="/assets/themes/sander/linkedin.png"><a>
+             <a href="http://www.github.com/SanderMak" target="_blank"><img  title="GitHub" alt="GitHub" class="small" src="/assets/themes/sander/github.png"></a>
+             <a href="http://www.slideshare.net/SanderMak/presentations" target="_blank"><img title="Slideshare presentations"  alt="Slideshare presentations" class="small" src="/assets/themes/sander/slideshare.png"></a>
+           </span>
+           <hr>
+           <h5 class="sidebar">&nbsp;View archive by:</h5>
+           <ul class="sidebar unstyled">
+             <li><a href="/archive.html">Date</a></li>
+             <li><a href="/categories.html">Category</a></li>
+             <li><a href="/tags.html">Tag</a></li>
+           </ul>
+          </div>
+          <div class="hero-unit twittersidebar">
+            <h5 class="sidebar">Featured articles:</h5>
+            <br>
+            <ul>
+              <li>&raquo; <a href="/blog/scala/2013/05/launching-scalabitz/?src=featured">Launching Scalabitz</a></li>
+              <li>&raquo; <a href="/blog/bookreview/2013/01/bookreview-infinity-and-the-mind/?src=featured">Infinity and the Mind</a></li>      
+  	          <li>&raquo; <a href="/blog/conferences/2012/06/preparing-a-technical-talk/?src=featured">Preparing a technical talk</a></li>
+            </ul>
+          </div>
+          <div class="hero-unit readingsidebar">
+            <h5 class="sidebar">Currently reading:</h5>
+            <br>
+            <ul>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/1933988916/ref=as_li_ss_tl?ie=UTF8&tag=branandboun-20&linkCode=as2&camp=1789&creative=390957&creativeASIN=1933988916" target="_blank">OSGi in action</a></li>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/1593273886/ref=as_li_ss_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=1593273886&linkCode=as2&tag=branandboun-20" target="_blank">The Tangled Web</a></li>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/0321125215/ref=as_li_ss_tl?ie=UTF8&tag=branandboun-20&linkCode=as2&camp=1789&creative=390957&creativeASIN=0321125215" target="_blank">Domain-driven design</a></li>
+            </ul>
+          </div>
+          <div class="hero-unit sidebar">
+           <a class="twitter-timeline" width="250" height="500" data-dnt=true href="https://twitter.com/Sander_Mak" data-widget-id="266609354059431938">Tweets by @Sander_Mak</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+
+                       
+          </div>
+        </div>
+       </div>
+      </div>
+     </div>
+
+
+      <footer>
+        <div class="container">
+         <div class="row">
+           <div class="span9 offset2">
+            <br>
+            <hr>
+           </div>
+         </div>
+         <div class="row">
+          <div class="span4 offset2">
+            <p>Branch and Bound - ... pruning the software universe</p>
+          </div>   
+          <div class="span5">  
+            <p class="pull-right">by Sander Mak</p>
+          </div>
+         </div>
+        </div>
+      </footer>
+
+    <!-- Scripts at the end for faster loading. -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
+    <script src="/assets/themes/sander/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="http://twitter.com/javascripts/blogger.js"></script>
+   
+
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-15335121-2']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+
+    </script>
+
+  </body>
+</html>
+
+
+

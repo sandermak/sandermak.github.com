@@ -1,0 +1,353 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Verify dependencies using PGP - Branch and Bound</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Sander Mak">
+
+    <link href="http://feeds.feedburner.com/BranchAndBound" rel="alternate" title="Branch and Bound Blog Feed" type="application/atom+xml" />
+    <!-- Le styles -->
+    <link href="/assets/themes/sander/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="/assets/themes/sander/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="/assets/themes/sander/syntax.css" rel="stylesheet">
+    <link href="/assets/themes/sander/style.css" rel="stylesheet">
+
+    <style type="text/css">
+      body {
+        padding-top: 10px;
+        padding-bottom: 40px;
+      }
+    </style>
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="assets/bootstrap/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="assets/bootstrap/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/bootstrap/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="assets/bootstrap/ico/apple-touch-icon-57-precomposed.png">
+
+  </head>
+
+  <body>
+
+
+    <div class="container">
+      <div class="row">
+        <div class="span11">
+    <div class="navbar">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="/">Branch and Bound</a>
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li><a href="/">Home</a></li>
+              <li><a href="/about.html">About</a></li>
+              <li><a href="/talks.html">Talks</a></li>
+              <li><a href="/archive.html">Archive</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+        </div>
+      </div>
+      <div class="row">
+        <div class="span6 offset2">
+          
+<article>
+  <header>
+    <h1>Verify dependencies using PGP</h1>
+    <strong><time datetime="2012-08-22" pubdate>22 August 2012</time></strong>
+
+    <br>
+    <br>
+
+    <p><em><p>Many builds use automatic dependency retrieval from repositories like Maven Central. In an earlier post, I've outlined the dangers of so-called <a href="/blog/security/2012/03/crossbuild-injection-how-safe-is-your-build">cross-build injection attacks</a> when using automatic dependency management. In this post, I'll show how you can counter such attacks by verifying PGP signatures of artifacts downloaded from Maven Central.</p>
+</em></p>
+  </header>
+  
+
+  <section>
+   <p>There are <a href="http://kohsuke.org/pgp-maven-plugin/">various</a> <a href="http://www.sonatype.com/people/2010/01/how-to-generate-pgp-signatures-with-maven/">articles</a> that show how to sign your artifact before uploading it to Maven Central. However, we're more likely to be library users than library authors. Unfortunately, information on how to verify PGP signatures of artifacts is surprisingly scarce. Even StackOverflow seems to <a href="http://stackoverflow.com/questions/3307146/verification-of-dependency-authenticy-in-automated-build-systems">dodge the bullet</a>. So let's fix that.</p>
+
+<h3>Pretty Good Privacy</h3>
+
+<p>Pretty Good Privacy (PGP) can be used to encrypt or sign data. It uses asymmetric public/private keypairs. Since libraries on Maven Central are open source, encryption is pointless. Signing, on the other hand, can be used to prove the authenticity of a library. We can use the library authors' public key to verify that the artifact is signed with the corresponding private key. This may sound easy, but in practice this is a multi-step process. If you want to follow along with the signature verification steps in this post, you'll have to install a PGP implementation. I'm using GnuPG ('brew install gpg' on OSX).</p>
+
+<h3>Getting the signature</h3>
+
+<p>Before we can verify an artifact, we must first obtain its signature. So let's say we want to use the plexus-cipher library. First, add the dependency to the build (groupId: org.sonatype.plexus, artifactId: plexus-cipher and version: 1.7). Any buildtool that uses Maven Central to retrieve dependencies will do. Of course this can be Maven itself, but also SBT, Gradle or even Ant+Ivy (I'll assume Maven for the remainder of this post). Adding this dependency will prompt Maven to download:</p>
+
+<pre><code>http://repo1.maven.org/maven2/org/sonatype/plexus/plexus-cipher/1.7/plexus-cipher-1.7.jar
+http://repo1.maven.org/maven2/org/sonatype/plexus/plexus-cipher/1.7/plexus-cipher-1.7.pom
+</code></pre>
+
+<p>In order to get the accompanying signatures, append .asc to these urls and download them:</p>
+
+<pre><code>$ wget http://repo1.maven.org/maven2/org/sonatype/plexus/plexus-cipher/1.7/plexus-cipher-1.7.jar.asc
+$ wget http://repo1.maven.org/maven2/org/sonatype/plexus/plexus-cipher/1.7/plexus-cipher-1.7.pom.asc
+</code></pre>
+
+<p>Even though these signatures live alongside the artifacts themselves, Maven does not download them automatically. Also, beware that not all artifacts in Maven Central have .asc signatures. Up to three years ago, Maven Central did not require library authors to provide PGP signatures.</p>
+
+<h3>Verifying the signature</h3>
+
+<p>We have the artifact and the signature, but we still need to obtain the public key of the library author before we can continue. The gpg verify command dutifully tells us just that:</p>
+
+<pre><code>$ gpg --verify plexus-cipher-1.7.jar.asc ~/.m2/.../plexus-chipher-1.7.jar
+
+gpg: Signature made Tue Jul 26 20:06:33 2011 CEST using DSA key ID 8DD1BDFD
+gpg: Can't check signature: public key not found 
+</code></pre>
+
+<p>Now we could of course ask the author for his public key by email, or try to download it from the project's website. That's not really a scalable solution though... Fortunately, Maven Central also requires its uploaders to publish their public key to a PGP keyserver. Specifically, <a href="http://pgp.mit.edu/">MIT's keyserver</a>. The following diagram shows how it works:
+<img src="/pics/maven_pgp.png" alt="Publishing signed library to Maven Central" /></p>
+
+<p>Armed with this knowledge, we can import the key with ID 8DD1BDFD (as we learned during our failed verification attempt) into our keyring:</p>
+
+<pre><code>$ gpg --keyserver pgp.mit.edu --recv-key 8DD1BDFD
+
+gpg: requesting key 8DD1BDFD from hkp server pgp.mit.edu
+gpg: key 8DD1BDFD: public key "Sonatype, Inc. (Sonatype release key) &lt;dev@sonatype.com&gt;" imported
+gpg: no ultimately trusted keys found
+gpg: Total number processed: 1
+gpg:               imported: 1
+</code></pre>
+
+<p>We can make our lives even easier (depending on your tolerance for long commandlines...) by telling gpg to find and import keys automatically as they are referenced in the signature. Note that the following command combines the previous two steps into one:</p>
+
+<pre><code>$ gpg --auto-key-locate keyserver --keyserver pgp.mit.edu --keyserver-options auto-key-retrieve --verify plexus-cipher-1.7.jar.asc ~/.m2/.../plexus-chipher-1.7.jar
+
+gpg: Signature made Tue Jul 26 20:06:33 2011 CEST using DSA key ID 8DD1BDFD
+gpg: requesting key 8DD1BDFD from hkp server pgp.mit.edu
+gpg: key 8DD1BDFD: public key "Sonatype, Inc. (Sonatype release key) &lt;dev@sonatype.com&gt;" imported
+gpg: 3 marginal(s) needed, 1 complete(s) needed, PGP trust model
+gpg: depth: 0  valid:   1  signed:   0  trust: 0-, 0q, 0n, 0m, 0f, 1u
+gpg: Total number processed: 1
+gpg:               imported: 1
+gpg: Good signature from "Sonatype, Inc. (Sonatype release key) &lt;dev@sonatype.com&gt;"
+gpg: WARNING: This key is not certified with a trusted signature!
+gpg:          There is no indication that the signature belongs to the owner.
+Primary key fingerprint: 2BCB DD0F 23EA 1CAF CC11  D486 0374 CF2E 8DD1 BDFD
+</code></pre>
+
+<p>Our long-winded command rewards us with an even longer output, telling that this is a 'good signature'. Victory! Congratulations, you're now part of a select elite who actually verifies what they download from the internet before putting it into their mission-critical application:
+<a href="https://twitter.com/jvanzyl/status/212890726386774017"><img src="/pics/tweet_jason.png" alt="Minority downloads sigs" /></a></p>
+
+<h3>Web of trust</h3>
+
+<p>But all is not well. In case you missed it, there's a huge warning in the verification output, ending with 'There is no indication that the signature belongs to the owner'. This means that even though everything checks out, we can not be certain that the key is actually from 'Sonatype, Inc. (Sonatype release key) &lt;dev@sonatype.com&gt;'. Anyone could have uploaded such a key to the MIT keyserver. This is a hard problem&trade; to solve. With SSL certificates, the other well-known public/private key infrastructure, this conondrum is solved by having ultimately trusted root Certificate Authorities. This creates a centralized system which only works because browsers  distribute the trusted certificates of these selected root CAs to end-users.</p>
+
+<p>PGP takes a different, decentralized approach known as the <a href="http://en.wikipedia.org/wiki/Web_of_trust">web of trust</a>. In essence, PGP allows public keys to be signed by other people. By doing so, they certify that that key is valid. This web of trust can work transitively. For example, if I sign person A's key, and person A signs person B's key, I transitively trust person B as well (there are different levels of trust, but I'll leave that aside for now). The idea is that we only sign another person's key if we met them in person and verified their identity. Obviously, it is benefial to have a large web of trust, to increase the chances that it contains a trusted someone close to yourself.</p>
+
+<p>Let's try to visualize the situation in the case of Sonatype's release key:
+<img src="/pics/pgp_weboftrust.png" alt="Web of trust" />
+Th red keys are private, the blue keys are public and arrows indicate signing. Three different individuals have signed the public Sonatype release with their private key. You can <a href="http://pgp.mit.edu:11371/pks/lookup?op=vindex&amp;search=0x0374CF2E8DD1BDFD">lookup</a> this information on the MIT keyserver. And, in turn, other people may have signed the public keys of these three individuals and so on. Now in order for gpg to fully trust the Sonatype release key, either we must sign it with our own key, or we must have signed any key that has a path in the web of trust to this release key. Signing the Sonatype release key directly would be the easiest, but not the most correct approach. How would we meet 'Sonatype, Inc.' and verify their identity? (hint: they might post their key fingerprint on a secure website). Let's assume instead that we know Brian F. Therefore, we can import and trust his key to put the web of trust in motion:</p>
+
+<pre><code>gpg --keyserver pgp.mit.edu --recv-key 3C062231
+
+gpg: requesting key 3C062231 from hkp server pgp.mit.edu
+gpg: key 3C062231: public key "Brian E Fox &lt;brianf@apache.org&gt;" imported
+gpg: 3 marginal(s) needed, 1 complete(s) needed, PGP trust model
+gpg: depth: 0  valid:   1  signed:   0  trust: 0-, 0q, 0n, 0m, 0f, 1u
+gpg: Total number processed: 1
+gpg:               imported: 1 
+
+gpg --edit-key 3C06223
+
+&lt;snipped some certificate details&gt;
+gpg&gt; trust
+&lt;snipped some certificate details&gt;
+Please decide how far you trust this user to correctly verify other users' keys
+(by looking at passports, checking fingerprints from different sources, etc.)
+
+  1 = I don't know or won't say
+  2 = I do NOT trust
+  3 = I trust marginally
+  4 = I trust fully
+  5 = I trust ultimately
+  m = back to the main menu
+
+Your decision? 4
+</code></pre>
+
+<p>Instead of assigning trust to this key, we could have also signed it. Note that you need <a href="http://www.gnupg.org/gph/en/manual.html#AEN26">your own keypair</a> to do this. Now lo and behold, no more warnings when verifying the signature:</p>
+
+<pre><code>$ gpg --verify plexus-cipher-1.7.pom.asc  ~/.m2/.../plexus-cipher-1.7.pom
+
+gpg: Signature made Tue Jul 26 20:06:33 2011 CEST using DSA key ID 8DD1BDFD
+gpg: checking the trustdb
+gpg: 3 marginal(s) needed, 1 complete(s) needed, PGP trust model
+gpg: depth: 0  valid:   1  signed:   1  trust: 0-, 0q, 0n, 0m, 0f, 1u
+gpg: depth: 1  valid:   1  signed:   1  trust: 0-, 0q, 0n, 0m, 1f, 0u
+gpg: depth: 2  valid:   1  signed:   0  trust: 1-, 0q, 0n, 0m, 0f, 0u
+gpg: Good signature from "Sonatype, Inc. (Sonatype release key) &lt;dev@sonatype.com&gt;"
+</code></pre>
+
+<h3>Automatic verification?</h3>
+
+<p>By now, you must be thinking 'that is an awful lot of work just to verify a single dependency'. And you're absolutely right. Applications typically use many dependencies, and checking them all by hand quickly becomes tedious. In my opinion, there is a huge opportunity for Maven-based build tools to support automatic PGP signature verification. Until that is the case though, you can also use Sonatype's Nexus repository manager as a proxy to Maven Central. It can automatically check the PGP signatures for proxied artifacts and refuse to serve them when the signature check fails. Unfortunately, this is only possible using the commercial version <a href="http://www.sonatype.com/Products/Nexus-Professional">Nexus Pro</a>, not with the <a href="http://www.sonatype.org/nexus/">open source</a> version.</p>
+
+<h3>Wrapping up</h3>
+
+<p>Before you dismiss everything above as wildly impractical, I urge you to read up on <a href="/blog/security/2012/03/crossbuild-injection-how-safe-is-your-build">cross-build injection attacks</a>. Decide for yourself whether your applications constitute a target for such attacks, and what the impact will be. If you'd like to hear more about this, I'm also giving a talk called 'Cross-build injections attacks: how safe is your Java build' (<a href="https://oracleus.activeevents.com/connect/sessionDetail.ww?SESSION_ID=3892">CON3892</a>) at JavaOne 2012. May your build be secure!</p>
+
+  </section>
+</article>
+<div>
+  <strong>If you liked this post, please share it!</strong>
+  <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://branchandbound.net/blog/security/2012/08/verify-dependencies-using-pgp" data-via="Sander_Mak" data-dnt="true">Tweet</a>
+  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</div>
+
+<br>
+<br>
+
+<div id="related">
+  <h3>Related Posts</h3>
+  <ul class="posts">
+    
+      <li><span>05 Aug 2013</span> &raquo; <a href="/blog/web/2013/08/some-angularjs-pitfalls">Some AngularJS pitfalls</a></li>
+    
+      <li><span>18 Jul 2013</span> &raquo; <a href="/blog/java/2013/07/java-modularity-story">The Java Modularity Story</a></li>
+    
+      <li><span>24 Jun 2013</span> &raquo; <a href="/blog/development/2013/06/annoyances-daily-life-developer">Annoyances in the daily life of a developer</a></li>
+    
+  </ul>
+</div>
+
+
+
+
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    
+    var disqus_shortname = 'branchandbound'; // required: replace example with your forum shortname
+    
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+
+
+
+        </div>
+        <div class="span3">
+         <div class="hero-unit sidebar">
+           <a href="http://feeds.feedburner.com/BranchAndBound"><img class="rss pull-right" title="Branch and Bound Blog RSS Feed" alt="RSS Feed" src="/assets/themes/sander/rss.png"></a>
+           <h4 class="sidebar"><strong>Branch and Bound Blog</strong></h4>
+           <em>... pruning the software universe</em> 
+           <hr>
+           <ul class="sidebar unstyled">
+             <li><a href="/about.html">About Sander</a></li>
+           </ul>
+           <span class="sidebar pull-right">
+             <a href="http://www.twitter.com/Sander_Mak" target="_blank"><img title="Twitter" alt="Twitter" class="small" src="/assets/themes/sander/twitter.png"></a>
+             <a href="http://nl.linkedin.com/in/SanderMak" target="_blank"><img title="Linkedin profile" alt="Linkedin profile" class="small" src="/assets/themes/sander/linkedin.png"><a>
+             <a href="http://www.github.com/SanderMak" target="_blank"><img  title="GitHub" alt="GitHub" class="small" src="/assets/themes/sander/github.png"></a>
+             <a href="http://www.slideshare.net/SanderMak/presentations" target="_blank"><img title="Slideshare presentations"  alt="Slideshare presentations" class="small" src="/assets/themes/sander/slideshare.png"></a>
+           </span>
+           <hr>
+           <h5 class="sidebar">&nbsp;View archive by:</h5>
+           <ul class="sidebar unstyled">
+             <li><a href="/archive.html">Date</a></li>
+             <li><a href="/categories.html">Category</a></li>
+             <li><a href="/tags.html">Tag</a></li>
+           </ul>
+          </div>
+          <div class="hero-unit twittersidebar">
+            <h5 class="sidebar">Featured articles:</h5>
+            <br>
+            <ul>
+              <li>&raquo; <a href="/blog/scala/2013/05/launching-scalabitz/?src=featured">Launching Scalabitz</a></li>
+              <li>&raquo; <a href="/blog/bookreview/2013/01/bookreview-infinity-and-the-mind/?src=featured">Infinity and the Mind</a></li>      
+  	          <li>&raquo; <a href="/blog/conferences/2012/06/preparing-a-technical-talk/?src=featured">Preparing a technical talk</a></li>
+            </ul>
+          </div>
+          <div class="hero-unit readingsidebar">
+            <h5 class="sidebar">Currently reading:</h5>
+            <br>
+            <ul>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/1933988916/ref=as_li_ss_tl?ie=UTF8&tag=branandboun-20&linkCode=as2&camp=1789&creative=390957&creativeASIN=1933988916" target="_blank">OSGi in action</a></li>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/1593273886/ref=as_li_ss_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=1593273886&linkCode=as2&tag=branandboun-20" target="_blank">The Tangled Web</a></li>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/0321125215/ref=as_li_ss_tl?ie=UTF8&tag=branandboun-20&linkCode=as2&camp=1789&creative=390957&creativeASIN=0321125215" target="_blank">Domain-driven design</a></li>
+            </ul>
+          </div>
+          <div class="hero-unit sidebar">
+           <a class="twitter-timeline" width="250" height="500" data-dnt=true href="https://twitter.com/Sander_Mak" data-widget-id="266609354059431938">Tweets by @Sander_Mak</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+
+                       
+          </div>
+        </div>
+       </div>
+      </div>
+     </div>
+
+
+      <footer>
+        <div class="container">
+         <div class="row">
+           <div class="span9 offset2">
+            <br>
+            <hr>
+           </div>
+         </div>
+         <div class="row">
+          <div class="span4 offset2">
+            <p>Branch and Bound - ... pruning the software universe</p>
+          </div>   
+          <div class="span5">  
+            <p class="pull-right">by Sander Mak</p>
+          </div>
+         </div>
+        </div>
+      </footer>
+
+    <!-- Scripts at the end for faster loading. -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
+    <script src="/assets/themes/sander/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="http://twitter.com/javascripts/blogger.js"></script>
+   
+
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-15335121-2']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+
+    </script>
+
+  </body>
+</html>
+
+
+
