@@ -4,13 +4,88 @@
  <title>Branch and Bound</title>
  <link href="http://branchandbound.net/atom.xml" rel="self"/>
  <link href="http://branchandbound.net"/>
- <updated>2013-08-05T11:11:05+02:00</updated>
+ <updated>2013-10-01T00:04:06+02:00</updated>
  <id>http://branchandbound.net/</id>
  <author>
    <name>Sander Mak</name>
    <email>sandermak@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <author><name>Sander Mak</name></author>
+   <title>JavaOne 2013 trip report</title>
+   <link href="http://branchandbound.net/blog/conferences/2013/09/javaone-2013-tripreport"/>
+   <updated>2013-09-30T00:00:00+02:00</updated>
+   <id>http://branchandbound.net/blog/conferences/2013/09/javaone-2013-tripreport</id>
+   <content type="html">
+       &lt;p&gt;Last week, San Francisco was sprawling with developers. It was that time of the year again: JavaOne 2013 took place. Thousands of Java developers gathered September 22-26 to learn new things and meet new people.&lt;/p&gt;
+
+       &lt;p&gt;I started visiting JavaOne in 2010, just after Oracle took over the reigns from Sun. In that sense, my past four JavaOnes gave a consistent experience. Not incredibly exciting, but lots of good content when you look hard enough at the enormous &lt;a href=&quot;https://oracleus.activeevents.com/2013/connect/search.ww?eventRef=javaone#loadSearch-event=null&amp;amp;searchPhrase=&amp;amp;searchType=session&amp;amp;tc=0&amp;amp;sortBy=&amp;amp;p=&amp;amp;i(11180)=20801&quot;&gt;content catalog&lt;/a&gt;. Whether this is a good or bad thing is a matter of taste. Sun over-promised and under-delivered, Oracle has a consistent and oftentimes conservative message. At least they deliver, with schedule slippages of months rather than years.&lt;/p&gt;
+
+&lt;h3&gt;Announcements&lt;/h3&gt;
+
+&lt;p&gt;This can be pretty short: there were no big announcements at the JavaOne keynotes this year. It was all about consolidating the progress made in the past few years. Delivering Java EE 7, JavaFX and in the near future Java 8 is certainly something to be proud of. The demo's in the technical keynote were fun and engaging. However, the punch-line was missing, so to say.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/pics/javaone2013.jpg&quot; alt=&quot;The venue&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;(Just before the keynote in Moscone)&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;There was actually one new piece of information: an update on project Avatar. Project Avatar was originally announced without any details in 2011. Last year, it became clear that Avatar is a JavaScript framework to tie the browser and Java EE backends together more easily. This year, it finally became tangible. It is now &lt;a href=&quot;https://avatar.java.net/&quot;&gt;open-sourced&lt;/a&gt; at java.net. No further story, that was it. Honestly, it feels a bit like this baby was left at the doorstep of the hospital. Who's going to take care of it, and will it ever grow up to be important?&lt;/p&gt;
+
+&lt;p&gt;Finally, while not really an announcement, it was interesting to note that Oracle is shifting the attention for Java to the 'Internet of things.' This term is used often to explain their heavy focus on embedded Java development. The cynic might say it's because this is the only part of Java that is traditionally well-monetized (with Java ME), so it makes sense to secure this cashflow for the future. Regardless of the motivation, I'm happy to see that a unified VM for Java 8 for all platforms is in the cards.&lt;/p&gt;
+
+&lt;h3&gt;Java 8&lt;/h3&gt;
+
+&lt;p&gt;Java 8, and specifically its Lambda's took the center stage. With the GA date set for March 2014, now is the right time to &lt;a href=&quot;http://cr.openjdk.java.net/~briangoetz/lambda/lambda-state-final.html&quot;&gt;familiarize yourself&lt;/a&gt; with Lambda's. Especially nice is the fact that the collections library &lt;a href=&quot;http://cr.openjdk.java.net/~briangoetz/lambda/lambda-libraries-final.html&quot;&gt;has been revamped&lt;/a&gt; to support a more functional style. Even cooler, Streams are added on top of the improved collections library, providing stream fusion:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;java&quot;&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sum&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;widgets&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;stream&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt;
+                      &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;filter&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getColor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;RED&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+                      &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;mapToInt&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getWeight&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;())&lt;/span&gt;
+                      &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;sum&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt; 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;In this example, there is only one traversal of the &lt;code&gt;widgets&lt;/code&gt; collection because the operations are performed on a &lt;a href=&quot;http://download.java.net/jdk8/docs/api/java/util/stream/Stream.html&quot;&gt;stream&lt;/a&gt;. Stream fusion means that the implementation collects all the transformations up until a terminal operation (like &lt;code&gt;sum&lt;/code&gt;). The terminal operation then forces the evaluation of the preceding chain of expressions with a single pass over the actual underlying collection.&lt;/p&gt;
+
+&lt;h3&gt;Conference sessions&lt;/h3&gt;
+
+&lt;p&gt;As to be expected with a huge amount of parallel tracks, the quality of the sessions varied. I did attend some excellent sessions. Particularly interesting was the talk from one of the Jetty founders. &lt;a href=&quot;http://www.eclipse.org/jetty/documentation/current/&quot;&gt;Jetty 9.1&lt;/a&gt; pushes the performance boundaries for Java-based webservers, with &lt;a href=&quot;http://en.wikipedia.org/wiki/SPDY&quot;&gt;SPDY&lt;/a&gt; and &lt;a href=&quot;http://webtide.intalio.com/2012/06/spdy-we-push/&quot;&gt;SPDY-Push&lt;/a&gt; support. All this is supported on top of the Servlet spec. You only need to &lt;a href=&quot;http://www.eclipse.org/jetty/documentation/current/spdy.html&quot;&gt;configure&lt;/a&gt; the right endpoints.&lt;/p&gt;
+
+&lt;p&gt;One of the other great talks I saw was by Ben Christensen of Netflix. He showed how RxJava enables &lt;a href=&quot;https://github.com/Netflix/RxJava/wiki#functional-reactive-programming-frp&quot;&gt;functional reactive programming&lt;/a&gt; on the JVM. RxJava ports the &lt;a href=&quot;http://rx.codeplex.com&quot;&gt;Reactive Extensions&lt;/a&gt; from the .Net world to the JVM world. Slides are &lt;a href=&quot;https://speakerdeck.com/benjchristensen/functional-reactive-programming-with-rxjava-javaone-2013&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Another cool talk was by the Typesafe guys on &lt;a href=&quot;http://slick.typesafe.com&quot;&gt;SLICK&lt;/a&gt; (Scala Language-Integrated Connection Kit.) In short, SLICK maps standard Scala collection methods and for-comprehensions to database access code in a type-safe manner. Kind of what Linq-to-SQL does for .Net, but slightly more ambitious. Definitely something to consider when accessing relational databases from Scala code without relying on a more traditional Java-inspired ORM approach. Slides can be found &lt;a href=&quot;http://slick.typesafe.com/talks/2013-09-25_JavaOne/2013-09-25_JavaOne-Scaling-Scala-to-the-Database.pdf&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3&gt;Talking at JavaOne&lt;/h3&gt;
+
+&lt;p&gt;Last year I had the opportunity to speak at JavaOne for the first time. Since it was an enjoyable experience, fate decided that I should double the amount of talks this year (hopefully this trend will not continue for too many years.)&lt;/p&gt;
+
+&lt;p&gt;My first talk was 'Data Science with R for Java developers' on Tuesday. It was fun to introduce a completely new language to a group of Java developers. Understanding the data that lives in your application deeply is increasingly important. The main takeaway of the talk is that learning R gives you a powerful tool for doing &lt;a href=&quot;/blog/data/2013/03/year-blogging-analyzed-r/&quot;&gt;exploratory data analysis&lt;/a&gt;. Here are the slides:&lt;/p&gt;
+
+&lt;br&gt;
+
+
+&lt;iframe src=&quot;http://www.slideshare.net/slideshow/embed_code/26510955&quot; width=&quot;425&quot; height=&quot;355&quot; frameborder=&quot;0&quot; marginwidth=&quot;0&quot; marginheight=&quot;0&quot; scrolling=&quot;no&quot; allowfullscreen&gt;embed&lt;/iframe&gt;
+
+
+&lt;br&gt;&lt;br&gt;
+
+
+&lt;p&gt;On Wednesday, I presented 'Modular JavaScript' with my co-worker &lt;a href=&quot;https://twitter.com/pbakker/&quot;&gt;Paul Bakker&lt;/a&gt;. Modular development is something we value. For large Java codebases, we use modular designs &lt;a href=&quot;/blog/java/2013/07/java-modularity-story/&quot;&gt;on top of OSGi&lt;/a&gt; to enforce runtime modularity as well. In JavaScript land, codebases are getting bigger and bigger too. Hence, you need a principled approach to modular development there as well. In this talk we introduce the primitives for modularity in JavaScript and compare several module systems for JavaScript.&lt;/p&gt;
+
+&lt;br&gt;
+
+
+&lt;iframe src=&quot;http://www.slideshare.net/slideshow/embed_code/26558391&quot; width=&quot;425&quot; height=&quot;355&quot; frameborder=&quot;0&quot; marginwidth=&quot;0&quot; marginheight=&quot;0&quot; scrolling=&quot;no&quot; allowfullscreen&gt;embed&lt;/iframe&gt;
+
+
+&lt;br&gt;&lt;br&gt;
+
+
+&lt;p&gt;During both talks there was a lot of audience interaction, which is always an encouraging sign. All in all, JavaOne 2013 was a great experience. Hope to see you in 2014!&lt;/p&gt;
+
+   </content>
+ </entry>
  
  <entry>
    <author><name>Sander Mak</name></author>

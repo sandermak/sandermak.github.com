@@ -8,6 +8,7 @@ http://branchandbound.net/sitemap.txt
 http://branchandbound.net/tags.html
 http://branchandbound.net/talks.html
 
+http://branchandbound.net/blog/conferences/2013/09/javaone-2013-tripreport
 http://branchandbound.net/blog/web/2013/08/some-angularjs-pitfalls
 http://branchandbound.net/blog/java/2013/07/java-modularity-story
 http://branchandbound.net/blog/development/2013/06/annoyances-daily-life-developer
