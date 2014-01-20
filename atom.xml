@@ -4,13 +4,80 @@
  <title>Branch and Bound</title>
  <link href="http://branchandbound.net/atom.xml" rel="self"/>
  <link href="http://branchandbound.net"/>
- <updated>2014-01-02T21:14:52+01:00</updated>
+ <updated>2014-01-20T18:22:30+01:00</updated>
  <id>http://branchandbound.net/</id>
  <author>
    <name>Sander Mak</name>
    <email>sandermak@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <author><name>Sander Mak</name></author>
+   <title>ng-conf 2014: the world's first AngularJS conference</title>
+   <link href="http://branchandbound.net/blog/conferences/2014/01/ng-conf-2014-world-first-angular-conference"/>
+   <updated>2014-01-20T00:00:00+01:00</updated>
+   <id>http://branchandbound.net/blog/conferences/2014/01/ng-conf-2014-world-first-angular-conference</id>
+   <content type="html">
+       &lt;p&gt;Last week I attended the world’s first ever dedicated AngularJS conference in Salt Lake City. More than 700 JavaScript developers gathered in the Little America hotel for two days to learn from Angular core-devs and community members.&lt;/p&gt;
+
+       &lt;p&gt;Angular is going mainstream, that’s for sure. It was 'Google IO hard’ to get tickets for ng-conf: they sold out in a few minutes tops. The organizers were overwhelmed by this as well and it wouldn’t surprise me if next year’s ng-conf is significantly bigger. Fortunately, a few days before the conference it was announced that the talks were to be live-streamed. Now they are all available on &lt;a href=&quot;http://www.youtube.com/user/ngconfvideos&quot;&gt;YouTube&lt;/a&gt; for your viewing pleasure.&lt;/p&gt;
+
+&lt;h3&gt;Conference format&lt;/h3&gt;
+
+&lt;p&gt;I really liked the conference format. It was single-track, so no switching between (and looking for) rooms in between talks. Really amazing what a difference in atmosphere this gives, as everybody has the same experience throughout the day. Also, the talks were short: 20 minutes with 5 minute breaks. You would think that it’s hard to go deep in 20 minutes. And it definitely required a lot of skill from the presenters, but most pulled it off. Another advantage of 20 minute talks is that non-interesting topics or speakers are over before you know it.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/pics/ng-conf-hall.jpg&quot; alt=&quot;Large ballroom&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;(Large ballroom filling up for ng-conf)&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;AngularJS seems to attract a very bright and friendly community. Everything went super-smooth even though it was the first time around this conference was organized. Another thing that really worked well was a private Google+ community that the organizers used for communication. It was used heavily throughout the event and proved to be a good way to discuss talks in more depth afterwards.&lt;/p&gt;
+
+&lt;h3&gt;Future of Angular&lt;/h3&gt;
+
+&lt;p&gt;Of course the keynote was delivered by two Angular core-team members. Brad Green and Miško Hevery started by giving some context and history around Angular. For example, I never knew that Angular originally included a whole backend and data-syncing solution as well. Or that the name Angular was chosen because HTML has lots of angle brackets. But however interesting the past is, I am more interested in the future of Angular. Miško gave a very clear overview of what’s in store for Angular 1.3 and beyond. In short, Angular 1.3 will be the Angular for the current browsers and AngularJS 2.0 will be for the future browser:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;embracing &lt;a href=&quot;http://www.w3.org/TR/components-intro/&quot;&gt;Web Components&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;using ES6 to enhance Angular modules and dependency injection&lt;/li&gt;
+&lt;li&gt;using &lt;a href=&quot;http://wiki.ecmascript.org/doku.php?id=harmony:observe&quot;&gt;object.observe&lt;/a&gt; instead of dirty-checking for two-way databinding&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;p&gt;All three points are exciting improvements, the first two for increased modularity and the last for increased performance. Slides for the keynote can be found &lt;a href=&quot;https://docs.google.com/presentation/d/1rno8HFYcst3nrd6xpruX7r427W5g1RRUL36115OEUnQ/edit#slide=id.g261d5ca55_02&quot;&gt;here&lt;/a&gt; or you can just &lt;a href=&quot;http://www.youtube.com/watch?v=r1A1VR0ibIQ&quot;&gt;watch it&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/pics/ng-conf-keynote.jpg&quot; alt=&quot;Keynote&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;(Brad and Miško keynoting on the first day)&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;As you can guess from the picture above, improved support for mobile is also forthcoming.&lt;/p&gt;
+
+&lt;h3&gt;AngularDart&lt;/h3&gt;
+
+&lt;p&gt;It was interesting to see that none of the attendees reacted favorably to Dart as as JavaScript replacement. Much less the fact that AngularDart was created. The Angular team recognized this sentiment and explained the reasoning behind all this. Internal demand at Google spurred the development of AngularDart. Still, most of the 14 core developers currently working on Angular focus on AngularJS rather than AngularDart. Also, the team sees AngularDart as a fertile breeding ground for new concepts and innovations. In fact, many of the points I described on the future of Angular are prototyped in the AngularDart implementation. All of the successful AngularDart experiments will flow back into AngularJS (2.0). The bottomline is that AngularDart is an important part of Angular's future, even if the current focus is mostly on AngularJS.&lt;/p&gt;
+
+&lt;h3&gt;Community&lt;/h3&gt;
+
+&lt;p&gt;An open source project is only as good as its community is. Angular definitely had a bumpy journey in that regard. For example, the 1.2 release was severely delayed without any communication around it. This turned out to be due to an internal experiment with server-side pre-rendering for Angular, which was ultimately abandoned. The sudden introduction of AngularDart is another example of poor communication of longer term plans.&lt;/p&gt;
+
+&lt;p&gt;A lot of these issues stemmed from the lack of resources within the core-dev team. Pull-requests withered and GitHub issues were sometimes overlooked. In the past few months, a lot has changed. Besides extending the core team to 14 developers, an automated build/verification bot checks all pull-requests. Also, the Angular team has weekly issue triage meetings so nothing gets overlooked. Finally, an Angular working group will be assembled consisting of non-core developers, giving the community a voice to steer the direction of Angular. If you'd like to be an active participant in the Angular community, do check out &lt;a href=&quot;http://angularjs.org/i-want-to-help&quot;&gt;angularjs.org/i-want-to-help&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3&gt;Recommended watching&lt;/h3&gt;
+
+&lt;p&gt;I’ll round off this post by listing some of my favorite talks:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;http://www.youtube.com/watch?v=62RvRQuMVyg&quot;&gt;Writing a Massive Angular App at Google&lt;/a&gt;: Google’s DoubleClick team shows their code-organization patterns&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;http://www.youtube.com/watch?v=aQipuiTcn3U&quot;&gt;End to End Angular Testing with Protractor&lt;/a&gt;: the upcoming integration-testing framework for Angular&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;http://www.youtube.com/watch?v=zyYpHIOrk_Y&quot;&gt;Angular performance&lt;/a&gt;: some great insights to improve performance of your app.&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;http://www.youtube.com/watch?v=_OGGsf1ZXMs&quot;&gt;Dependency Injection&lt;/a&gt;: Vojta Ina explains the current prototype of Angular injection based on ES6 classes and annotations.&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;p&gt;It's exciting to see that AngularJS is gaining so much momentum. Going to ng-conf was a great way to get inspired to write solid Angular code and to be prepared for what's coming.&lt;/p&gt;
+
+   </content>
+ </entry>
  
  <entry>
    <author><name>Sander Mak</name></author>
