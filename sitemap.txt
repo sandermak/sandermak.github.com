@@ -8,6 +8,7 @@ http://branchandbound.net/sitemap.txt
 http://branchandbound.net/tags.html
 http://branchandbound.net/talks.html
 
+http://branchandbound.net/blog/web/2014/03/generating-junit-testreports-jasmine-20
 http://branchandbound.net/blog/conferences/2014/01/ng-conf-2014-world-first-angular-conference
 http://branchandbound.net/blog/java/2013/10/failed-experiment-improving-builder-pattern
 http://branchandbound.net/blog/conferences/2013/09/javaone-2013-tripreport
