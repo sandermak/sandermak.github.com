@@ -4,7 +4,7 @@
  <title>Branch and Bound</title>
  <link href="http://branchandbound.net/atom.xml" rel="self"/>
  <link href="http://branchandbound.net"/>
- <updated>2014-06-11T19:23:46-04:00</updated>
+ <updated>2014-06-11T19:36:15-04:00</updated>
  <id>http://branchandbound.net/</id>
  <author>
    <name>Sander Mak</name>
@@ -15,9 +15,9 @@
  <entry>
    <author><name>Sander Mak</name></author>
    <title>Facebook announces Apollo at QCon NY 2014</title>
-   <link href="http://branchandbound.net/blog/data/2014/06/facebook-announces-appolo-qcon"/>
+   <link href="http://branchandbound.net/blog/conferences/2014/06/facebook-announces-appolo-qcon"/>
    <updated>2014-06-11T00:00:00-04:00</updated>
-   <id>http://branchandbound.net/blog/data/2014/06/facebook-announces-appolo-qcon</id>
+   <id>http://branchandbound.net/blog/conferences/2014/06/facebook-announces-appolo-qcon</id>
    <content type="html">
        &lt;p&gt;Today I attended a talk &lt;a href=&quot;https://qconnewyork.com/presentation/how-facebook-scales-big-data-systems&quot;&gt;'How Facebook Scales Big Data Systems'&lt;/a&gt; at QCon NY 2014. It turns out that Jeff Johnson took this opportunity to announce a new project by Facebook: Apollo. The following is a rough transcript of the talk.&lt;/p&gt;
 
