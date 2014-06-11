@@ -3,7 +3,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Archive - Branch and Bound</title>
+    <title>Facebook announces Apollo at QCon NY 2014 - Branch and Bound</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="Sander Mak">
@@ -67,414 +67,124 @@
       <div class="row">
         <div class="span6 offset2">
           
+<article>
+  <header>
+    <h1>Facebook announces Apollo at QCon NY 2014</h1>
+    <strong><time datetime="2014-06-11" pubdate>11 June 2014</time></strong>
+
+    <br>
+    <br>
+
+    <p><em><p>Today I attended a talk <a href="https://qconnewyork.com/presentation/how-facebook-scales-big-data-systems">'How Facebook Scales Big Data Systems'</a> at QCon NY 2014. It turns out that Jeff Johnson took this opportunity to announce a new project by Facebook: Apollo. The following is a rought transcript of the talk.</p>
+</em></p>
+  </header>
+  
+
+  <section>
+   <p>Apollo is a system Facebook has been working on for about a year in their New York office. The tagline of Apollo is 'consistency at scale'. Its design is heavily influenced by their experience with HBase.</p>
+
+<p><img src="/pics/qcon_apollo1.jpg" alt="Jeff Johnson" /></p>
+
+<h3>Why?</h3>
+
+<p>Facebook generally favors CP systems. They have four datacenters using master/slave style replication. Missing the 'A'vailability usually isn't a big deal within a datacenter, but across DCs it becomes troublesome.</p>
+
+<p>The wishlist that lead to Apollo:
+* we need some kind of transactions
+* acked writes should be eventually visible and not lost
+* availability</p>
+
+<p>So the question really boils down to: can we layer AP on top of CP?</p>
+
+<h3>Apollo</h3>
+
+<p>Apollo itself is written 100% C++11, using thrift2. Its design is based on having a hierarchy of shards. These form the basic building block of Apollo. Essentially like HDFS (regions) are the building block for HBase. It supports thousands of shards, scaling from 3 servers to ~10k servers.</p>
+
+<p>The shards use Paxos style quorum protocols (CP). Raft is used for consensus. Fun sidenote: this turned out to be not much simpler than multi-paxos, even though that was the expectation.</p>
+
+<p>RocksDB (a key-val store, log-structured storage) or MySQL can be used as underlying storage. The storage primitives offered by Apollo are:
+* binary value
+* map
+* pqueue
+* CRDTs</p>
+
+<h3>Use cases</h3>
+
+<p>The apparent sweetspot for Apollo is online, low-latency storage of aforementioned data structures. Where atomic transformations of these data structures are required. The size of 'records' should range from a byte to about a megabyte.</p>
+
+<p>Every operation on Apollo api is atomic. For exampe, you can pass in conditions into a read/write call, for exampe asserting that a map contains a certain key. The operation will only go through if the condition (atomically) holds.</p>
+
+<p><img src="/pics/qcon_apollo2.jpg" alt="Jeff Johnson" />
+<em>First write call mimics a traditional last-write wins KV store. Second one does optimistic concurrency, last one allows for complex transactional behavior. Note that a write can also return (consistent) reads!</em></p>
+
+<p>Atomicity works across shards, at varying levels:</p>
+
+<p><img src="/pics/qcon_apollo3.jpg" alt="Jeff Johnson" /></p>
+
+<h3>Fault tolerant state machines</h3>
+
+<p>In addition to just storing and querying data, Apollo has another unique feature: it allows execution of user submitted code in the form of state machines. These fault tolerant state machines are primarily used by Apollo's internal implementation. E.g. to do shard creation/destruction, load balancing, data migration, coordinating cross-shard transactions.</p>
+
+<p>But users can submit FTSMs too. These are persistently stored, so it tolerates node failures. A shard owns a FTSM. A state machine may have side effects (e.g. call an external API), but all state changes are submitted through the shard replication mechanism. The exact way to create these FTSMs were not discussed.</p>
+
+<h3>Applications of Apollo at Facebook</h3>
+
+<p>One of the current applications of Apollo at Facebook is as a reliable in-memory database. For this use case it is setup with a RAFT write-ahead-log on a Linux tmpfs. They replace memcache(d) with this setup, gaining transactional support in the caching layer.</p>
+
+<p>Furthermore it powers TACO, an in-memory version of their TAO graph. It supports billions of reads per second and millions of writes this way.</p>
+
+<p>A more persistent applicatio of Apollo is to provide reliable queues, for example to manage the push notifications.</p>
+
+<h2>Open source?</h2>
+
+<p>Currently Apollo is developed internally at Facebook. No firm claims were made during the talk that it will be opensourced. It was mentioned as a possibility after internal development settles down.</p>
+
+<p>This was a quick write-up, twenty minutes after the talk ended. Any factual errors are solely caused by me misinterpreting or mishearing stuff. I expect more information to trickle out of Facebook engineer soon. That said, I hope this post paints an adequate initial picture of Facebook's Apollo!</p>
+
+  </section>
+</article>
+<div>
+  <strong>If you liked this post, please share it!</strong>
+  <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://branchandbound.net/blog/conferences/2014/06/facebook-announces-appolo-qcon" data-via="Sander_Mak" data-dnt="true">Tweet</a>
+  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</div>
+
+<br>
+<br>
+
+<div id="related">
+  <h3>Related Posts</h3>
+  <ul class="posts">
+    
+      <li><span>18 Jul 2013</span> &raquo; <a href="/blog/java/2013/07/java-modularity-story">The Java Modularity Story</a></li>
+    
+      <li><span>12 May 2013</span> &raquo; <a href="/blog/scala/2013/05/launching-scalabitz">Launching Scalabitz</a></li>
+    
+      <li><span>23 Mar 2012</span> &raquo; <a href="/blog/security/2012/03/crossbuild-injection-how-safe-is-your-build">Cross-build injection attacks: how safe is your build?</a></li>
+    
+  </ul>
+</div>
 
 
 
 
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_developer = 1;
+    var disqus_shortname = 'branchandbound'; // required: replace example with your forum shortname
+    
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
 
-  
-    
-    
-    
-    
-  
-    
-      <h2>2014</h2>
-      <h3>June</h3>
-      <ul>
-    
-  
-    <li><span>June 11, 2014</span> &raquo; <a href="/blog/conferences/2014/06/facebook-announces-appolo-qcon?src=archive">Facebook announces Apollo at QCon NY 2014</a></li>
-  
-    
-          
-        
-          </ul>
-          <h3>March</h3>
-          <ul>
-        
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li><span>March  6, 2014</span> &raquo; <a href="/blog/web/2014/03/generating-junit-testreports-jasmine-20?src=archive">Generating JUnit test reports with Jasmine 2.0</a></li>
-  
-    
-          
-        
-          </ul>
-          <h3>January</h3>
-          <ul>
-        
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li><span>January 20, 2014</span> &raquo; <a href="/blog/conferences/2014/01/ng-conf-2014-world-first-angular-conference?src=archive">ng-conf 2014: the world's first AngularJS conference</a></li>
-  
-    
-      
-        </ul>
-        <h2>2013</h2>
-        <h3>October</h3>
-        <ul>
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li><span>October 21, 2013</span> &raquo; <a href="/blog/java/2013/10/failed-experiment-improving-builder-pattern?src=archive">A failed experiment: improving the Builder pattern</a></li>
-  
-    
-          
-        
-          </ul>
-          <h3>September</h3>
-          <ul>
-        
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li><span>September 30, 2013</span> &raquo; <a href="/blog/conferences/2013/09/javaone-2013-tripreport?src=archive">JavaOne 2013 trip report</a></li>
-  
-    
-          
-        
-          </ul>
-          <h3>August</h3>
-          <ul>
-        
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li><span>August  5, 2013</span> &raquo; <a href="/blog/web/2013/08/some-angularjs-pitfalls?src=archive">Some AngularJS pitfalls</a></li>
-  
-    
-          
-        
-          </ul>
-          <h3>July</h3>
-          <ul>
-        
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li><span>July 18, 2013</span> &raquo; <a href="/blog/java/2013/07/java-modularity-story?src=archive">The Java Modularity Story</a></li>
-  
-    
-          
-        
-          </ul>
-          <h3>June</h3>
-          <ul>
-        
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li><span>June 24, 2013</span> &raquo; <a href="/blog/development/2013/06/annoyances-daily-life-developer?src=archive">Annoyances in the daily life of a developer</a></li>
-  
-    
-          
-        
-          </ul>
-          <h3>May</h3>
-          <ul>
-        
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li><span>May 25, 2013</span> &raquo; <a href="/blog/conferences/2013/05/jeeconf-2013-tripreport?src=archive">JEEConf 2013 trip report</a></li>
-  
-    
-          
-        
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li><span>May 12, 2013</span> &raquo; <a href="/blog/scala/2013/05/launching-scalabitz?src=archive">Launching Scalabitz</a></li>
-  
-    
-          
-        
-          </ul>
-          <h3>March</h3>
-          <ul>
-        
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li><span>March 23, 2013</span> &raquo; <a href="/blog/data/2013/03/year-blogging-analyzed-r?src=archive">A year of blogging analyzed with R</a></li>
-  
-    
-          
-        
-          </ul>
-          <h3>January</h3>
-          <ul>
-        
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li><span>January 31, 2013</span> &raquo; <a href="/blog/bookreview/2013/01/bookreview-infinity-and-the-mind?src=archive">Book review: Infinity and the Mind</a></li>
-  
-    
-      
-        </ul>
-        <h2>2012</h2>
-        <h3>December</h3>
-        <ul>
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li><span>December 20, 2012</span> &raquo; <a href="/blog/scala/2012/12/scala-is-like-git?src=archive">Scala is like Git</a></li>
-  
-    
-          
-        
-          </ul>
-          <h3>November</h3>
-          <ul>
-        
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li><span>November 21, 2012</span> &raquo; <a href="/blog/web/2012/11/unify-server-side-client-side-rendering-embedding-json?src=archive">Unify client-side and server-side rendering by embedding JSON</a></li>
-  
-    
-          
-        
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li><span>November  1, 2012</span> &raquo; <a href="/blog/conferences/2012/11/jfall-2012-dutch-java-awesomeness?src=archive">JFall 2012: Dutch Java awesomeness</a></li>
-  
-    
-          
-        
-          </ul>
-          <h3>October</h3>
-          <ul>
-        
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li><span>October  8, 2012</span> &raquo; <a href="/blog/security/2012/10/cross-build-injection-in-action?src=archive">Cross-Build Injection in action</a></li>
-  
-    
-          
-        
-          </ul>
-          <h3>August</h3>
-          <ul>
-        
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li><span>August 22, 2012</span> &raquo; <a href="/blog/security/2012/08/verify-dependencies-using-pgp?src=archive">Verify dependencies using PGP</a></li>
-  
-    
-          
-        
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li><span>August  4, 2012</span> &raquo; <a href="/blog/bookreview/2012/08/bookreview-dsls-in-action?src=archive">Book review: DSLs in Action</a></li>
-  
-    
-          
-        
-          </ul>
-          <h3>July</h3>
-          <ul>
-        
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li><span>July 23, 2012</span> &raquo; <a href="/blog/java/2012/07/modern-concurrency-and-javaee?src=archive">Modern concurrency and Java EE</a></li>
-  
-    
-          
-        
-          </ul>
-          <h3>June</h3>
-          <ul>
-        
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li><span>June  6, 2012</span> &raquo; <a href="/blog/conferences/2012/06/preparing-a-technical-talk?src=archive">Preparing a technical talk</a></li>
-  
-    
-          
-        
-          </ul>
-          <h3>May</h3>
-          <ul>
-        
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li><span>May 20, 2012</span> &raquo; <a href="/blog/conferences/2012/05/jeeconf-tripreport?src=archive">JEEConf 2012 trip report</a></li>
-  
-    
-          
-        
-          </ul>
-          <h3>March</h3>
-          <ul>
-        
-      
-    
-  
-    
-    
-    
-    
-  
-    
-  
-    <li><span>March 23, 2012</span> &raquo; <a href="/blog/security/2012/03/crossbuild-injection-how-safe-is-your-build?src=archive">Cross-build injection attacks: how safe is your build?</a></li>
-  
-    
-      </ul>
-    
-  
+
+
 
 
 

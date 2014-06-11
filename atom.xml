@@ -4,7 +4,7 @@
  <title>Branch and Bound</title>
  <link href="http://branchandbound.net/atom.xml" rel="self"/>
  <link href="http://branchandbound.net"/>
- <updated>2014-03-07T21:56:55+01:00</updated>
+ <updated>2014-06-11T18:48:17-04:00</updated>
  <id>http://branchandbound.net/</id>
  <author>
    <name>Sander Mak</name>
@@ -14,9 +14,81 @@
  
  <entry>
    <author><name>Sander Mak</name></author>
+   <title>Facebook announces Apollo at QCon NY 2014</title>
+   <link href="http://branchandbound.net/blog/conferences/2014/06/facebook-announces-appolo-qcon"/>
+   <updated>2014-06-11T00:00:00-04:00</updated>
+   <id>http://branchandbound.net/blog/conferences/2014/06/facebook-announces-appolo-qcon</id>
+   <content type="html">
+       &lt;p&gt;Today I attended a talk &lt;a href=&quot;https://qconnewyork.com/presentation/how-facebook-scales-big-data-systems&quot;&gt;'How Facebook Scales Big Data Systems'&lt;/a&gt; at QCon NY 2014. It turns out that Jeff Johnson took this opportunity to announce a new project by Facebook: Apollo. The following is a rought transcript of the talk.&lt;/p&gt;
+
+       &lt;p&gt;Apollo is a system Facebook has been working on for about a year in their New York office. The tagline of Apollo is 'consistency at scale'. Its design is heavily influenced by their experience with HBase.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/pics/qcon_apollo1.jpg&quot; alt=&quot;Jeff Johnson&quot; /&gt;&lt;/p&gt;
+
+&lt;h3&gt;Why?&lt;/h3&gt;
+
+&lt;p&gt;Facebook generally favors CP systems. They have four datacenters using master/slave style replication. Missing the 'A'vailability usually isn't a big deal within a datacenter, but across DCs it becomes troublesome.&lt;/p&gt;
+
+&lt;p&gt;The wishlist that lead to Apollo:
+* we need some kind of transactions
+* acked writes should be eventually visible and not lost
+* availability&lt;/p&gt;
+
+&lt;p&gt;So the question really boils down to: can we layer AP on top of CP?&lt;/p&gt;
+
+&lt;h3&gt;Apollo&lt;/h3&gt;
+
+&lt;p&gt;Apollo itself is written 100% C++11, using thrift2. Its design is based on having a hierarchy of shards. These form the basic building block of Apollo. Essentially like HDFS (regions) are the building block for HBase. It supports thousands of shards, scaling from 3 servers to ~10k servers.&lt;/p&gt;
+
+&lt;p&gt;The shards use Paxos style quorum protocols (CP). Raft is used for consensus. Fun sidenote: this turned out to be not much simpler than multi-paxos, even though that was the expectation.&lt;/p&gt;
+
+&lt;p&gt;RocksDB (a key-val store, log-structured storage) or MySQL can be used as underlying storage. The storage primitives offered by Apollo are:
+* binary value
+* map
+* pqueue
+* CRDTs&lt;/p&gt;
+
+&lt;h3&gt;Use cases&lt;/h3&gt;
+
+&lt;p&gt;The apparent sweetspot for Apollo is online, low-latency storage of aforementioned data structures. Where atomic transformations of these data structures are required. The size of 'records' should range from a byte to about a megabyte.&lt;/p&gt;
+
+&lt;p&gt;Every operation on Apollo api is atomic. For exampe, you can pass in conditions into a read/write call, for exampe asserting that a map contains a certain key. The operation will only go through if the condition (atomically) holds.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/pics/qcon_apollo2.jpg&quot; alt=&quot;Jeff Johnson&quot; /&gt;
+&lt;em&gt;First write call mimics a traditional last-write wins KV store. Second one does optimistic concurrency, last one allows for complex transactional behavior. Note that a write can also return (consistent) reads!&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;Atomicity works across shards, at varying levels:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/pics/qcon_apollo3.jpg&quot; alt=&quot;Jeff Johnson&quot; /&gt;&lt;/p&gt;
+
+&lt;h3&gt;Fault tolerant state machines&lt;/h3&gt;
+
+&lt;p&gt;In addition to just storing and querying data, Apollo has another unique feature: it allows execution of user submitted code in the form of state machines. These fault tolerant state machines are primarily used by Apollo's internal implementation. E.g. to do shard creation/destruction, load balancing, data migration, coordinating cross-shard transactions.&lt;/p&gt;
+
+&lt;p&gt;But users can submit FTSMs too. These are persistently stored, so it tolerates node failures. A shard owns a FTSM. A state machine may have side effects (e.g. call an external API), but all state changes are submitted through the shard replication mechanism. The exact way to create these FTSMs were not discussed.&lt;/p&gt;
+
+&lt;h3&gt;Applications of Apollo at Facebook&lt;/h3&gt;
+
+&lt;p&gt;One of the current applications of Apollo at Facebook is as a reliable in-memory database. For this use case it is setup with a RAFT write-ahead-log on a Linux tmpfs. They replace memcache(d) with this setup, gaining transactional support in the caching layer.&lt;/p&gt;
+
+&lt;p&gt;Furthermore it powers TACO, an in-memory version of their TAO graph. It supports billions of reads per second and millions of writes this way.&lt;/p&gt;
+
+&lt;p&gt;A more persistent applicatio of Apollo is to provide reliable queues, for example to manage the push notifications.&lt;/p&gt;
+
+&lt;h2&gt;Open source?&lt;/h2&gt;
+
+&lt;p&gt;Currently Apollo is developed internally at Facebook. No firm claims were made during the talk that it will be opensourced. It was mentioned as a possibility after internal development settles down.&lt;/p&gt;
+
+&lt;p&gt;This was a quick write-up, twenty minutes after the talk ended. Any factual errors are solely caused by me misinterpreting or mishearing stuff. I expect more information to trickle out of Facebook engineer soon. That said, I hope this post paints an adequate initial picture of Facebook's Apollo!&lt;/p&gt;
+
+   </content>
+ </entry>
+ 
+ <entry>
+   <author><name>Sander Mak</name></author>
    <title>Generating JUnit test reports with Jasmine 2.0</title>
    <link href="http://branchandbound.net/blog/web/2014/03/generating-junit-testreports-jasmine-20"/>
-   <updated>2014-03-06T00:00:00+01:00</updated>
+   <updated>2014-03-06T00:00:00-05:00</updated>
    <id>http://branchandbound.net/blog/web/2014/03/generating-junit-testreports-jasmine-20</id>
    <content type="html">
        &lt;p&gt;While setting up a new project at work, a seemingly small upgrade from Jasmine 1.3 to Jasmine 2.0 broke a vital feature: the ability to generate JUnit XML reports for JavaScript unit tests. Long story short: I created &lt;a href=&quot;https://github.com/sandermak/jasmine2-junit&quot;&gt;jasmine2-junit&lt;/a&gt; to bring this feature to Jasmine 2.0 again.&lt;/p&gt;
@@ -88,7 +160,7 @@
    <author><name>Sander Mak</name></author>
    <title>ng-conf 2014: the world's first AngularJS conference</title>
    <link href="http://branchandbound.net/blog/conferences/2014/01/ng-conf-2014-world-first-angular-conference"/>
-   <updated>2014-01-20T00:00:00+01:00</updated>
+   <updated>2014-01-20T00:00:00-05:00</updated>
    <id>http://branchandbound.net/blog/conferences/2014/01/ng-conf-2014-world-first-angular-conference</id>
    <content type="html">
        &lt;p&gt;Last week I attended the world’s first ever dedicated AngularJS conference in Salt Lake City. More than 700 JavaScript developers gathered in the Little America hotel for two days to learn from Angular core-devs and community members.&lt;/p&gt;
@@ -155,7 +227,7 @@
    <author><name>Sander Mak</name></author>
    <title>A failed experiment: improving the Builder pattern</title>
    <link href="http://branchandbound.net/blog/java/2013/10/failed-experiment-improving-builder-pattern"/>
-   <updated>2013-10-21T00:00:00+02:00</updated>
+   <updated>2013-10-21T00:00:00-04:00</updated>
    <id>http://branchandbound.net/blog/java/2013/10/failed-experiment-improving-builder-pattern</id>
    <content type="html">
        &lt;p&gt;Sometimes, you want to try something new. Like last week, when I wanted to implement a builder for a domain object. In Java, lest you wonder why the code samples in this post are so long.&lt;/p&gt;
@@ -395,7 +467,7 @@
    <author><name>Sander Mak</name></author>
    <title>JavaOne 2013 trip report</title>
    <link href="http://branchandbound.net/blog/conferences/2013/09/javaone-2013-tripreport"/>
-   <updated>2013-09-30T00:00:00+02:00</updated>
+   <updated>2013-09-30T00:00:00-04:00</updated>
    <id>http://branchandbound.net/blog/conferences/2013/09/javaone-2013-tripreport</id>
    <content type="html">
        &lt;p&gt;Last week, San Francisco was sprawling with developers. It was that time of the year again: JavaOne 2013 took place. Thousands of Java developers gathered September 22-26 to learn new things and meet new people.&lt;/p&gt;
@@ -470,7 +542,7 @@
    <author><name>Sander Mak</name></author>
    <title>Some AngularJS pitfalls</title>
    <link href="http://branchandbound.net/blog/web/2013/08/some-angularjs-pitfalls"/>
-   <updated>2013-08-05T00:00:00+02:00</updated>
+   <updated>2013-08-05T00:00:00-04:00</updated>
    <id>http://branchandbound.net/blog/web/2013/08/some-angularjs-pitfalls</id>
    <content type="html">
        &lt;p&gt;In the past few months I've been heavily using AngularJS. It's a marvelous framework for modern web applications. But as with every new toy, there are some rough edges that you have to be aware of. In this post I'll round up some gotcha's I encountered. Assuming you already know your way around Angular, these may be helpful.&lt;/p&gt;
@@ -615,7 +687,7 @@
    <author><name>Sander Mak</name></author>
    <title>The Java Modularity Story</title>
    <link href="http://branchandbound.net/blog/java/2013/07/java-modularity-story"/>
-   <updated>2013-07-18T00:00:00+02:00</updated>
+   <updated>2013-07-18T00:00:00-04:00</updated>
    <id>http://branchandbound.net/blog/java/2013/07/java-modularity-story</id>
    <content type="html">
        &lt;p&gt;So you've got a growing Java application with a nice feature set. Unfortunately adding new features gets harder over time and things start breaking in unexpected places. Chances are that your applications is not as modular as it could be. Relax, it's not (just) your fault. Plain Java is notoriously lacking in the modularity department. But it doesn't have be this way.&lt;/p&gt;
@@ -709,7 +781,7 @@
    <author><name>Sander Mak</name></author>
    <title>Annoyances in the daily life of a developer</title>
    <link href="http://branchandbound.net/blog/development/2013/06/annoyances-daily-life-developer"/>
-   <updated>2013-06-24T00:00:00+02:00</updated>
+   <updated>2013-06-24T00:00:00-04:00</updated>
    <id>http://branchandbound.net/blog/development/2013/06/annoyances-daily-life-developer</id>
    <content type="html">
        &lt;p&gt;I'm not complaining and I love my job, but sometimes...&lt;/p&gt;
@@ -759,7 +831,7 @@
    <author><name>Sander Mak</name></author>
    <title>JEEConf 2013 trip report</title>
    <link href="http://branchandbound.net/blog/conferences/2013/05/jeeconf-2013-tripreport"/>
-   <updated>2013-05-25T00:00:00+02:00</updated>
+   <updated>2013-05-25T00:00:00-04:00</updated>
    <id>http://branchandbound.net/blog/conferences/2013/05/jeeconf-2013-tripreport</id>
    <content type="html">
        &lt;p&gt;Like &lt;a href=&quot;/blog/conferences/2012/05/jeeconf-tripreport&quot;&gt;last year&lt;/a&gt;, I had the opportunity to speak at JEEConf Kiev, the leading Java conference in Eastern Europe. More than 700 people from countries like Ukraine, Russia and Belarus attended JEEConf. Most talks are therefore in Russian. However, there was just enough English content to keep me entertained as well.&lt;/p&gt;
@@ -808,7 +880,7 @@
    <author><name>Sander Mak</name></author>
    <title>Launching Scalabitz</title>
    <link href="http://branchandbound.net/blog/scala/2013/05/launching-scalabitz"/>
-   <updated>2013-05-12T00:00:00+02:00</updated>
+   <updated>2013-05-12T00:00:00-04:00</updated>
    <id>http://branchandbound.net/blog/scala/2013/05/launching-scalabitz</id>
    <content type="html">
        &lt;p&gt;Today marks the launch of my lingering weekend-project: &lt;a href=&quot;http://scalabitz.com&quot;&gt;scalabitz.com&lt;/a&gt;. It tries to surface interesting Scala content through the API of link-shortener Bit.ly. The site was built using Scala and Play (and a bit of Akka) with a MongoDB storage layer and can be found on &lt;a href=&quot;https://github.com/sandermak/scalabitz&quot;&gt;GitHub&lt;/a&gt;.&lt;/p&gt;
@@ -873,7 +945,7 @@
    <author><name>Sander Mak</name></author>
    <title>A year of blogging analyzed with R</title>
    <link href="http://branchandbound.net/blog/data/2013/03/year-blogging-analyzed-r"/>
-   <updated>2013-03-23T00:00:00+01:00</updated>
+   <updated>2013-03-23T00:00:00-04:00</updated>
    <id>http://branchandbound.net/blog/data/2013/03/year-blogging-analyzed-r</id>
    <content type="html">
        &lt;p&gt;Today it's exactly one year ago that I published my first blogpost on branchandbound.net. During this year I've written 12 posts, including this one. Since we live in the age of analytics, I thought it would be nice to show how this blog has fared during its first year.&lt;/p&gt;
@@ -1088,7 +1160,7 @@ ga.df &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; ga&lt;span class=&q
    <author><name>Sander Mak</name></author>
    <title>Book review: Infinity and the Mind</title>
    <link href="http://branchandbound.net/blog/bookreview/2013/01/bookreview-infinity-and-the-mind"/>
-   <updated>2013-01-31T00:00:00+01:00</updated>
+   <updated>2013-01-31T00:00:00-05:00</updated>
    <id>http://branchandbound.net/blog/bookreview/2013/01/bookreview-infinity-and-the-mind</id>
    <content type="html">
        &lt;p&gt;&lt;a href=&quot;http://www.amazon.com/gp/product/0691121273/ref=as_li_ss_tl?ie=UTF8&amp;amp;camp=1789&amp;amp;creative=390957&amp;amp;creativeASIN=0691121273&amp;amp;linkCode=as2&amp;amp;tag=branandboun-20&quot;&gt;Infinity and the Mind&lt;/a&gt; provides a rare mixture of mathematical, scientific and philosophical explorations.  It gives both an account of the theory of transfinite numbers and discusses its implications from a philosophical point of view. With 'The science and philosophy of the infinite' as its subtitle, it is one of the most challenging books I've read in a while. Granted, this may be because I'm neither a mathematician nor a philosopher, just a software developer who has some interest in both fields. And yes, the book is relatively old, but it has stood the test of time.&lt;/p&gt;
@@ -1132,7 +1204,7 @@ ga.df &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; ga&lt;span class=&q
    <author><name>Sander Mak</name></author>
    <title>Scala is like Git</title>
    <link href="http://branchandbound.net/blog/scala/2012/12/scala-is-like-git"/>
-   <updated>2012-12-20T00:00:00+01:00</updated>
+   <updated>2012-12-20T00:00:00-05:00</updated>
    <id>http://branchandbound.net/blog/scala/2012/12/scala-is-like-git</id>
    <content type="html">
        &lt;p&gt;Scala is often portrayed as being too complex. Many times these discussions about complexity remind me of similar arguments around the complexity of Git. I know, the comparison between a source control system and a programming language falls flat quickly when pushed too hard. But bear with me, because I do believe it can put the Scala complexity discussion in a new perspective.&lt;/p&gt;
@@ -1186,7 +1258,7 @@ ga.df &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; ga&lt;span class=&q
    <author><name>Sander Mak</name></author>
    <title>Unify client-side and server-side rendering by embedding JSON</title>
    <link href="http://branchandbound.net/blog/web/2012/11/unify-server-side-client-side-rendering-embedding-json"/>
-   <updated>2012-11-21T00:00:00+01:00</updated>
+   <updated>2012-11-21T00:00:00-05:00</updated>
    <id>http://branchandbound.net/blog/web/2012/11/unify-server-side-client-side-rendering-embedding-json</id>
    <content type="html">
        &lt;p&gt;Not many applications I work on these days are solely using the traditional server-side rendering model. Neither do they employ 100% client-side rendering and templating. Usually it's a mix in which the 'old' world meets the new world, giving rise to some interesting design decisions. In this article I want to explore a solution that combines both worlds while minimizing the duplication of rendering logic by embedding JSON in the view.&lt;/p&gt;
@@ -1316,7 +1388,7 @@ ga.df &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; ga&lt;span class=&q
    <author><name>Sander Mak</name></author>
    <title>JFall 2012: Dutch Java awesomeness</title>
    <link href="http://branchandbound.net/blog/conferences/2012/11/jfall-2012-dutch-java-awesomeness"/>
-   <updated>2012-11-01T00:00:00+01:00</updated>
+   <updated>2012-11-01T00:00:00-04:00</updated>
    <id>http://branchandbound.net/blog/conferences/2012/11/jfall-2012-dutch-java-awesomeness</id>
    <content type="html">
        &lt;p&gt;The J-Fall conference has been a stable factor in the Dutch Java community for many years now. The 2012 edition was again jam-packed with excellent content. But above all, it's a place where more than thousand like-minded developers can meet (again) and exchange fresh new ideas!&lt;/p&gt;
@@ -1372,7 +1444,7 @@ ga.df &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; ga&lt;span class=&q
    <author><name>Sander Mak</name></author>
    <title>Cross-Build Injection in action</title>
    <link href="http://branchandbound.net/blog/security/2012/10/cross-build-injection-in-action"/>
-   <updated>2012-10-08T00:00:00+02:00</updated>
+   <updated>2012-10-08T00:00:00-04:00</updated>
    <id>http://branchandbound.net/blog/security/2012/10/cross-build-injection-in-action</id>
    <content type="html">
        &lt;p&gt;A &lt;a href=&quot;/blog/security/2012/03/crossbuild-injection-how-safe-is-your-build&quot;&gt;previous post&lt;/a&gt; introduced Cross-Build Injection (XBI) attacks. Recently, I've had the opportunity to present this work at JavaOne. In that session, I used a live example to show what could go wrong. By popular request, this post outlines the example XBI attack that I used as demonstration.&lt;/p&gt;
@@ -1487,7 +1559,7 @@ Hi, you&lt;span class=&quot;err&quot;&gt;&amp;#39;&lt;/span&gt;ve been p0wned!
    <author><name>Sander Mak</name></author>
    <title>Verify dependencies using PGP</title>
    <link href="http://branchandbound.net/blog/security/2012/08/verify-dependencies-using-pgp"/>
-   <updated>2012-08-22T00:00:00+02:00</updated>
+   <updated>2012-08-22T00:00:00-04:00</updated>
    <id>http://branchandbound.net/blog/security/2012/08/verify-dependencies-using-pgp</id>
    <content type="html">
        &lt;p&gt;Many builds use automatic dependency retrieval from repositories like Maven Central. In an earlier post, I've outlined the dangers of so-called &lt;a href=&quot;/blog/security/2012/03/crossbuild-injection-how-safe-is-your-build&quot;&gt;cross-build injection attacks&lt;/a&gt; when using automatic dependency management. In this post, I'll show how you can counter such attacks by verifying PGP signatures of artifacts downloaded from Maven Central.&lt;/p&gt;
@@ -1623,7 +1695,7 @@ gpg: Good signature from &quot;Sonatype, Inc. (Sonatype release key) &amp;lt;dev
    <author><name>Sander Mak</name></author>
    <title>Book review: DSLs in Action</title>
    <link href="http://branchandbound.net/blog/bookreview/2012/08/bookreview-dsls-in-action"/>
-   <updated>2012-08-04T00:00:00+02:00</updated>
+   <updated>2012-08-04T00:00:00-04:00</updated>
    <id>http://branchandbound.net/blog/bookreview/2012/08/bookreview-dsls-in-action</id>
    <content type="html">
        &lt;p&gt;Domain-Specific Languages are not the most used tools in the toolbox of developers. According to the author of 'DSLs in Action' this is a missed opportunity: these little languages can deliver lots of benefits. In this book he argues this position with fervor. But be warned: this is not a book for beginners.&lt;/p&gt;
@@ -1659,7 +1731,7 @@ gpg: Good signature from &quot;Sonatype, Inc. (Sonatype release key) &amp;lt;dev
    <author><name>Sander Mak</name></author>
    <title>Modern concurrency and Java EE</title>
    <link href="http://branchandbound.net/blog/java/2012/07/modern-concurrency-and-javaee"/>
-   <updated>2012-07-23T00:00:00+02:00</updated>
+   <updated>2012-07-23T00:00:00-04:00</updated>
    <id>http://branchandbound.net/blog/java/2012/07/modern-concurrency-and-javaee</id>
    <content type="html">
        &lt;p&gt;Managing your own threads within a Java EE container is not recommended and even illegal in some circumstances. But where does that leave us when we want to use the shiny new Java concurrency frameworks like Fork/Join and Akka in Java EE applications? The addition of new concurrency facilities to the Java EE 7 spec may open some doors.&lt;/p&gt;
@@ -1725,7 +1797,7 @@ submitted the task. All tasks will then run on the selected process/server.&lt;/
    <author><name>Sander Mak</name></author>
    <title>Preparing a technical talk</title>
    <link href="http://branchandbound.net/blog/conferences/2012/06/preparing-a-technical-talk"/>
-   <updated>2012-06-06T00:00:00+02:00</updated>
+   <updated>2012-06-06T00:00:00-04:00</updated>
    <id>http://branchandbound.net/blog/conferences/2012/06/preparing-a-technical-talk</id>
    <content type="html">
        &lt;p&gt;We software engineers love giving talks. Fortunately, the abundance of technical conferences shows that we like listening too. A lot of talks on these conferences are given by software engineers who love sharing knowledge, rather than professional speakers. This especially holds true for conferences organized by user groups. Since I'm one of those software engineers who likes to give talks, I'd like to share my thoughts on what you can do to prepare a technical talk.&lt;/p&gt;
@@ -1790,7 +1862,7 @@ submitted the task. All tasks will then run on the selected process/server.&lt;/
    <author><name>Sander Mak</name></author>
    <title>JEEConf 2012 trip report</title>
    <link href="http://branchandbound.net/blog/conferences/2012/05/jeeconf-tripreport"/>
-   <updated>2012-05-20T00:00:00+02:00</updated>
+   <updated>2012-05-20T00:00:00-04:00</updated>
    <id>http://branchandbound.net/blog/conferences/2012/05/jeeconf-tripreport</id>
    <content type="html">
        &lt;p&gt;What do Eastern European developers do on their free Saturday? Well, at least 650 of them go and attend a technical conference: JEEConf in Kiev, Ukraine. This is the second year that JEEConf is organized, and they've already grown from 400 attendants last year to 650 this year, coming from 9 countries surrounding Ukraine. I was invited to give two talks, one on Hibernate Performance Tuning and another on Scala &amp;amp; Lift.&lt;/p&gt;
@@ -1850,7 +1922,7 @@ Beautiful Kiev University building&lt;/p&gt;
    <author><name>Sander Mak</name></author>
    <title>Cross-build injection attacks: how safe is your build?</title>
    <link href="http://branchandbound.net/blog/security/2012/03/crossbuild-injection-how-safe-is-your-build"/>
-   <updated>2012-03-23T00:00:00+01:00</updated>
+   <updated>2012-03-23T00:00:00-04:00</updated>
    <id>http://branchandbound.net/blog/security/2012/03/crossbuild-injection-how-safe-is-your-build</id>
    <content type="html">
        &lt;p&gt;Imagine a world in which people blindly trust binaries uploaded to the internet by random strangers. Certainly not a world in which we as software engineers want to live. Except that many of us, including myself, do exactly that.  On a regular  basis. In our most precious environment: the software build process.&lt;/p&gt;
