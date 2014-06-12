@@ -4,7 +4,7 @@
  <title>Branch and Bound</title>
  <link href="http://branchandbound.net/atom.xml" rel="self"/>
  <link href="http://branchandbound.net"/>
- <updated>2014-06-11T19:36:15-04:00</updated>
+ <updated>2014-06-11T23:07:47-04:00</updated>
  <id>http://branchandbound.net/</id>
  <author>
    <name>Sander Mak</name>
@@ -29,10 +29,14 @@
 
 &lt;p&gt;Facebook generally favors CP systems. They have four datacenters using master/slave style replication. Missing the 'A'vailability usually isn't a big deal within a datacenter, but across DCs it becomes troublesome.&lt;/p&gt;
 
-&lt;p&gt;The wishlist that lead to Apollo is roughly as follows:
-* we need some kind of transactions
-* acked writes should be eventually visible and not lost
-* availability&lt;/p&gt;
+&lt;p&gt;The wishlist that lead to Apollo is roughly as follows:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;we need some kind of transactions&lt;/li&gt;
+&lt;li&gt;acked writes should be eventually visible and not lost&lt;/li&gt;
+&lt;li&gt;availability&lt;/li&gt;
+&lt;/ul&gt;
+
 
 &lt;p&gt;So the question really boils down to: can we layer AP on top of CP?&lt;/p&gt;
 
@@ -42,11 +46,15 @@
 
 &lt;p&gt;The shards use Paxos style quorum protocols (CP). Raft is used for consensus. Fun sidenote: this turned out to be not much simpler than multi-paxos, even though that was the expectation.&lt;/p&gt;
 
-&lt;p&gt;RocksDB (a key-val store, log-structured storage) or MySQL can be used as underlying storage. The storage primitives offered by Apollo are:
-* binary value
-* map
-* pqueue
-* CRDTs&lt;/p&gt;
+&lt;p&gt;RocksDB (a key-val store, log-structured storage) or MySQL can be used as underlying storage. The storage primitives offered by Apollo are:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;binary value&lt;/li&gt;
+&lt;li&gt;map&lt;/li&gt;
+&lt;li&gt;pqueue&lt;/li&gt;
+&lt;li&gt;CRDTs&lt;/li&gt;
+&lt;/ul&gt;
+
 
 &lt;h3&gt;Use cases&lt;/h3&gt;
 

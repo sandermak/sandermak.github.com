@@ -89,10 +89,14 @@
 
 <p>Facebook generally favors CP systems. They have four datacenters using master/slave style replication. Missing the 'A'vailability usually isn't a big deal within a datacenter, but across DCs it becomes troublesome.</p>
 
-<p>The wishlist that lead to Apollo is roughly as follows:
-* we need some kind of transactions
-* acked writes should be eventually visible and not lost
-* availability</p>
+<p>The wishlist that lead to Apollo is roughly as follows:</p>
+
+<ul>
+<li>we need some kind of transactions</li>
+<li>acked writes should be eventually visible and not lost</li>
+<li>availability</li>
+</ul>
+
 
 <p>So the question really boils down to: can we layer AP on top of CP?</p>
 
@@ -102,11 +106,15 @@
 
 <p>The shards use Paxos style quorum protocols (CP). Raft is used for consensus. Fun sidenote: this turned out to be not much simpler than multi-paxos, even though that was the expectation.</p>
 
-<p>RocksDB (a key-val store, log-structured storage) or MySQL can be used as underlying storage. The storage primitives offered by Apollo are:
-* binary value
-* map
-* pqueue
-* CRDTs</p>
+<p>RocksDB (a key-val store, log-structured storage) or MySQL can be used as underlying storage. The storage primitives offered by Apollo are:</p>
+
+<ul>
+<li>binary value</li>
+<li>map</li>
+<li>pqueue</li>
+<li>CRDTs</li>
+</ul>
+
 
 <h3>Use cases</h3>
 
