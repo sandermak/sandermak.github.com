@@ -98,7 +98,7 @@
 
 <p>Think about how you would implement this example. Strictly speaking, you can't really prevent duplicated logic. On the one hand, you need to render the table with the products from page one server-side on the initial request. Like in this JSP/JQuery based example:</p>
 
-<div class="highlight"><pre><code class="html"><span class="nt">&lt;table&gt;</span>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;table&gt;</span>
     <span class="nt">&lt;thead&gt;</span>
         <span class="nt">&lt;tr&gt;</span>
             <span class="nt">&lt;th&gt;</span>Product<span class="nt">&lt;/th&gt;</span>
@@ -114,19 +114,16 @@
         <span class="nt">&lt;/tr&gt;</span>
     <span class="nt">&lt;/c:forEach&gt;</span>
 <span class="nt">&lt;/table&gt;</span>
-<span class="c">&lt;!-- paging links omitted --&gt;</span>
-</code></pre></div>
+<span class="c">&lt;!-- paging links omitted --&gt;</span></code></pre></div>
 
 
 <p>Then you also need to construct the table again after a successful paging AJAX call:</p>
 
-<div class="highlight"><pre><code class="javascript"> 
-<span class="kd">var</span> <span class="nx">products</span> <span class="o">=</span> <span class="c1">// JSON result of AJAX call</span>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">products</span> <span class="o">=</span> <span class="c1">// JSON result of AJAX call</span>
 <span class="nx">$</span><span class="p">.</span><span class="nx">each</span><span class="p">(</span><span class="nx">products</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">index</span><span class="p">,</span> <span class="nx">product</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">productTable</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;&lt;tr&gt;&lt;td&gt;&#39;</span><span class="o">+</span><span class="nx">product</span><span class="p">.</span><span class="nx">name</span><span class="o">+</span><span class="s1">&#39;&lt;/td&gt;&lt;td&gt;&lt;em&gt;&#39;</span>
           <span class="o">+</span><span class="nx">product</span><span class="p">.</span><span class="nx">description</span><span class="o">+</span><span class="s1">&#39;&lt;/em&gt;&lt;/td&gt;&lt;td&gt;&#39;</span><span class="o">+</span><span class="nx">product</span><span class="p">.</span><span class="nx">price</span><span class="o">+</span><span class="s1">&#39;&lt;/td&gt;&lt;/tr&gt;&#39;</span><span class="p">));</span>
-<span class="p">});</span>
-</code></pre></div>
+<span class="p">});</span></code></pre></div>
 
 
 <p>(only do this when you can guarantee the concatenated strings are properly escaped!)</p>
@@ -149,8 +146,7 @@
 
 <p>While the general idea of client-side only rendering is good, the execution can be improved. What if the server makes the product data available in a format digestible by the client in the first request, but without needing to render the actual HTML? It turns out we can do that by embedding JSON in the page rendered on the server:</p>
 
-<div class="highlight"><pre><code class="html"> 
-<span class="nt">&lt;html&gt;</span>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;html&gt;</span>
 <span class="nt">&lt;head&gt;</span>
     <span class="c">&lt;!-- other header tags omitted --&gt;</span>
     <span class="nt">&lt;script&gt;</span>
@@ -173,8 +169,7 @@
 <span class="nt">&lt;body&gt;</span>
    <span class="c">&lt;!-- body containing an empty table and paging links etc. --&gt;</span>
 <span class="nt">&lt;/body&gt;</span>
-<span class="nt">&lt;/html&gt;</span>
-</code></pre></div>
+<span class="nt">&lt;/html&gt;</span></code></pre></div>
 
 
 <p>(View the full source of <a href="https://github.com/sandermak/embedded-json-example/blob/master/src/main/webapp/WEB-INF/views/index.jsp">this page</a> here.)</p>
@@ -218,7 +213,7 @@
     
       <li><span>18 Jul 2013</span> &raquo; <a href="/blog/java/2013/07/java-modularity-story">The Java Modularity Story</a></li>
     
-      <li><span>23 Mar 2013</span> &raquo; <a href="/blog/data/2013/03/year-blogging-analyzed-r">A year of blogging analyzed with R</a></li>
+      <li><span>27 Oct 2014</span> &raquo; <a href="/blog/data/2014/10/road-to-data-science">The Road to Data Science</a></li>
     
   </ul>
 </div>

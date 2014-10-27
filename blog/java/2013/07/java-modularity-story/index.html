@@ -133,14 +133,13 @@
 
 <p>And the accompanying manifest for the service bundle:</p>
 
-<div class="highlight"><pre><code class="properties"><span class="na">Manifest-Version</span><span class="o">:</span> <span class="s">1.0</span>
+<div class="highlight"><pre><code class="language-properties" data-lang="properties"><span class="na">Manifest-Version</span><span class="o">:</span> <span class="s">1.0</span>
 <span class="na">Bundle-ManifestVersion</span><span class="o">:</span> <span class="s">2</span>
 <span class="na">Bundle-Name</span><span class="o">:</span> <span class="s">MyService bundle</span>
 <span class="na">Bundle-SymbolicName</span><span class="o">:</span> <span class="s">com.foo.service</span>
 <span class="na">Bundle-Version</span><span class="o">:</span> <span class="s">1.0.0</span>
 <span class="na">Import-Package</span><span class="o">:</span>  <span class="s">org.apache.commons.logging;version=&quot;[1.0.4, 2.0.0)&quot;</span>
-<span class="na">Export-Package</span><span class="o">:</span>  <span class="s">com.foo.service.api;version=&quot;1.0.0&quot;</span>
-</code></pre></div>
+<span class="na">Export-Package</span><span class="o">:</span>  <span class="s">com.foo.service.api;version=&quot;1.0.0&quot;</span></code></pre></div>
 
 
 <p>And there you have it: OSGi provides an independently deployable Jar with a stable identity, and the possibility to require or advertise dependencies (ie. versioned packages). Everything else is strictly contained inside bundles. The OSGi runtime takes care of all the gritty details to enforce this strict separation at runtime. It even allows bundles to be added, removed and hot-swapped at run-time!</p>
@@ -178,11 +177,11 @@
   <h3>Related Posts</h3>
   <ul class="posts">
     
+      <li><span>27 Oct 2014</span> &raquo; <a href="/blog/data/2014/10/road-to-data-science">The Road to Data Science</a></li>
+    
       <li><span>22 Aug 2012</span> &raquo; <a href="/blog/security/2012/08/verify-dependencies-using-pgp">Verify dependencies using PGP</a></li>
     
       <li><span>06 Jun 2012</span> &raquo; <a href="/blog/conferences/2012/06/preparing-a-technical-talk">Preparing a technical talk</a></li>
-    
-      <li><span>23 Mar 2012</span> &raquo; <a href="/blog/security/2012/03/crossbuild-injection-how-safe-is-your-build">Cross-build injection attacks: how safe is your build?</a></li>
     
   </ul>
 </div>

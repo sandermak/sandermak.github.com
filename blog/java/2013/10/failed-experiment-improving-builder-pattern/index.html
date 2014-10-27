@@ -99,7 +99,7 @@
 
 <p>But here we are in 2013. Let's say we want a domain object modeling pizza orders. The usual solution looks somewhat like this, using a static inner class to implement the builder:</p>
 
-<div class="highlight"><pre><code class="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">PizzaOrderOldStyle</span> <span class="o">{</span>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">PizzaOrderOldStyle</span> <span class="o">{</span>
 
     <span class="kd">private</span> <span class="kt">int</span> <span class="n">size</span><span class="o">;</span>
     <span class="kd">private</span> <span class="kt">boolean</span> <span class="n">pepperoni</span><span class="o">;</span>
@@ -175,19 +175,17 @@
 
 <span class="c1">// Omitted getters</span>
 <span class="c1">// Omitted equals/hashCode</span>
-<span class="o">}</span>
-</code></pre></div>
+<span class="o">}</span></code></pre></div>
 
 
 <p>It's fairly straightforward. The constructor for <code>PizzaOrderOldStyle</code> is private and takes an instance of the builder. In this constructor, the fields on the domain object are initialized to the values from the builder. Only <code>Builder</code> can be instantiated by the user of the API and it takes the non-optional values directly. The <code>with*()</code> methods on the builder expose a <a href="http://en.wikipedia.org/wiki/Fluent_interface">Fluent API</a> by returning <code>this</code>. Since the resulting domain object has no setters, it is effectively immutable after it is returned from <code>build()</code>.</p>
 
 <p>Building the domain object is now as simple as:</p>
 
-<div class="highlight"><pre><code class="java"><span class="n">pizzaOrder</span><span class="o">(</span><span class="mi">10</span><span class="o">,</span> <span class="s">&quot;tomato&quot;</span><span class="o">,</span> <span class="s">&quot;Sander&quot;</span><span class="o">)</span>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="n">pizzaOrder</span><span class="o">(</span><span class="mi">10</span><span class="o">,</span> <span class="s">&quot;tomato&quot;</span><span class="o">,</span> <span class="s">&quot;Sander&quot;</span><span class="o">)</span>
     <span class="o">.</span><span class="na">withPepperoni</span><span class="o">()</span>
     <span class="o">.</span><span class="na">withMushroom</span><span class="o">()</span>
-    <span class="o">.</span><span class="na">withCheese</span><span class="o">(</span><span class="s">&quot;parmesan&quot;</span><span class="o">).</span><span class="na">build</span><span class="o">();</span>
-</code></pre></div>
+    <span class="o">.</span><span class="na">withCheese</span><span class="o">(</span><span class="s">&quot;parmesan&quot;</span><span class="o">).</span><span class="na">build</span><span class="o">();</span></code></pre></div>
 
 
 <p>(I added a static convenience method <code>pizzaOrder</code> to instantiate the builder)</p>
@@ -204,7 +202,7 @@
 
 <p>Seeing this problem got me thinking. What if the builder is just a façade on top of the domain object? It could use the fields of the domain object as 'intermediate' storage, without exposing the domain object as a whole before it is ready. Java allows non-static inner classes to mess with private state of the outer object. So that was a good starting point:</p>
 
-<div class="highlight"><pre><code class="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">PizzaOrder</span> <span class="o">{</span>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">PizzaOrder</span> <span class="o">{</span>
 
     <span class="kd">private</span> <span class="kt">int</span> <span class="n">size</span><span class="o">;</span>
     <span class="kd">private</span> <span class="kt">boolean</span> <span class="n">pepperoni</span><span class="o">;</span>
@@ -225,7 +223,7 @@
     <span class="o">}</span>
     
     <span class="kd">public</span> <span class="kd">class</span> <span class="nc">Builder</span> <span class="o">{</span>
-        <span class="kd">private</span> <span class="n">AtomicBoolean</span> <span class="n">build</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AtomicBoolean</span><span class="o">(</span><span class="kc">false</span><span class="o">);</span>
+        <span class="kd">private</span> <span class="n">AtomicBoolean</span> <span class="n">build</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">AtomicBoolean</span><span class="o">(</span><span class="kc">false</span><span class="o">);</span>
 
         <span class="kd">public</span> <span class="nf">Builder</span><span class="o">(</span><span class="kt">int</span> <span class="n">_size</span><span class="o">,</span> <span class="n">String</span> <span class="n">_sauce</span><span class="o">,</span> <span class="n">String</span> <span class="n">_orderFor</span><span class="o">)</span> <span class="o">{</span>
             <span class="n">size</span> <span class="o">=</span> <span class="n">_size</span><span class="o">;</span>
@@ -280,17 +278,15 @@
 
 <span class="c1">// Omitted getters</span>
 <span class="c1">// Omitted equals/hashCode    </span>
-<span class="o">}</span>
-</code></pre></div>
+<span class="o">}</span></code></pre></div>
 
 
 <p>Interestingly, the exposed API is identical since we again offer a static convenience function <code>pizzaOrder</code> hiding the slightly funky <code>new PizzaOrder().new Builder(..)</code> that is necessary to instantiate the builder:</p>
 
-<div class="highlight"><pre><code class="java"><span class="n">pizzaOrder</span><span class="o">(</span><span class="mi">10</span><span class="o">,</span> <span class="s">&quot;basil&quot;</span><span class="o">,</span> <span class="s">&quot;Fred&quot;</span><span class="o">)</span>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="n">pizzaOrder</span><span class="o">(</span><span class="mi">10</span><span class="o">,</span> <span class="s">&quot;basil&quot;</span><span class="o">,</span> <span class="s">&quot;Fred&quot;</span><span class="o">)</span>
     <span class="o">.</span><span class="na">withPepperoni</span><span class="o">()</span>
     <span class="o">.</span><span class="na">withMushroom</span><span class="o">()</span>
-    <span class="o">.</span><span class="na">withCheese</span><span class="o">(</span><span class="s">&quot;mozzarella&quot;</span><span class="o">).</span><span class="na">build</span><span class="o">();</span>
-</code></pre></div>
+    <span class="o">.</span><span class="na">withCheese</span><span class="o">(</span><span class="s">&quot;mozzarella&quot;</span><span class="o">).</span><span class="na">build</span><span class="o">();</span></code></pre></div>
 
 
 <p>Even though from a syntactic standpoint the API hasn't changed, from a usage perspective there are differences. After a call to <code>build()</code> any other call on the builder results in an exception. This must be the case, since the underlying fields are the actual fields of the domain object. We don't want those to change after the builder is done. I used an <code>AtomicBoolean</code> to 'seal' the builder and the underlying domain object. Compare this with the original approach, where you can build as many times as you want with the same <code>Builder</code> instance. Whether this is a good or bad thing is debatable. In practice it doesn't make much difference since you tend to use a builder only once anyway.</p>
@@ -328,7 +324,7 @@
     
       <li><span>21 Nov 2012</span> &raquo; <a href="/blog/web/2012/11/unify-server-side-client-side-rendering-embedding-json">Unify client-side and server-side rendering by embedding JSON</a></li>
     
-      <li><span>12 May 2013</span> &raquo; <a href="/blog/scala/2013/05/launching-scalabitz">Launching Scalabitz</a></li>
+      <li><span>27 Oct 2014</span> &raquo; <a href="/blog/data/2014/10/road-to-data-science">The Road to Data Science</a></li>
     
   </ul>
 </div>

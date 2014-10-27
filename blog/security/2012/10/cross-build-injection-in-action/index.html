@@ -87,14 +87,13 @@
 
 <p>So how do we get this innocent snippet of Java:</p>
 
-<div class="highlight"><pre><code class="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Test</span> <span class="o">{</span>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Test</span> <span class="o">{</span>
 
   <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">...</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
     <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Hi there&quot;</span><span class="o">);</span>
   <span class="o">}</span> 
 
-<span class="o">}</span>
-</code></pre></div>
+<span class="o">}</span></code></pre></div>
 
 
 <p>to print "Hi, you've been p0wned" rather than the bland "Hi there" message using a Cross-Build Injection attack? The central premise of my <a href="/blog/security/2012/03/crossbuild-injection-how-safe-is-your-build">Cross-Build Injection Attacks</a> talk is that this depends on how secure your build setup is. Let's take a look at a typical Maven-based setup. When we do a "mvn clean install" on the project containing the Test class, the following happens:</p>
@@ -107,14 +106,14 @@
 
 <p>Rather than creating a network setup that intercepts and replaces Maven request/responses, let's just place a compromised artifact in our local repository manually, to simulate the effects of an XBI attack. Since the maven-compiler-plugin orchestrates the actual invocation of the Java compiler, it seems like a good place to subvert the build process. Fortunately the source is just an <a href="http://svn.apache.org/repos/asf/maven/plugins/tags/maven-compiler-plugin-2.5.1">svn checkout</a> away. A little digging finds us the AbstractCompilerMojo class, containing an execute() method which ultimately invokes the compiler. So let's get to it and change it to our liking:</p>
 
-<div class="highlight"><pre><code class="java"><span class="kd">public</span> <span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">AbstractCompilerMojo</span> <span class="kd">extends</span> <span class="n">AbstractMojo</span> <span class="o">{</span>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">AbstractCompilerMojo</span> <span class="kd">extends</span> <span class="n">AbstractMojo</span> <span class="o">{</span>
 
   <span class="c1">// ... snipped lots of code ...</span>
 
   <span class="kd">public</span> <span class="kt">void</span> <span class="nf">execute</span><span class="o">()</span> 
     <span class="kd">throws</span> <span class="n">MojoExecutionException</span><span class="o">,</span> <span class="n">CompilationFailureException</span> <span class="o">{</span>
     
-    <span class="n">File</span> <span class="n">src</span> <span class="o">=</span> <span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">basedir</span> <span class="o">+</span> <span class="s">&quot;/src/main/java/Test.java&quot;</span><span class="o">);</span>
+    <span class="n">File</span> <span class="n">src</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">File</span><span class="o">(</span><span class="n">basedir</span> <span class="o">+</span> <span class="s">&quot;/src/main/java/Test.java&quot;</span><span class="o">);</span>
     <span class="n">String</span> <span class="n">original</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
     <span class="k">try</span> <span class="o">{</span>
         <span class="n">original</span> <span class="o">=</span> <span class="n">FileUtils</span><span class="o">.</span><span class="na">fileRead</span><span class="o">(</span><span class="n">src</span><span class="o">);</span>
@@ -136,8 +135,7 @@
     <span class="o">}</span>
   <span class="o">}</span> 
 
-<span class="o">}</span>
-</code></pre></div>
+<span class="o">}</span></code></pre></div>
 
 
 <p>(For the lazy bunch, here's the code (including the modified maven-compiler-plugin) in a convenient <a href="/dl/xbi_code.zip">download</a>.)</p>
@@ -146,8 +144,7 @@
 
 <p>To bring our version of the maven-compiler-plugin in place, execute</p>
 
-<div class="highlight"><pre><code class="sh">:maven-compiler-plugin<span class="nv">$ </span>mvn clean install -DskipTests
-</code></pre></div>
+<div class="highlight"><pre><code class="language-sh" data-lang="sh">:maven-compiler-plugin<span class="nv">$ </span>mvn clean install -DskipTests</code></pre></div>
 
 
 <p>in the maven-compiler-plugin project that we just 'improved'. The skipTests flag is necessary since our 'improvement' obviously fails any sensible unit test in the compiler plugin. Now this nefarious version of the compiler plugin lives in your local repository.</p>
@@ -156,10 +153,10 @@
 
 <p>Just two more steps to see our 'improved' compiler plugin in action. Perform a mvn clean install on the 'hacked' project, and run it:</p>
 
-<div class="highlight"><pre><code class="sh">:hacked<span class="nv">$ </span>mvn clean install
+<div class="highlight"><pre><code class="language-sh" data-lang="sh">:hacked<span class="nv">$ </span>mvn clean install
 .. snipped ..
 <span class="o">[</span>INFO<span class="o">]</span> --- maven-compiler-plugin:2.5.1:compile <span class="o">(</span>default-compile<span class="o">)</span> @ hacked ---
-<span class="o">[</span>INFO<span class="o">]</span> Compiling 1 <span class="nb">source </span>file to .../hacked/target/classes
+<span class="o">[</span>INFO<span class="o">]</span> Compiling <span class="m">1</span> <span class="nb">source </span>file to .../hacked/target/classes
 .. snipped ..
 <span class="o">[</span>INFO<span class="o">]</span> -------------------------------------------------------------------
 <span class="o">[</span>INFO<span class="o">]</span> BUILD SUCCESS
@@ -167,8 +164,7 @@
 .. snipped ..
 
 :hacked<span class="nv">$ </span>java -cp ./target/classes Test
-Hi, you<span class="err">&#39;</span>ve been p0wned!
-</code></pre></div>
+Hi, you<span class="err">&#39;</span>ve been p0wned!</code></pre></div>
 
 
 <p>There you have it: when compiled using this maven-compiler-plugin implementation, our original class seems to be untouched but the resulting .class file will print the unexpected message. And remember, we use a plain and uncompromised install of both Maven and the Java compiler. However, because Maven downloads a plugin before compiling, arbitrary code may be executed if you are not careful!</p>
@@ -201,9 +197,9 @@ Hi, you<span class="err">&#39;</span>ve been p0wned!
     
       <li><span>23 Mar 2012</span> &raquo; <a href="/blog/security/2012/03/crossbuild-injection-how-safe-is-your-build">Cross-build injection attacks: how safe is your build?</a></li>
     
-      <li><span>06 Mar 2014</span> &raquo; <a href="/blog/web/2014/03/generating-junit-testreports-jasmine-20">Generating JUnit test reports with Jasmine 2.0</a></li>
-    
       <li><span>18 Jul 2013</span> &raquo; <a href="/blog/java/2013/07/java-modularity-story">The Java Modularity Story</a></li>
+    
+      <li><span>06 Mar 2014</span> &raquo; <a href="/blog/web/2014/03/generating-junit-testreports-jasmine-20">Generating JUnit test reports with Jasmine 2.0</a></li>
     
   </ul>
 </div>

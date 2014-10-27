@@ -1,0 +1,288 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>The Road to Data Science - Branch and Bound</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Sander Mak">
+
+    <link href="http://feeds.feedburner.com/BranchAndBound" rel="alternate" title="Branch and Bound Blog Feed" type="application/atom+xml" />
+    <!-- Le styles -->
+    <link href="/assets/themes/sander/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="/assets/themes/sander/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="/assets/themes/sander/syntax.css" rel="stylesheet">
+    <link href="/assets/themes/sander/style.css" rel="stylesheet">
+
+    <style type="text/css">
+      body {
+        padding-top: 10px;
+        padding-bottom: 40px;
+      }
+    </style>
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="assets/bootstrap/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="assets/bootstrap/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/bootstrap/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="assets/bootstrap/ico/apple-touch-icon-57-precomposed.png">
+
+  </head>
+
+  <body>
+
+
+    <div class="container">
+      <div class="row">
+        <div class="span11">
+    <div class="navbar">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="/">Branch and Bound</a>
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li><a href="/">Home</a></li>
+              <li><a href="/about.html">About</a></li>
+              <li><a href="/talks.html">Talks</a></li>
+              <li><a href="/archive.html">Archive</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+        </div>
+      </div>
+      <div class="row">
+        <div class="span6 offset2">
+          
+<article>
+  <header>
+    <h1>The Road to Data Science</h1>
+    <strong><time datetime="2014-10-27" pubdate>27 October 2014</time></strong>
+
+    <br>
+    <br>
+
+    <p><em><p>Data is invariably a large part of the applications we deliver. Thinking about data, we often are concerned with ACID, scalability and other operational aspects. Building an (enterprise) app means we want our data to be safe, accessible and acted upon by our business rules. Sure, there is the occasional reporting need, but usually nothing a few well-placed queries won't be able to solve.</p>
+</em></p>
+  </header>
+  
+
+  <section>
+   <p>(this article appeared in an edited form in DZone's <a href="http://java.dzone.com/articles/introducing-dzones-2014-guide-2">Big Data guide</a>)</p>
+
+<h3>Shifting sands</h3>
+
+<p>But the world has changed. Gmail sorts our priority inbox for us. Facebook decides what's important in our newsfeed on our behalf. E-commerce sites are full of recommendations, sometimes eerily accurate. We see automatic tagging and classification of natural language resources. Ad-targeting systems predict how likely you are to click on a given ad. The list goes on and on. Applications are getting smarter with their data. It's not just about managing and consuming data anymore. It's all about deriving knowledge and insights from existing data, predicting future data and creating a customised user experience. And not just in fancy reports for management (think 'Business Intelligence'), but as an integral part of the application. Data drives the user experience directly, not after the fact. This is what data science is all about. Granted, the term is incredibly hyped, but there's a lot of substance behind the hype. So we might as well give it a name and try to figure out what it means for us as developers.</p>
+
+<p>All the applications discussed above arose in the context of the large web-giants (Google, Yahoo, Facebook) and lots of startups. Yes, these places are filled to the brim with very smart people, working on the bleeding edge. But make no mistake. This trend will trickle down into 'regular' application development just as well. Users' expectations for business applications increase, if only because they interact with slick and intelligent apps every day at home. For enterprise applications it's not a matter of if, but when.</p>
+
+<h3>From developer to data scientist</h3>
+
+<p>How do we cope with these increased expectations? It's not just a software engineering problem. You can't just throw libraries at it and hope for the best. Yes, there are great machine learning libraries, like <a href="https://mahout.apache.org/">Apache Mahout</a> (Java) and <a href="http://scikit-learn.org/">scikit-learn</a> (Python). There are even programming languages squarely aimed at doing data science, such as the <a href="http://r-project.org">R language</a>. But it's not just about that. There is a more fundamental level of understanding you need to attain to wield these tools.</p>
+
+<p>No, this article will not be enough to gain this level of understanding. It can, however, show you the landmarks along the road to data science. This diagram (adapted from Drew Conway's <a href="http://drewconway.com/zia/2013/3/26/the-data-science-venn-diagram">original</a>) shows the lay of the land:</p>
+
+<p><img src="/pics/datascience_venn.png" alt="Data science venn diagramg" /></p>
+
+<p>As software engineers we can relate to hacking skills. It's our bread and butter. And that's good, because from this solid basis you can branch out into the other fields and become more well-rounded. Let's tackle domain expertise first. It may sound obvious, but if you want to create good models for your data, you need to know what you're talking about. This is not strictly true for all approaches. For example <a href="http://en.wikipedia.org/wiki/Deep_learning">deep learning</a> and other machine learning techniques might be viewed as an exception. In general though, having more domain-specific knowledge is better. So start looking beyond the user-stories in your backlog and talk to your domain experts about what really makes the clock tick. Beware though. If you 'only' know your domain and can churn out decent code, you're in the danger zone. Meaning you're at risk of re-inventing the wheel, misapplying techniques and many other ways of shooting yourself in the foot.</p>
+
+<p>The elephant in the room here is of course math &amp; statistics. The link between math and the implementation of features such as recommendation or classification is very strong. Even if you're not building a recommender algorithm from scratch (which hopefully you wouldn't), you need to know what goes on under the hood in order to select the right one and to tune it correctly. As the diagram points out, the combination between domain expertise and math &amp; statistics knowledge is traditionally the area of researchers or analysts within companies. But when you combine these skills with software engineering prowess, many new doors will open.</p>
+
+<p>What can you do as developer if you don't want to miss the bus? Before diving head-first into libraries and tools, there are several areas where you can focus your energy:</p>
+
+<ul>
+<li>Data management</li>
+<li>Statistics</li>
+<li>Math</li>
+</ul>
+
+
+<p>We'll look at each of them in the remainder of this article. Thinks of these items as the major stops on the road to data science.</p>
+
+<h3>Data management</h3>
+
+<p>Features like recommendation, classification and prediction cannot be coded in a vacuum. You need data to drive the process of creating/tuning a good recommender engine for your application, in your specific context. So it all starts with gathering relevant data. It might already be in your databases, or you might have to setup new ways of capturing relevant data. Then comes the act of combining and cleaning data. This is also known as data wrangling or munging. Different algorithms have different pre-conditions on input data. You'll have to develop a good intuition for good data versus messy data.</p>
+
+<p>Typically, this phase of a data science project is very experimental. You'll need tools that help you quickly process lots of heterogeneous data and iterate on different strategies. Real world data is ugly and lacks structure. Dynamic scripting languages are often used for these tasks because they fit this challenge perfectly. A popular choice is Python with <a href="http://pandas.pydata.org">Pandas</a> or the R language.</p>
+
+<p>It's important to keep a close eye on everything related to data munging. Just because it's not production code, doesn't mean it's not important. There won't be any compiler errors or test failures when you silently omit or distort data, but it will influence the validity of all subsequent steps. Make sure you keep all your data management scripts, and both mangled and unmangled data. You can then always trace your steps. Garbage in, garbage out applies as always.</p>
+
+<h3>Statistics</h3>
+
+<p>Once you have data in the appropriate format, the time has come to do something useful with it. But your data is typically just a sample. You want to create models that handle yet unseen data. How can you infer valid information from this sample? How do you even know your data is representative? Enter the domain of statistics, a  vitally important part of data science. I've heard it put like this: 'a Data Scientist is a person who is better at statistics than any software engineer and better at software engineering than any statistician'.</p>
+
+<p>What should you know? Start by mastering the basics. Understand probabilities and probability distributions. When is a sample large enough to be representative? Know about common assumptions such as independence of probabilities, or when values are expected to follow a normal distribution. Many statistical procedures only make sense in the context of these assumptions. How do you test the significance of your findings? How do you select promising features from your data as input for algorithms? Any introductory material on statistics can teach you this. Then, move on the Bayesian statistics. It will pop up more and more in the context of machine learning.</p>
+
+<p>It's not just theory. Did you notice how we conveniently glossed over the 'science' part of data science up till now? Doing data science is essentially setting up experiments with data. Fortunately, the world of statistics knows a thing or two about experimental setup. You'll learn that you always should divide your data in a training set (to build your model) and test set (to validate your model). Otherwise, your model is no good for unseen data: the problem of  overfitting. Even then, you're still susceptible to pitfalls like <a href="http://en.wikipedia.org/wiki/Multiple_comparisons_problem">multiple testing</a>. There's a lot to take into account.</p>
+
+<h3>Math</h3>
+
+<p>Statistics tells you about the when and why, but for the how, math is unavoidable. Many popular algorithms such as linear regression, neural networks and various recommendation algorithms all boil down to math. Linear algebra, to be more precise. So brushing up on vector and matrix manipulations is a must. Again, many libraries abstract over the details for you. But it is essential to know what is going on behind the scenes, in order to know which knobs to tune. When results are different than expected, you need to know how to debug the algorithm.</p>
+
+<p>It's also very instructive to try and code at least one algorithm from scratch. Take linear regression for example, implemented with gradient descent. You will experience the intimate connection between optimization, derivatives and linear algebra when researching and implementing it. Andrew Ng's <a href="https://www.coursera.org/course/ml">Machine Learning class</a> on Coursera takes you through this journey in a surprisingly accessible way.</p>
+
+<h3>But wait, there's more...</h3>
+
+<p>Besides the fundamentals discussed so far, getting good at data science includes many other skills as well. Such as clearly communicating results of data-driven experiments. Or scaling whatever algorithm or data munging method you selected across a large cluster for large datasets. Also, many algorithms in data science are 'batch-oriented', requiring expensive recalculations. Translation into online versions of these algorithms is often necessary. Fortunately, many (open-source) products and libraries can help with the last two challenges.</p>
+
+<p>Data science is a fascinating combination between real-world software engineering and math &amp; statistics. This explains why the field is currently dominated by PhDs. On the flipside, we live in an age where education has never been more accessible. Be it through MOOCs, websites or books. If you want read a hands-on book to get started, read <a href="http://amzn.to/1kE1HB2">Machine Learning for Hackers</a>. Then, move on to a more rigorous book like <a href="http://amzn.to/1pB2ykA">Elements of Statistical Learning</a>. There are no shortcuts on the road to data science. Broadening your view from software engineering to data science will be hard, but certainly rewarding.</p>
+
+  </section>
+</article>
+<div>
+  <strong>If you liked this post, please share it!</strong>
+  <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://branchandbound.net/blog/data/2014/10/road-to-data-science" data-via="Sander_Mak" data-dnt="true">Tweet</a>
+  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</div>
+
+<br>
+<br>
+
+<div id="related">
+  <h3>Related Posts</h3>
+  <ul class="posts">
+    
+      <li><span>18 Jul 2013</span> &raquo; <a href="/blog/java/2013/07/java-modularity-story">The Java Modularity Story</a></li>
+    
+      <li><span>06 Jun 2012</span> &raquo; <a href="/blog/conferences/2012/06/preparing-a-technical-talk">Preparing a technical talk</a></li>
+    
+      <li><span>22 Aug 2012</span> &raquo; <a href="/blog/security/2012/08/verify-dependencies-using-pgp">Verify dependencies using PGP</a></li>
+    
+  </ul>
+</div>
+
+
+
+
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_developer = 1;
+    var disqus_shortname = 'branchandbound'; // required: replace example with your forum shortname
+    
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+
+
+
+        </div>
+        <div class="span3">
+         <div class="hero-unit sidebar">
+           <a href="http://feeds.feedburner.com/BranchAndBound"><img class="rss pull-right" title="Branch and Bound Blog RSS Feed" alt="RSS Feed" src="/assets/themes/sander/rss.png"></a>
+           <h4 class="sidebar"><strong>Branch and Bound Blog</strong></h4>
+           <em>... pruning the software universe</em> 
+           <hr>
+           <ul class="sidebar unstyled">
+             <li><a href="/about.html">About Sander</a></li>
+           </ul>
+           <span class="sidebar pull-right">
+             <a href="http://www.twitter.com/Sander_Mak" target="_blank"><img title="Twitter" alt="Twitter" class="small" src="/assets/themes/sander/twitter.png"></a>
+             <a href="http://nl.linkedin.com/in/SanderMak" target="_blank"><img title="Linkedin profile" alt="Linkedin profile" class="small" src="/assets/themes/sander/linkedin.png"><a>
+             <a href="http://www.github.com/SanderMak" target="_blank"><img  title="GitHub" alt="GitHub" class="small" src="/assets/themes/sander/github.png"></a>
+             <a href="http://www.slideshare.net/SanderMak/presentations" target="_blank"><img title="Slideshare presentations"  alt="Slideshare presentations" class="small" src="/assets/themes/sander/slideshare.png"></a>
+           </span>
+           <hr>
+           <h5 class="sidebar">&nbsp;View archive by:</h5>
+           <ul class="sidebar unstyled">
+             <li><a href="/archive.html">Date</a></li>
+             <li><a href="/categories.html">Category</a></li>
+             <li><a href="/tags.html">Tag</a></li>
+           </ul>
+          </div>
+          <div class="hero-unit twittersidebar">
+            <h5 class="sidebar">Featured articles:</h5>
+            <br>
+            <ul>
+              <li>&raquo; <a href="/blog/scala/2013/05/launching-scalabitz/?src=featured">Launching Scalabitz</a></li>
+              <li>&raquo; <a href="/blog/bookreview/2013/01/bookreview-infinity-and-the-mind/?src=featured">Infinity and the Mind</a></li>      
+  	          <li>&raquo; <a href="/blog/conferences/2012/06/preparing-a-technical-talk/?src=featured">Preparing a technical talk</a></li>
+            </ul>
+          </div>
+          <div class="hero-unit readingsidebar">
+            <h5 class="sidebar">Currently reading:</h5>
+            <br>
+            <ul>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/1933988916/ref=as_li_ss_tl?ie=UTF8&tag=branandboun-20&linkCode=as2&camp=1789&creative=390957&creativeASIN=1933988916" target="_blank">OSGi in action</a></li>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/1593273886/ref=as_li_ss_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=1593273886&linkCode=as2&tag=branandboun-20" target="_blank">The Tangled Web</a></li>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/0321125215/ref=as_li_ss_tl?ie=UTF8&tag=branandboun-20&linkCode=as2&camp=1789&creative=390957&creativeASIN=0321125215" target="_blank">Domain-driven design</a></li>
+            </ul>
+          </div>
+          <div class="hero-unit sidebar">
+           <a class="twitter-timeline" width="250" height="500" data-dnt=true href="https://twitter.com/Sander_Mak" data-widget-id="266609354059431938">Tweets by @Sander_Mak</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+
+                       
+          </div>
+        </div>
+       </div>
+      </div>
+     </div>
+
+
+      <footer>
+        <div class="container">
+         <div class="row">
+           <div class="span9 offset2">
+            <br>
+            <hr>
+           </div>
+         </div>
+         <div class="row">
+          <div class="span4 offset2">
+            <p>Branch and Bound - ... pruning the software universe</p>
+          </div>   
+          <div class="span5">  
+            <p class="pull-right">by Sander Mak</p>
+          </div>
+         </div>
+        </div>
+      </footer>
+
+    <!-- Scripts at the end for faster loading. -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
+    <script src="/assets/themes/sander/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="http://twitter.com/javascripts/blogger.js"></script>
+   
+
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-15335121-2']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+
+    </script>
+
+  </body>
+</html>
+
+
+

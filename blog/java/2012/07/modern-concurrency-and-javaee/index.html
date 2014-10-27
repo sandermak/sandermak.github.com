@@ -115,7 +115,7 @@ submitted the task. All tasks will then run on the selected process/server.</li>
 
 <p>You might be wondering why it is important to have these concurrency utilities, since Java EE 6 already provides the <a href="http://docs.oracle.com/javaee/6/tutorial/doc/gkkqg.html">@Asynchronous</a> annotation on EJB's and <a href="https://blogs.oracle.com/enterprisetechtips/entry/asynchronous_support_in_servlet_3">async Servlet</a> support is also available. However useful these are for application development, the constructs are not meant to bootstrap other concurrency libraries and frameworks. With the proposed utilities, however, you could construct your own java.util.concurrent.ThreadPoolExecutor backed with managed threads:</p>
 
-<div class="highlight"><pre><code class="java"> <span class="c1">// Can also use JNDI lookup in method instead of injection</span>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="c1">// Can also use JNDI lookup in method instead of injection</span>
  <span class="nd">@Resource</span>
  <span class="n">ManagedThreadFactory</span> <span class="n">mtf</span><span class="o">;</span>
 
@@ -123,8 +123,7 @@ submitted the task. All tasks will then run on the selected process/server.</li>
    <span class="c1">// All threads created will be managed</span>
    <span class="k">return</span> <span class="k">new</span> <span class="nf">ThreadPoolExecutor</span><span class="o">(</span><span class="mi">5</span><span class="o">,</span> <span class="mi">10</span><span class="o">,</span> <span class="mi">5</span><span class="o">,</span> <span class="n">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">,</span>
        <span class="k">new</span> <span class="n">ArrayBlockingQueue</span><span class="o">&lt;</span><span class="n">Runnable</span><span class="o">&gt;(</span><span class="mi">10</span><span class="o">),</span> <span class="n">tf</span><span class="o">);</span>
- <span class="o">}</span>
-</code></pre></div>
+ <span class="o">}</span></code></pre></div>
 
 
 <p>Similarly, ForkJoinPool can be parameterized with a custom ForkJoinPool.ForkJoinWorkerThreadFactory implementation that delegates thread creation to the ManagedThreadFactory. While trying to implement such an adapter I unfortunately ran into the issue that Fork/Join uses a custom Thread subclass (<a href="http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/ForkJoinWorkerThread.html">ForkJoinWorkerThread</a>). This makes the task a bit harder, it's constructor being package protected. And obviously I can't test the code, since I'm not aware of any (public) JSR-236 implementation. Furthermore, I believe such adapters for java.util.concurrent should be part of the spec. No need to force application developers to reinvent the wheel again and again!</p>
@@ -152,9 +151,9 @@ submitted the task. All tasks will then run on the selected process/server.</li>
     
       <li><span>18 Jul 2013</span> &raquo; <a href="/blog/java/2013/07/java-modularity-story">The Java Modularity Story</a></li>
     
-      <li><span>23 Mar 2012</span> &raquo; <a href="/blog/security/2012/03/crossbuild-injection-how-safe-is-your-build">Cross-build injection attacks: how safe is your build?</a></li>
-    
       <li><span>06 Mar 2014</span> &raquo; <a href="/blog/web/2014/03/generating-junit-testreports-jasmine-20">Generating JUnit test reports with Jasmine 2.0</a></li>
+    
+      <li><span>27 Oct 2014</span> &raquo; <a href="/blog/data/2014/10/road-to-data-science">The Road to Data Science</a></li>
     
   </ul>
 </div>

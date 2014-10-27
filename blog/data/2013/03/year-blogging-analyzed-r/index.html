@@ -99,7 +99,7 @@
 
 <p>How do you get the Google Analytics data into R? We could work with the Analytics REST API directly in R, but there is also a nice wrapper library call <a href="http://skardhamar.github.com/rga/">rga</a>. Did I mention there's a package for everything in R? Here's how you call the Google Analytics API:</p>
 
-<div class="highlight"><pre><code class="r">library<span class="p">(</span>rga<span class="p">)</span> 
+<div class="highlight"><pre><code class="language-r" data-lang="r"><span class="kn">library</span><span class="p">(</span>rga<span class="p">)</span> 
 rga.open<span class="p">(</span>instance <span class="o">=</span> <span class="s">&quot;ga&quot;</span><span class="p">,</span> where <span class="o">=</span> <span class="s">&quot;~/temp/ga-api&quot;</span><span class="p">)</span>
 <span class="c1"># the call above triggers the oAuth flow, and the resulting  </span>
 <span class="c1"># key is cached in the specified file.</span>
@@ -110,8 +110,7 @@ ga.df <span class="o">&lt;-</span> ga<span class="o">$</span>getData<span class=
                     metrics <span class="o">=</span> <span class="s">&quot;ga:visits&quot;</span><span class="p">,</span>
                     dimensions <span class="o">=</span> <span class="s">&quot;ga:date&quot;</span><span class="p">,</span>
                     max <span class="o">=</span> <span class="m">1500</span><span class="p">,</span>
-                    sort <span class="o">=</span> <span class="s">&quot;ga:date&quot;</span><span class="p">)</span>
-</code></pre></div>
+                    sort <span class="o">=</span> <span class="s">&quot;ga:date&quot;</span><span class="p">)</span></code></pre></div>
 
 
 <p>Yes, that <code>instance="ga"</code> on the second line specifies the name of a variable that will pop into existence, later to be used in <code>ga$getData()</code>. Life's full of dynamic surprises with R.</p>
@@ -120,8 +119,7 @@ ga.df <span class="o">&lt;-</span> ga<span class="o">$</span>getData<span class=
 
 <p>Actually, the hardest part was finding out the right profile id to use for calling the API. Just so you know, this id is not the same as the tracking id you use on your page. Anyway, a quick way to find all your profile id's is to head to Google's <a href="https://developers.google.com/oauthplayground/">OAuth2 playground</a>, authorize the Analytics API and call:</p>
 
-<div class="highlight"><pre><code class="html">https://www.googleapis.com/analytics/v3/management/accounts/~all/webproperties/~all/profiles
-</code></pre></div>
+<div class="highlight"><pre><code class="language-html" data-lang="html">https://www.googleapis.com/analytics/v3/management/accounts/~all/webproperties/~all/profiles</code></pre></div>
 
 
 <h3>Visitors</h3>
@@ -143,127 +141,24 @@ ga.df <span class="o">&lt;-</span> ga<span class="o">$</span>getData<span class=
 
 <p>Writing blog articles is a funny thing. You have complete freedom to write whatever is on your mind. Still you can't keep yourself from wondering 'who would read this?' The answer to this question is oftentimes surprising, at least to me. After a year of blogging I'm starting to find my tone of voice. I tend to write longer posts. Preferably ones that require some research and are not just short rants or opinion pieces. This approach seems to resonate with a lot of people. The following table shows exactly what was most popular on this blog last year:</p>
 
-<table>
-<thead>
-<tr>
-<th></th>
-<th align="left"> Post (pagetitle)  </th>
-<th align="right"> Pageviews   </th>
-<th align="right"> Visits       </th>
-<th align="right"> Visitors </th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td></td>
-<td align="left">                                            <a href="/blog/scala/2012/12/scala-is-like-git/">Scala is like Git</a>  </td>
-<td align="right">    9383  </td>
-<td align="right"> 8124   </td>
-<td align="right">  7936|</td>
-</tr>
-<tr>
-<td></td>
-<td align="left">                               <a href="/blog/java/2012/07/modern-concurrency-and-javaee/">Modern concurrency and Java EE</a>  </td>
-<td align="right">    4300  </td>
-<td align="right"> 3849   </td>
-<td align="right">  3695|</td>
-</tr>
-<tr>
-<td></td>
-<td align="left"><a href="/blog/web/2012/11/unify-server-side-client-side-rendering-embedding-json/">Unify client-side and server-side rendering by embedding JSON</a>  </td>
-<td align="right">    3141  </td>
-<td align="right"> 2807   </td>
-<td align="right">  2769|</td>
-</tr>
-<tr>
-<td></td>
-<td align="left">                              <a href="/blog/security/2012/10/cross-build-injection-in-action/">Cross-Build Injection in action</a>  </td>
-<td align="right">    2355  </td>
-<td align="right"> 2111   </td>
-<td align="right">  2148|</td>
-</tr>
-<tr>
-<td></td>
-<td align="left">                                   <a href="/blog/conferences/2012/06/preparing-a-technical-talk/">Preparing a technical talk</a>  </td>
-<td align="right">    2343  </td>
-<td align="right"> 2104   </td>
-<td align="right">  1995|</td>
-</tr>
-<tr>
-<td></td>
-<td align="left">                           <a href="/">Branch and Bound Blog - Sander Mak (homepage)</a>  </td>
-<td align="right">    1225  </td>
-<td align="right">  791   </td>
-<td align="right">   948|</td>
-</tr>
-<tr>
-<td></td>
-<td align="left">       <a href="/blog/security/2012/03/crossbuild-injection-how-safe-is-your-build/">Cross-build injection attacks: how safe is your build?</a>  </td>
-<td align="right">    1218  </td>
-<td align="right">  883   </td>
-<td align="right">  1051|</td>
-</tr>
-<tr>
-<td></td>
-<td align="left">                                <a href="/blog/security/2012/08/verify-dependencies-using-pgp/">Verify dependencies using PGP</a>  </td>
-<td align="right">     784  </td>
-<td align="right">  628   </td>
-<td align="right">   680|</td>
-</tr>
-<tr>
-<td></td>
-<td align="left">                           <a href="/blog/conferences/2012/11/jfall-2012-dutch-java-awesomeness/">JFall 2012: Dutch Java awesomeness</a>  </td>
-<td align="right">     729  </td>
-<td align="right">  620   </td>
-<td align="right">   648|</td>
-</tr>
-<tr>
-<td></td>
-<td align="left">                                  <a href="/blog/bookreview/2012/08/bookreview-dsls-in-action/">Book review: DSLs in Action</a>  </td>
-<td align="right">     633  </td>
-<td align="right">  575   </td>
-<td align="right">   598|</td>
-</tr>
-<tr>
-<td></td>
-<td align="left">                                     <a href="/blog/conferences/2012/05/jeeconf-tripreport/">JEEConf 2012 trip report</a>  </td>
-<td align="right">     505  </td>
-<td align="right">  442   </td>
-<td align="right">   446|</td>
-</tr>
-<tr>
-<td></td>
-<td align="left">                                             <a href="/about.html">About Sander Mak</a>  </td>
-<td align="right">     277  </td>
-<td align="right">   21   </td>
-<td align="right">   231|</td>
-</tr>
-<tr>
-<td></td>
-<td align="left">                                                      <a href="/archive.html">Archive</a>  </td>
-<td align="right">     188  </td>
-<td align="right">   10   </td>
-<td align="right">   162|</td>
-</tr>
-<tr>
-<td></td>
-<td align="left">                                          <a href="/talks.html">Talks by Sander Mak</a>  </td>
-<td align="right">      90  </td>
-<td align="right">    4   </td>
-<td align="right">    79|</td>
-</tr>
-<tr>
-<td></td>
-<td align="left">                           <a href="/blog/bookreview/2013/01/bookreview-infinity-and-the-mind/">Book review: Infinity and the Mind</a>  </td>
-<td align="right">      70  </td>
-<td align="right">   50   </td>
-<td align="right">    55|</td>
-</tr>
-</tbody>
-</table>
-
-
-<p>(in some rows the visitor count exceeds the number of visits. Not sure what is up with that...)</p>
+<p>| Post (pagetitle)  | Pageviews   | Visits       | Visitors |
+|:-----------|------------:|-------------:|---------:|
+|                                            <a href="/blog/scala/2012/12/scala-is-like-git/">Scala is like Git</a>  |    9383  | 8124   |  7936|
+|                               <a href="/blog/java/2012/07/modern-concurrency-and-javaee/">Modern concurrency and Java EE</a>  |    4300  | 3849   |  3695|
+|<a href="/blog/web/2012/11/unify-server-side-client-side-rendering-embedding-json/">Unify client-side and server-side rendering by embedding JSON</a>  |    3141  | 2807   |  2769|
+|                              <a href="/blog/security/2012/10/cross-build-injection-in-action/">Cross-Build Injection in action</a>  |    2355  | 2111   |  2148|
+|                                   <a href="/blog/conferences/2012/06/preparing-a-technical-talk/">Preparing a technical talk</a>  |    2343  | 2104   |  1995|
+|                           <a href="/">Branch and Bound Blog - Sander Mak (homepage)</a>  |    1225  |  791   |   948|
+|       <a href="/blog/security/2012/03/crossbuild-injection-how-safe-is-your-build/">Cross-build injection attacks: how safe is your build?</a>  |    1218  |  883   |  1051|
+|                                <a href="/blog/security/2012/08/verify-dependencies-using-pgp/">Verify dependencies using PGP</a>  |     784  |  628   |   680|
+|                           <a href="/blog/conferences/2012/11/jfall-2012-dutch-java-awesomeness/">JFall 2012: Dutch Java awesomeness</a>  |     729  |  620   |   648|
+|                                  <a href="/blog/bookreview/2012/08/bookreview-dsls-in-action/">Book review: DSLs in Action</a>  |     633  |  575   |   598|
+|                                     <a href="/blog/conferences/2012/05/jeeconf-tripreport/">JEEConf 2012 trip report</a>  |     505  |  442   |   446|
+|                                             <a href="/about.html">About Sander Mak</a>  |     277  |   21   |   231|
+|                                                      <a href="/archive.html">Archive</a>  |     188  |   10   |   162|
+|                                          <a href="/talks.html">Talks by Sander Mak</a>  |      90  |    4   |    79|
+|                           <a href="/blog/bookreview/2013/01/bookreview-infinity-and-the-mind/">Book review: Infinity and the Mind</a>  |      70  |   50   |    55|
+(in some rows the visitor count exceeds the number of visits. Not sure what is up with that...)</p>
 
 <p><a href="/blog/scala/2012/12/scala-is-like-git/">'Scala is like Git'</a> is the undeniable winner here, accounting for approximately a third of all pageviews in this year of blogging. I honestly did not expect this post to take off like that. On the other end of the spectrum we find <a href="/blog/bookreview/2013/01/bookreview-infinity-and-the-mind/">'Book review: Infinity and the Mind'</a>. While it is also the most recent post, I don't expect it go anywhere. I still think it's a great book though, and certainly don't regret the time it has taken me to write a thorough review.</p>
 
@@ -299,11 +194,11 @@ ga.df <span class="o">&lt;-</span> ga<span class="o">$</span>getData<span class=
   <h3>Related Posts</h3>
   <ul class="posts">
     
+      <li><span>27 Oct 2014</span> &raquo; <a href="/blog/data/2014/10/road-to-data-science">The Road to Data Science</a></li>
+    
       <li><span>12 May 2013</span> &raquo; <a href="/blog/scala/2013/05/launching-scalabitz">Launching Scalabitz</a></li>
     
       <li><span>06 Jun 2012</span> &raquo; <a href="/blog/conferences/2012/06/preparing-a-technical-talk">Preparing a technical talk</a></li>
-    
-      <li><span>18 Jul 2013</span> &raquo; <a href="/blog/java/2013/07/java-modularity-story">The Java Modularity Story</a></li>
     
   </ul>
 </div>

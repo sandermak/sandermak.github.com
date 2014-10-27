@@ -109,11 +109,10 @@
 
 <p>The main building block for this application is <code>scala.concurrent.Future</code>. Introduced in Scala 2.10, the <code>Future</code> API provides a very nice way to do async programming. It has been adopted by both Play and Akka, so all the pieces fit together perfectly. To give a taste of how easily you can do non-blocking and asynchronous programming with Scala and Play, consider the following snippet:</p>
 
-<div class="highlight"><pre><code class="scala"><span class="nc">ScalabitzService</span><span class="o">.</span><span class="n">getPublishedArticles</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span> <span class="nc">Some</span><span class="o">(</span><span class="mi">100</span><span class="o">)).</span><span class="n">flatMap</span> <span class="o">{</span> <span class="n">articles</span> <span class="k">=&gt;</span> 
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="nc">ScalabitzService</span><span class="o">.</span><span class="n">getPublishedArticles</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span> <span class="nc">Some</span><span class="o">(</span><span class="mi">100</span><span class="o">)).</span><span class="n">flatMap</span> <span class="o">{</span> <span class="n">articles</span> <span class="k">=&gt;</span> 
    <span class="k">val</span> <span class="n">clickFutures</span> <span class="k">=</span> <span class="k">for</span><span class="o">(</span><span class="n">article</span> <span class="k">&lt;-</span><span class="n">articles</span><span class="o">)</span> <span class="k">yield</span> <span class="n">clickWSCall</span><span class="o">(</span><span class="n">article</span><span class="o">)</span> 
    <span class="nc">Future</span><span class="o">.</span><span class="n">sequence</span><span class="o">(</span><span class="n">clickFutures</span><span class="o">)</span> 
-<span class="o">}</span>
-</code></pre></div>
+<span class="o">}</span></code></pre></div>
 
 
 <p><em>(see the code <a href="https://github.com/sandermak/scalabitz/blob/master/app/service/BitlyService.scala#L119">in context</a> on GitHub)</em></p>
@@ -151,9 +150,9 @@
     
       <li><span>18 Jul 2013</span> &raquo; <a href="/blog/java/2013/07/java-modularity-story">The Java Modularity Story</a></li>
     
-      <li><span>23 Mar 2013</span> &raquo; <a href="/blog/data/2013/03/year-blogging-analyzed-r">A year of blogging analyzed with R</a></li>
+      <li><span>27 Oct 2014</span> &raquo; <a href="/blog/data/2014/10/road-to-data-science">The Road to Data Science</a></li>
     
-      <li><span>20 Dec 2012</span> &raquo; <a href="/blog/scala/2012/12/scala-is-like-git">Scala is like Git</a></li>
+      <li><span>23 Mar 2013</span> &raquo; <a href="/blog/data/2013/03/year-blogging-analyzed-r">A year of blogging analyzed with R</a></li>
     
   </ul>
 </div>

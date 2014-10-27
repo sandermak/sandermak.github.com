@@ -99,11 +99,10 @@
 
 <p>Java 8, and specifically its Lambda's took the center stage. With the GA date set for March 2014, now is the right time to <a href="http://cr.openjdk.java.net/~briangoetz/lambda/lambda-state-final.html">familiarize yourself</a> with Lambda's. Especially nice is the fact that the collections library <a href="http://cr.openjdk.java.net/~briangoetz/lambda/lambda-libraries-final.html">has been revamped</a> to support a more functional style. Even cooler, Streams are added on top of the improved collections library, providing stream fusion:</p>
 
-<div class="highlight"><pre><code class="java"><span class="kt">int</span> <span class="n">sum</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="na">stream</span><span class="o">()</span>
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="kt">int</span> <span class="n">sum</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="na">stream</span><span class="o">()</span>
                       <span class="o">.</span><span class="na">filter</span><span class="o">(</span><span class="n">w</span> <span class="o">-&gt;</span> <span class="n">w</span><span class="o">.</span><span class="na">getColor</span><span class="o">()</span> <span class="o">==</span> <span class="n">RED</span><span class="o">)</span>
                       <span class="o">.</span><span class="na">mapToInt</span><span class="o">(</span><span class="n">w</span> <span class="o">-&gt;</span> <span class="n">w</span><span class="o">.</span><span class="na">getWeight</span><span class="o">())</span>
-                      <span class="o">.</span><span class="na">sum</span><span class="o">();</span> 
-</code></pre></div>
+                      <span class="o">.</span><span class="na">sum</span><span class="o">();</span></code></pre></div>
 
 
 <p>In this example, there is only one traversal of the <code>widgets</code> collection because the operations are performed on a <a href="http://download.java.net/jdk8/docs/api/java/util/stream/Stream.html">stream</a>. Stream fusion means that the implementation collects all the transformations up until a terminal operation (like <code>sum</code>). The terminal operation then forces the evaluation of the preceding chain of expressions with a single pass over the actual underlying collection.</p>
@@ -120,29 +119,22 @@
 
 <p>Last year I had the opportunity to speak at JavaOne for the first time. Since it was an enjoyable experience, fate decided that I should double the amount of talks this year (hopefully this trend will not continue for too many years.)</p>
 
-<p>My first talk was 'Data Science with R for Java developers' on Tuesday. It was fun to introduce a completely new language to a group of Java developers. Understanding the data that lives in your application deeply is increasingly important. The main takeaway of the talk is that learning R gives you a powerful tool for doing <a href="/blog/data/2013/03/year-blogging-analyzed-r/">exploratory data analysis</a>. Here are the slides:</p>
-
-<br>
-
+<p>My first talk was 'Data Science with R for Java developers' on Tuesday. It was fun to introduce a completely new language to a group of Java developers. Understanding the data that lives in your application deeply is increasingly important. The main takeaway of the talk is that learning R gives you a powerful tool for doing <a href="/blog/data/2013/03/year-blogging-analyzed-r/">exploratory data analysis</a>. Here are the slides:
+<br></p>
 
 <iframe src="http://www.slideshare.net/slideshow/embed_code/26510955" width="425" height="355" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" allowfullscreen>embed</iframe>
 
 
-<br><br>
+<p><br><br></p>
 
-
-<p>On Wednesday, I presented 'Modular JavaScript' with my co-worker <a href="https://twitter.com/pbakker/">Paul Bakker</a>. Modular development is something we value. For large Java codebases, we use modular designs <a href="/blog/java/2013/07/java-modularity-story/">on top of OSGi</a> to enforce runtime modularity as well. In JavaScript land, codebases are getting bigger and bigger too. Hence, you need a principled approach to modular development there as well. In this talk we introduce the primitives for modularity in JavaScript and compare several module systems for JavaScript.</p>
-
-<br>
-
+<p>On Wednesday, I presented 'Modular JavaScript' with my co-worker <a href="https://twitter.com/pbakker/">Paul Bakker</a>. Modular development is something we value. For large Java codebases, we use modular designs <a href="/blog/java/2013/07/java-modularity-story/">on top of OSGi</a> to enforce runtime modularity as well. In JavaScript land, codebases are getting bigger and bigger too. Hence, you need a principled approach to modular development there as well. In this talk we introduce the primitives for modularity in JavaScript and compare several module systems for JavaScript.
+<br></p>
 
 <iframe src="http://www.slideshare.net/slideshow/embed_code/26558391" width="425" height="355" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" allowfullscreen>embed</iframe>
 
 
-<br><br>
-
-
-<p>During both talks there was a lot of audience interaction, which is always an encouraging sign. All in all, JavaOne 2013 was a great experience. Hope to see you in 2014!</p>
+<p><br><br>
+During both talks there was a lot of audience interaction, which is always an encouraging sign. All in all, JavaOne 2013 was a great experience. Hope to see you in 2014!</p>
 
   </section>
 </article>
@@ -161,9 +153,9 @@
     
       <li><span>25 May 2013</span> &raquo; <a href="/blog/conferences/2013/05/jeeconf-2013-tripreport">JEEConf 2013 trip report</a></li>
     
-      <li><span>18 Jul 2013</span> &raquo; <a href="/blog/java/2013/07/java-modularity-story">The Java Modularity Story</a></li>
-    
       <li><span>01 Nov 2012</span> &raquo; <a href="/blog/conferences/2012/11/jfall-2012-dutch-java-awesomeness">JFall 2012: Dutch Java awesomeness</a></li>
+    
+      <li><span>18 Jul 2013</span> &raquo; <a href="/blog/java/2013/07/java-modularity-story">The Java Modularity Story</a></li>
     
   </ul>
 </div>
