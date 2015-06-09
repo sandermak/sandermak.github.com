@@ -8,6 +8,7 @@ http://branchandbound.net/sitemap.txt
 http://branchandbound.net/tags.html
 http://branchandbound.net/talks.html
 
+http://branchandbound.net/blog/architecture/2015/06/on-microservices-monoliths-and-critical-thinking
 http://branchandbound.net/blog/data/2014/10/road-to-data-science
 http://branchandbound.net/blog/conferences/2014/06/facebook-announces-appolo-qcon
 http://branchandbound.net/blog/web/2014/03/generating-junit-testreports-jasmine-20
