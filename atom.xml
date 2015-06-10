@@ -4,7 +4,7 @@
  <title>Branch and Bound</title>
  <link href="http://branchandbound.net/atom.xml" rel="self"/>
  <link href="http://branchandbound.net"/>
- <updated>2015-06-09T23:21:47+02:00</updated>
+ <updated>2015-06-10T16:14:21+02:00</updated>
  <id>http://branchandbound.net/</id>
  <author>
    <name>Sander Mak</name>
@@ -31,7 +31,7 @@
 
 &lt;p&gt;Then, pendulum swings back. Martin Fowler publishes his &lt;a href=&quot;http://martinfowler.com/bliki/MonolithFirst.html&quot;&gt;MonolithFirst&lt;/a&gt; post. And the people rejoice. It&#39;s ok to officially push back against the cool kids again. Now you&#39;re scolded for ever starting from scratch with a service oriented architecture. YAGNI, silly! And if you do need it, just chop up your monolith and season to taste. Easy, right?&lt;/p&gt;
 
-&lt;p&gt;As you might have guessed by now, this post is not about technical arguments either for or against monoliths and microservices. If you&#39;re looking for that, read Fowler&#39;s post. Then, read &lt;a href=&quot;http://martinfowler.com/articles/dont-start-monolith.html&quot;&gt;Stefan Tilkov&#39;s counterpoint&lt;/a&gt; (graciously hosted on Fowler&#39;s site as well). I&#39;m much more interested in what this all means for our profession. What does it mean if public software engineering opinion flips 360 degrees in a matter of weeks? It&#39;s too easy to chalk it all up to people needing authority figures. Yes, I know: not everybody was all over microservices. But you have to admit there&#39;s something fundamentally unsound going on here.&lt;/p&gt;
+&lt;p&gt;As you might have guessed by now, this post is not about technical arguments either for or against monoliths and microservices. If you&#39;re looking for that, read Fowler&#39;s post. Then, read &lt;a href=&quot;http://martinfowler.com/articles/dont-start-monolith.html&quot;&gt;Stefan Tilkov&#39;s counterpoint&lt;/a&gt; (graciously hosted on Fowler&#39;s site as well). I&#39;m much more interested in what this all means for our profession. What does it mean if public software engineering opinion flips 180 degrees in a matter of weeks? It&#39;s too easy to chalk it all up to people needing authority figures. Yes, I know: not everybody was all over microservices. But you have to admit there&#39;s something fundamentally unsound going on here.&lt;/p&gt;
 
 &lt;h3&gt;The art of problem solving&lt;/h3&gt;
 
