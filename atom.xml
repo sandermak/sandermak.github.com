@@ -4,13 +4,159 @@
  <title>Branch and Bound</title>
  <link href="http://branchandbound.net/atom.xml" rel="self"/>
  <link href="http://branchandbound.net"/>
- <updated>2015-06-10T16:14:21+02:00</updated>
+ <updated>2015-09-10T16:10:27+02:00</updated>
  <id>http://branchandbound.net/</id>
  <author>
    <name>Sander Mak</name>
    <email>sandermak@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <author><name>Sander Mak</name></author>
+   <title>The Java Module system: a first look</title>
+   <link href="http://branchandbound.net/blog/java/2015/09/java-module-system-first-look"/>
+   <updated>2015-09-10T00:00:00+02:00</updated>
+   <id>http://branchandbound.net/blog/java/2015/09/java-module-system-first-look</id>
+   <content type="html">
+       &lt;p&gt;A module system for Java has been a long time coming. Late 2014, a new JSR requirements document (JSR-376) was created to this end. The changes are slated for Java 9. However, no working prototype was available. Until yesterday, that is. There now is an OpenJDK early access build that includes Project JigSaw.&lt;/p&gt;
+
+       &lt;p&gt;Together with my co-worker Paul Bakker I gave a talk on the proposed Java Module system at JavaZone yesterday. We had to base this entirely on the &lt;a href=&quot;http://openjdk.java.net/projects/jigsaw/spec/reqs/2015-04-01&quot;&gt;JSR-376 requirements document&lt;/a&gt; and other tidbits of information floating around. While proposing this talk at the beginning of the year, we definitely thought a prototype would be available to showcase. However, that didn&#39;t quite pan out the way we thought. Instead, the prototype was released just hours after our talk ended (phew). If you&#39;re completely new to the Java Module system proposal, I recommend you watch &lt;a href=&quot;https://vimeo.com/138736736&quot;&gt;our talk&lt;/a&gt; before reading on. It explains the current proposal and puts it in a broader context by comparing it to OSGi.&lt;/p&gt;
+
+&lt;h3&gt;Why modules?&lt;/h3&gt;
+
+&lt;p&gt;So what are modules, and why do we want them? If you want an in-depth discussion, read the &lt;a href=&quot;http://openjdk.java.net/projects/jigsaw/spec/sotms/&quot;&gt;&#39;State of the module system&#39;&lt;/a&gt; or watch &lt;a href=&quot;https://vimeo.com/138736736&quot;&gt;our talk&lt;/a&gt;. For the uninitiated, here&#39;s the Cliff&#39;s notes version.&lt;/p&gt;
+
+&lt;p&gt;Java has jar files. But really, these are just glorified zipfiles containing classes which in turn are inside packages. When you assemble and run an application consisting of different jar files (read: every non-trivial application), you put them on the classpath. And then hope for the best. Because there&#39;s no way to tell if you put everything on the classpath that your application need. Or whether you inadvertently put the same classes (in different jars) on the classpath. Classpath-hell (analogous to DLL-hell) is a real thing. This leads to bad situations rearing their ugly head at runtime. Also, the knowledge that a class was ever in a jar file is lost at runtime. The JRE just sees one big collection of classes. But jars need other jars. It&#39;s just not encoded explicitly in any form of metadata at the moment. Ideally, you would also be able to hide implementation classes inside your jar and only expose your public API. The module system for Java aims to solve these issues:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;modules become first-class citizens that can encapsulate implementation details and expose only what is needed&lt;/li&gt;
+&lt;li&gt;modules explicitly describe what they offer, and what they need (dependencies), hence dependencies can be verified and resolved automatically during all phases of development&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;p&gt;Having such a module system greatly improves maintainability, reliability and security of large systems. Not in the least of the JDK itself! Given such a system, a module graph can be automatically constructed. This graph contains only the necessary modules to run your application.&lt;/p&gt;
+
+&lt;h3&gt;Installing JDK9 early access&lt;/h3&gt;
+
+&lt;p&gt;If you want to follow along with the example code yourself, you need to install the JDK9 early access build that includes the JigSaw prototype. On OSX, this means extracting the archive, and moving the extracted directory to &lt;code&gt;/Library/Java/JavaVirtualMachines/&lt;/code&gt;. Then, you need to adjust your path and &lt;code&gt;JAVA_HOME&lt;/code&gt; directory to point to the JDK9 directory. I&#39;m using the excellent &lt;a href=&quot;http://www.jayway.com/2014/01/15/how-to-switch-jdk-version-on-mac-os-x-maverick/&quot;&gt;setjdk&lt;/a&gt; bash script to switch between Java installations on the command line. You most certainly don&#39;t want to use this early access build as your daily Java installation. You can verify that the installation works by executing &lt;code&gt;java -version&lt;/code&gt;. The output should read something like:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;java version &quot;1.9.0-ea&quot;
+Java(TM) SE Runtime Environment (build 1.9.0-ea-jigsaw-nightly-h3337-20150908-b80)
+Java HotSpot(TM) 64-Bit Server VM (build 1.9.0-ea-jigsaw-nightly-h3337-20150908-b80, mixed mode)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;As long as it includes the phrase jigsaw, you&#39;re good to go. The resulting code for the example coming up can found at &lt;a href=&quot;https://github.com/sandermak/jigsaw-firstlook&quot;&gt;https://github.com/sandermak/jigsaw-firstlook&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3&gt;A small example&lt;/h3&gt;
+
+&lt;p&gt;You can still use JDK9 in &#39;legacy-mode&#39; with just classes, jars and the classpath. But obviously we want to work with modules. So we&#39;ll create a project that produces two modules, where module1 uses code from module2.&lt;/p&gt;
+
+&lt;p&gt;The first thing to do, is to structure your project so that modules are clearly separated. Then, metadata needs to be added to modules in the form of a &lt;code&gt;module-info.java&lt;/code&gt; file. Our example is structured as follows:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;src\
+  module1\
+     module-info.java
+     com\test\TestClassModule1.java
+  module2\
+     module-info.java
+     com\moretest\TestClassModule2.java
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Effectively, this introduces another layer (module1, module2) on top of the package layering that you already do in Java. In these &#39;module directories&#39;, we find the &lt;code&gt;module-info.java&lt;/code&gt; descriptor at the root. Furthermore, note that the two classes are in distinctly named packages.&lt;/p&gt;
+
+&lt;p&gt;Let&#39;s look at the code for &lt;code&gt;TestClassModule1&lt;/code&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;&lt;span class=&quot;kn&quot;&gt;package&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;com&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;test&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.moretest.TestClassModule2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;TestClassModule1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+   &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[]&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;args&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+     &lt;span class=&quot;n&quot;&gt;System&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;out&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;println&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;Hi from &amp;quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TestClassModule2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;msg&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;());&lt;/span&gt;
+   &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Looks pretty vanilla, right? Nothing related to modules going on here. There is an import for the &lt;code&gt;TestClassModule2&lt;/code&gt;, on which the main method later calls the &lt;code&gt;msg()&lt;/code&gt; method:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;&lt;span class=&quot;kn&quot;&gt;package&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;com&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;moretest&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;TestClassModule2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+   &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;msg&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+     &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;from module 2!&amp;quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+   &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;For now, we&#39;ll leave the &lt;code&gt;module-info.java&lt;/code&gt; files empty.&lt;/p&gt;
+
+&lt;h3&gt;Compiling Java modules&lt;/h3&gt;
+
+&lt;p&gt;Now for the next step: actually compiling our modules and associated classfiles. To make this work, a new javac compiler flag is introduced:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;javac -modulesourcepath src -d mods $(find src -name &#39;*.java&#39;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This asssumes you run the command from the parent directory of the &lt;code&gt;src&lt;/code&gt; dir. The -modulesourcepath flag switches javac into module-mode, rather than &#39;legacy&#39; mode. The -d flag indicates the output directory for the compiled modules. These are output by javac in an exploded directory format. If we later want to deliver modules as jars, that&#39;s a separate step.&lt;/p&gt;
+
+&lt;p&gt;So what happens if we execute the above javac invocation? We get errors!&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;src/module1/module-info.java:1: error: expected &#39;module&#39;
+src/module2/module-info.java:1: error: expected &#39;module&#39;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The empty &lt;code&gt;module-info.java&lt;/code&gt; files are wreaking havoc here. Some new keywords are introduced for these files, the most important being &lt;code&gt;module&lt;/code&gt;. We update the module descriptors to contain the minimal amount of information necessary:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;module module1 { }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;and for module2&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;module module2 { }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now the modules are explicitly named in the definitions, but do not contain any other metadata yet. Compiling again leads to new errors:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;src/module1/com/test/TestClassModule1.java:3: error: TestClassModule2 is not visible because package com.moretest is not visible
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Encapsulation in action! By default, all classes/types inside a module are hidden to the outside world. That&#39;s why javac disallows the usage of &lt;code&gt;TestClassModule2&lt;/code&gt;, even though it is a public class. If we were still in a flat classpath world, everything would be fine and dandy. Of course we can fix this, by explicitly exposing &lt;code&gt;TestClassModule2&lt;/code&gt; to the outside world. The following changes are necessary in module2&#39;s &lt;code&gt;module-info.java&lt;/code&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;module module2 {
+  exports com.moretest;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;That&#39;s not enough. If you compile with this change, you still get the same error. That&#39;s because module2 now exposes the right package (and thereby all it&#39;s containing public types), but module1 does not yet express its dependency on module2. We can do that by changing module1&#39;s &lt;code&gt;module-info.java&lt;/code&gt;, too:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;module module1 {
+   requires module2;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Requirements are expressed on other bundles by name, whereas exports are defined in terms of packages. Much can be said about this choice, but I won&#39;t go into this for a first look. After making this change, we have our first successful compilation of a multi-module build using the JigSaw prototype. If you look inside the &lt;code&gt;/mods&lt;/code&gt; directory, you see the compiled artifacts neatly separate into two directories.  Congratulations!&lt;/p&gt;
+
+&lt;h3&gt;Running modular code&lt;/h3&gt;
+
+&lt;p&gt;Compiling alone is not much fun of course. We also want to see the app running. Fortunately, the JRE and JDK have also been made module-aware in this prototype. The application can be started by defining a modulepath rather than classpath:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;java -mp mods -m module1/com.test.TestClassModule1
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We point the modulepath to the &lt;code&gt;mods&lt;/code&gt; dir that javac wrote to. Then, -m is used to indicate the initial module that kickstarts the resolving of the module graph. We also tack on the name of the main class that should be invoked, and there we have it:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Hi from from module 2!
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3&gt;Future&lt;/h3&gt;
+
+&lt;p&gt;This first look gives a taste of what you can do with modules in Java 9. There&#39;s lots more to explore here. Like packaging: besides jars, there is a new format coming called jmod. The module system also includes a services layer that can bind service providers and consumers through interfaces. Think of it as inversion of control where the module system fulfills the role of service registry. It&#39;s also very interesting to see how the module system was used to modularize the &lt;a href=&quot;http://openjdk.java.net/jeps/200&quot;&gt;JDK itself&lt;/a&gt;. This in turn enables nice things like creating a &lt;a href=&quot;http://openjdk.java.net/jeps/220&quot;&gt;run-time image&lt;/a&gt; that contains just the JDK and application modules that your app needs, nothing more. Lower footprint, more options for whole-program optimization, etc. It&#39;s all very promising.&lt;/p&gt;
+
+&lt;p&gt;The next step for me is to try and port a sample OSGi application that uses several modules and services to the Java 9 module system. Stay tuned!&lt;/p&gt;
+
+   </content>
+ </entry>
  
  <entry>
    <author><name>Sander Mak</name></author>

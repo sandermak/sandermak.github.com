@@ -1,0 +1,362 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>The Java Module system: a first look - Branch and Bound</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Sander Mak">
+
+    <link href="http://feeds.feedburner.com/BranchAndBound" rel="alternate" title="Branch and Bound Blog Feed" type="application/atom+xml" />
+    <!-- Le styles -->
+    <link href="/assets/themes/sander/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="/assets/themes/sander/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="/assets/themes/sander/syntax.css" rel="stylesheet">
+    <link href="/assets/themes/sander/style.css" rel="stylesheet">
+
+    <style type="text/css">
+      body {
+        padding-top: 10px;
+        padding-bottom: 40px;
+      }
+    </style>
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="assets/bootstrap/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="assets/bootstrap/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/bootstrap/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="assets/bootstrap/ico/apple-touch-icon-57-precomposed.png">
+
+  </head>
+
+  <body>
+
+
+    <div class="container">
+      <div class="row">
+        <div class="span11">
+    <div class="navbar">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="/">Branch and Bound</a>
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li><a href="/">Home</a></li>
+              <li><a href="/about.html">About</a></li>
+              <li><a href="/talks.html">Talks</a></li>
+              <li><a href="/archive.html">Archive</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+        </div>
+      </div>
+      <div class="row">
+        <div class="span6 offset2">
+          
+<article>
+  <header>
+    <h1>The Java Module system: a first look</h1>
+    <strong><time datetime="2015-09-10" pubdate>10 September 2015</time></strong>
+
+    <br>
+    <br>
+
+    <p><em><p>A module system for Java has been a long time coming. Late 2014, a new JSR requirements document (JSR-376) was created to this end. The changes are slated for Java 9. However, no working prototype was available. Until yesterday, that is. There now is an OpenJDK early access build that includes Project JigSaw.</p>
+</em></p>
+  </header>
+  
+
+  <section>
+   <p>Together with my co-worker Paul Bakker I gave a talk on the proposed Java Module system at JavaZone yesterday. We had to base this entirely on the <a href="http://openjdk.java.net/projects/jigsaw/spec/reqs/2015-04-01">JSR-376 requirements document</a> and other tidbits of information floating around. While proposing this talk at the beginning of the year, we definitely thought a prototype would be available to showcase. However, that didn't quite pan out the way we thought. Instead, the prototype was released just hours after our talk ended (phew). If you're completely new to the Java Module system proposal, I recommend you watch <a href="https://vimeo.com/138736736">our talk</a> before reading on. It explains the current proposal and puts it in a broader context by comparing it to OSGi.</p>
+
+<h3>Why modules?</h3>
+
+<p>So what are modules, and why do we want them? If you want an in-depth discussion, read the <a href="http://openjdk.java.net/projects/jigsaw/spec/sotms/">'State of the module system'</a> or watch <a href="https://vimeo.com/138736736">our talk</a>. For the uninitiated, here's the Cliff's notes version.</p>
+
+<p>Java has jar files. But really, these are just glorified zipfiles containing classes which in turn are inside packages. When you assemble and run an application consisting of different jar files (read: every non-trivial application), you put them on the classpath. And then hope for the best. Because there's no way to tell if you put everything on the classpath that your application need. Or whether you inadvertently put the same classes (in different jars) on the classpath. Classpath-hell (analogous to DLL-hell) is a real thing. This leads to bad situations rearing their ugly head at runtime. Also, the knowledge that a class was ever in a jar file is lost at runtime. The JRE just sees one big collection of classes. But jars need other jars. It's just not encoded explicitly in any form of metadata at the moment. Ideally, you would also be able to hide implementation classes inside your jar and only expose your public API. The module system for Java aims to solve these issues:</p>
+
+<ul>
+<li>modules become first-class citizens that can encapsulate implementation details and expose only what is needed</li>
+<li>modules explicitly describe what they offer, and what they need (dependencies), hence dependencies can be verified and resolved automatically during all phases of development</li>
+</ul>
+
+
+<p>Having such a module system greatly improves maintainability, reliability and security of large systems. Not in the least of the JDK itself! Given such a system, a module graph can be automatically constructed. This graph contains only the necessary modules to run your application.</p>
+
+<h3>Installing JDK9 early access</h3>
+
+<p>If you want to follow along with the example code yourself, you need to install the JDK9 early access build that includes the JigSaw prototype. On OSX, this means extracting the archive, and moving the extracted directory to <code>/Library/Java/JavaVirtualMachines/</code>. Then, you need to adjust your path and <code>JAVA_HOME</code> directory to point to the JDK9 directory. I'm using the excellent <a href="http://www.jayway.com/2014/01/15/how-to-switch-jdk-version-on-mac-os-x-maverick/">setjdk</a> bash script to switch between Java installations on the command line. You most certainly don't want to use this early access build as your daily Java installation. You can verify that the installation works by executing <code>java -version</code>. The output should read something like:</p>
+
+<pre><code>java version "1.9.0-ea"
+Java(TM) SE Runtime Environment (build 1.9.0-ea-jigsaw-nightly-h3337-20150908-b80)
+Java HotSpot(TM) 64-Bit Server VM (build 1.9.0-ea-jigsaw-nightly-h3337-20150908-b80, mixed mode)
+</code></pre>
+
+<p>As long as it includes the phrase jigsaw, you're good to go. The resulting code for the example coming up can found at <a href="https://github.com/sandermak/jigsaw-firstlook">https://github.com/sandermak/jigsaw-firstlook</a>.</p>
+
+<h3>A small example</h3>
+
+<p>You can still use JDK9 in 'legacy-mode' with just classes, jars and the classpath. But obviously we want to work with modules. So we'll create a project that produces two modules, where module1 uses code from module2.</p>
+
+<p>The first thing to do, is to structure your project so that modules are clearly separated. Then, metadata needs to be added to modules in the form of a <code>module-info.java</code> file. Our example is structured as follows:</p>
+
+<pre><code>src\
+  module1\
+     module-info.java
+     com\test\TestClassModule1.java
+  module2\
+     module-info.java
+     com\moretest\TestClassModule2.java
+</code></pre>
+
+<p>Effectively, this introduces another layer (module1, module2) on top of the package layering that you already do in Java. In these 'module directories', we find the <code>module-info.java</code> descriptor at the root. Furthermore, note that the two classes are in distinctly named packages.</p>
+
+<p>Let's look at the code for <code>TestClassModule1</code>:</p>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="kn">package</span> <span class="n">com</span><span class="o">.</span><span class="na">test</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">com.moretest.TestClassModule2</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">TestClassModule1</span> <span class="o">{</span>
+   <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+     <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Hi from &quot;</span> <span class="o">+</span> <span class="n">TestClassModule2</span><span class="o">.</span><span class="na">msg</span><span class="o">());</span>
+   <span class="o">}</span>
+<span class="o">}</span></code></pre></div>
+
+
+<p>Looks pretty vanilla, right? Nothing related to modules going on here. There is an import for the <code>TestClassModule2</code>, on which the main method later calls the <code>msg()</code> method:</p>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="kn">package</span> <span class="n">com</span><span class="o">.</span><span class="na">moretest</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">TestClassModule2</span> <span class="o">{</span>
+   <span class="kd">public</span> <span class="kd">static</span> <span class="n">String</span> <span class="nf">msg</span><span class="o">()</span> <span class="o">{</span>
+     <span class="k">return</span> <span class="s">&quot;from module 2!&quot;</span><span class="o">;</span>
+   <span class="o">}</span>
+<span class="o">}</span></code></pre></div>
+
+
+<p>For now, we'll leave the <code>module-info.java</code> files empty.</p>
+
+<h3>Compiling Java modules</h3>
+
+<p>Now for the next step: actually compiling our modules and associated classfiles. To make this work, a new javac compiler flag is introduced:</p>
+
+<pre><code>javac -modulesourcepath src -d mods $(find src -name '*.java')
+</code></pre>
+
+<p>This asssumes you run the command from the parent directory of the <code>src</code> dir. The -modulesourcepath flag switches javac into module-mode, rather than 'legacy' mode. The -d flag indicates the output directory for the compiled modules. These are output by javac in an exploded directory format. If we later want to deliver modules as jars, that's a separate step.</p>
+
+<p>So what happens if we execute the above javac invocation? We get errors!</p>
+
+<pre><code>src/module1/module-info.java:1: error: expected 'module'
+src/module2/module-info.java:1: error: expected 'module'
+</code></pre>
+
+<p>The empty <code>module-info.java</code> files are wreaking havoc here. Some new keywords are introduced for these files, the most important being <code>module</code>. We update the module descriptors to contain the minimal amount of information necessary:</p>
+
+<pre><code>module module1 { }
+</code></pre>
+
+<p>and for module2</p>
+
+<pre><code>module module2 { }
+</code></pre>
+
+<p>Now the modules are explicitly named in the definitions, but do not contain any other metadata yet. Compiling again leads to new errors:</p>
+
+<pre><code>src/module1/com/test/TestClassModule1.java:3: error: TestClassModule2 is not visible because package com.moretest is not visible
+</code></pre>
+
+<p>Encapsulation in action! By default, all classes/types inside a module are hidden to the outside world. That's why javac disallows the usage of <code>TestClassModule2</code>, even though it is a public class. If we were still in a flat classpath world, everything would be fine and dandy. Of course we can fix this, by explicitly exposing <code>TestClassModule2</code> to the outside world. The following changes are necessary in module2's <code>module-info.java</code>:</p>
+
+<pre><code>module module2 {
+  exports com.moretest;
+}
+</code></pre>
+
+<p>That's not enough. If you compile with this change, you still get the same error. That's because module2 now exposes the right package (and thereby all it's containing public types), but module1 does not yet express its dependency on module2. We can do that by changing module1's <code>module-info.java</code>, too:</p>
+
+<pre><code>module module1 {
+   requires module2;
+}
+</code></pre>
+
+<p>Requirements are expressed on other bundles by name, whereas exports are defined in terms of packages. Much can be said about this choice, but I won't go into this for a first look. After making this change, we have our first successful compilation of a multi-module build using the JigSaw prototype. If you look inside the <code>/mods</code> directory, you see the compiled artifacts neatly separate into two directories.  Congratulations!</p>
+
+<h3>Running modular code</h3>
+
+<p>Compiling alone is not much fun of course. We also want to see the app running. Fortunately, the JRE and JDK have also been made module-aware in this prototype. The application can be started by defining a modulepath rather than classpath:</p>
+
+<pre><code>java -mp mods -m module1/com.test.TestClassModule1
+</code></pre>
+
+<p>We point the modulepath to the <code>mods</code> dir that javac wrote to. Then, -m is used to indicate the initial module that kickstarts the resolving of the module graph. We also tack on the name of the main class that should be invoked, and there we have it:</p>
+
+<pre><code>Hi from from module 2!
+</code></pre>
+
+<h3>Future</h3>
+
+<p>This first look gives a taste of what you can do with modules in Java 9. There's lots more to explore here. Like packaging: besides jars, there is a new format coming called jmod. The module system also includes a services layer that can bind service providers and consumers through interfaces. Think of it as inversion of control where the module system fulfills the role of service registry. It's also very interesting to see how the module system was used to modularize the <a href="http://openjdk.java.net/jeps/200">JDK itself</a>. This in turn enables nice things like creating a <a href="http://openjdk.java.net/jeps/220">run-time image</a> that contains just the JDK and application modules that your app needs, nothing more. Lower footprint, more options for whole-program optimization, etc. It's all very promising.</p>
+
+<p>The next step for me is to try and port a sample OSGi application that uses several modules and services to the Java 9 module system. Stay tuned!</p>
+
+  </section>
+</article>
+<div>
+  <strong>If you liked this post, please share it!</strong>
+  <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://branchandbound.net/blog/java/2015/09/java-module-system-first-look" data-via="Sander_Mak" data-dnt="true">Tweet</a>
+  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</div>
+
+<br>
+<br>
+
+<div id="related">
+  <h3>Related Posts</h3>
+  <ul class="posts">
+    
+      <li><span>18 Jul 2013</span> &raquo; <a href="/blog/java/2013/07/java-modularity-story">The Java Modularity Story</a></li>
+    
+      <li><span>27 Oct 2014</span> &raquo; <a href="/blog/data/2014/10/road-to-data-science">The Road to Data Science</a></li>
+    
+      <li><span>22 Aug 2012</span> &raquo; <a href="/blog/security/2012/08/verify-dependencies-using-pgp">Verify dependencies using PGP</a></li>
+    
+  </ul>
+</div>
+
+
+
+
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_developer = 1;
+    var disqus_shortname = 'branchandbound'; // required: replace example with your forum shortname
+    
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+
+
+
+        </div>
+        <div class="span3">
+         <div class="hero-unit sidebar">
+           <a href="http://feeds.feedburner.com/BranchAndBound"><img class="rss pull-right" title="Branch and Bound Blog RSS Feed" alt="RSS Feed" src="/assets/themes/sander/rss.png"></a>
+           <h4 class="sidebar"><strong>Branch and Bound Blog</strong></h4>
+           <em>... pruning the software universe</em> 
+           <hr>
+           <ul class="sidebar unstyled">
+             <li><a href="/about.html">About Sander</a></li>
+           </ul>
+           <span class="sidebar pull-right">
+             <a href="http://www.twitter.com/Sander_Mak" target="_blank"><img title="Twitter" alt="Twitter" class="small" src="/assets/themes/sander/twitter.png"></a>
+             <a href="http://nl.linkedin.com/in/SanderMak" target="_blank"><img title="Linkedin profile" alt="Linkedin profile" class="small" src="/assets/themes/sander/linkedin.png"><a>
+             <a href="http://www.github.com/SanderMak" target="_blank"><img  title="GitHub" alt="GitHub" class="small" src="/assets/themes/sander/github.png"></a>
+             <a href="http://www.slideshare.net/SanderMak/presentations" target="_blank"><img title="Slideshare presentations"  alt="Slideshare presentations" class="small" src="/assets/themes/sander/slideshare.png"></a>
+           </span>
+           <hr>
+           <h5 class="sidebar">&nbsp;View archive by:</h5>
+           <ul class="sidebar unstyled">
+             <li><a href="/archive.html">Date</a></li>
+             <li><a href="/categories.html">Category</a></li>
+             <li><a href="/tags.html">Tag</a></li>
+           </ul>
+          </div>
+          <div class="hero-unit twittersidebar">
+            <h5 class="sidebar">Featured articles:</h5>
+            <br>
+            <ul>
+              <li>&raquo; <a href="/blog/scala/2013/05/launching-scalabitz/?src=featured">Launching Scalabitz</a></li>
+              <li>&raquo; <a href="/blog/bookreview/2013/01/bookreview-infinity-and-the-mind/?src=featured">Infinity and the Mind</a></li>      
+  	          <li>&raquo; <a href="/blog/conferences/2012/06/preparing-a-technical-talk/?src=featured">Preparing a technical talk</a></li>
+            </ul>
+          </div>
+          <div class="hero-unit readingsidebar">
+            <h5 class="sidebar">Currently reading:</h5>
+            <br>
+            <ul>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/1933988916/ref=as_li_ss_tl?ie=UTF8&tag=branandboun-20&linkCode=as2&camp=1789&creative=390957&creativeASIN=1933988916" target="_blank">OSGi in action</a></li>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/1593273886/ref=as_li_ss_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=1593273886&linkCode=as2&tag=branandboun-20" target="_blank">The Tangled Web</a></li>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/0321125215/ref=as_li_ss_tl?ie=UTF8&tag=branandboun-20&linkCode=as2&camp=1789&creative=390957&creativeASIN=0321125215" target="_blank">Domain-driven design</a></li>
+            </ul>
+          </div>
+          <div class="hero-unit sidebar">
+           <a class="twitter-timeline" width="250" height="500" data-dnt=true href="https://twitter.com/Sander_Mak" data-widget-id="266609354059431938">Tweets by @Sander_Mak</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+
+                       
+          </div>
+        </div>
+       </div>
+      </div>
+     </div>
+
+
+      <footer>
+        <div class="container">
+         <div class="row">
+           <div class="span9 offset2">
+            <br>
+            <hr>
+           </div>
+         </div>
+         <div class="row">
+          <div class="span4 offset2">
+            <p>Branch and Bound - ... pruning the software universe</p>
+          </div>   
+          <div class="span5">  
+            <p class="pull-right">by Sander Mak</p>
+          </div>
+         </div>
+        </div>
+      </footer>
+
+    <!-- Scripts at the end for faster loading. -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
+    <script src="/assets/themes/sander/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+   
+
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-15335121-2']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+
+    </script>
+
+  </body>
+</html>
+
+
+
