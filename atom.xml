@@ -4,7 +4,7 @@
  <title>Branch and Bound</title>
  <link href="http://branchandbound.net/atom.xml" rel="self"/>
  <link href="http://branchandbound.net"/>
- <updated>2015-09-10T18:44:14+02:00</updated>
+ <updated>2015-09-17T16:52:20+02:00</updated>
  <id>http://branchandbound.net/</id>
  <author>
    <name>Sander Mak</name>
@@ -21,11 +21,11 @@
    <content type="html">
        &lt;p&gt;A module system for Java has been a long time coming. Late 2014, a new JSR requirements document (JSR-376) was created to this end. The changes are slated for Java 9. However, no working prototype was available. Until yesterday, that is. There now is an OpenJDK early access build that includes Project Jigsaw.&lt;/p&gt;
 
-       &lt;p&gt;Together with my co-worker Paul Bakker I gave a talk on the proposed Java Module system at JavaZone yesterday. We had to base this entirely on the &lt;a href=&quot;http://openjdk.java.net/projects/Jigsaw/spec/reqs/2015-04-01&quot;&gt;JSR-376 requirements document&lt;/a&gt; and other tidbits of information floating around. While proposing this talk at the beginning of the year, we definitely thought a prototype would be available to showcase. However, that didn&#39;t quite pan out the way we thought. Instead, the prototype was released just hours after our talk ended (phew). Which means some things we say in the talk are already outdated, but the main ideas still stand. If you&#39;re completely new to the Java Module system proposal, I recommend you watch &lt;a href=&quot;https://vimeo.com/138736736&quot;&gt;our talk&lt;/a&gt; before reading on. It explains the current proposal and puts it in a broader context by comparing it to OSGi.&lt;/p&gt;
+       &lt;p&gt;Together with my co-worker Paul Bakker I gave a talk on the proposed Java Module system at JavaZone yesterday. We had to base this entirely on the &lt;a href=&quot;http://openjdk.java.net/projects/jigsaw/spec/reqs/2015-04-01&quot;&gt;JSR-376 requirements document&lt;/a&gt; and other tidbits of information floating around. While proposing this talk at the beginning of the year, we definitely thought a prototype would be available to showcase. However, that didn&#39;t quite pan out the way we thought. Instead, the prototype was released just hours after our talk ended (phew). Which means some things we say in the talk are already outdated, but the main ideas still stand. If you&#39;re completely new to the Java Module system proposal, I recommend you watch &lt;a href=&quot;https://vimeo.com/138736736&quot;&gt;our talk&lt;/a&gt; before reading on. It explains the current proposal and puts it in a broader context by comparing it to OSGi.&lt;/p&gt;
 
 &lt;h3&gt;Why modules?&lt;/h3&gt;
 
-&lt;p&gt;So what are modules, and why do we want them? If you want an in-depth discussion, read the &lt;a href=&quot;http://openjdk.java.net/projects/Jigsaw/spec/sotms/&quot;&gt;&#39;State of the module system&#39;&lt;/a&gt; or watch &lt;a href=&quot;https://vimeo.com/138736736&quot;&gt;our talk&lt;/a&gt;. For the uninitiated, here&#39;s the Cliff&#39;s notes version.&lt;/p&gt;
+&lt;p&gt;So what are modules, and why do we want them? If you want an in-depth discussion, read the &lt;a href=&quot;http://openjdk.java.net/projects/jigsaw/spec/sotms/&quot;&gt;&#39;State of the module system&#39;&lt;/a&gt; or watch &lt;a href=&quot;https://vimeo.com/138736736&quot;&gt;our talk&lt;/a&gt;. For the uninitiated, here&#39;s the Cliff&#39;s notes version.&lt;/p&gt;
 
 &lt;p&gt;Java has jar files. But really, these are just glorified zip-files containing classes which in turn are inside packages. When you assemble and run an application consisting of different jar files (read: every non-trivial application), you put them on the classpath. And then hope for the best. Because there&#39;s no way to tell if you put everything on the classpath that your application needs. Or whether you inadvertently put the same classes (in different jars) on the classpath. Classpath-hell (analogous to DLL-hell) is a real thing. This leads to bad situations rearing their ugly head at runtime. Also, the knowledge that a class was ever in a jar file is lost at runtime. The JRE just sees one big collection of classes. But jars need other jars. It&#39;s just not encoded explicitly in any form of meta-data at the moment. Ideally, you would also be able to hide implementation classes inside your jar and only expose your public API. The proposed module system for Java aims to solve these issues:&lt;/p&gt;
 
@@ -137,7 +137,7 @@ src/module2/module-info.java:1: error: expected &#39;module&#39;
 }
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Requirements are expressed on other bundles by name, whereas exports are defined in terms of packages. Much can be said about this choice, but I won&#39;t go into this for a first look. After making this change, we have our first successful compilation of a multi-module build using the Jigsaw prototype. If you look inside the &lt;code&gt;/mods&lt;/code&gt; directory, you see the compiled artifacts neatly separated into two directories.  Congratulations!&lt;/p&gt;
+&lt;p&gt;Requirements are expressed on other modules by name, whereas exports are defined in terms of packages. Much can be said about this choice, but I won&#39;t go into this for a first look. After making this change, we have our first successful compilation of a multi-module build using the Jigsaw prototype. If you look inside the &lt;code&gt;/mods&lt;/code&gt; directory, you see the compiled artifacts neatly separated into two directories.  Congratulations!&lt;/p&gt;
 
 &lt;h3&gt;Running modular code&lt;/h3&gt;
 
