@@ -221,7 +221,7 @@ Loose coupling, remember?</p>
 <span class="o">}</span></code></pre></div>
 
 
-<p>The interesting part is the penultimate line of the module descriptor: <code>uses carprov.dashboard.api.App;</code>.
+<p>The interesting part is the last line of the module descriptor: <code>uses carprov.dashboard.api.App;</code>.
 With this uses-clause, we tell the JPMS that we are interested in instances of App interface.
 Subsequently, the dashboard can use the <a href="http://cr.openjdk.java.net/~mr/jigsaw/spec/api/java/util/ServiceLoader.html">ServiceLoader API</a> to retrieve these instances:</p>
 
