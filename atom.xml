@@ -4,7 +4,7 @@
  <title>Branch and Bound</title>
  <link href="http://branchandbound.net/atom.xml" rel="self"/>
  <link href="http://branchandbound.net"/>
- <updated>2015-09-17T16:52:20+02:00</updated>
+ <updated>2015-10-27T11:46:11-07:00</updated>
  <id>http://branchandbound.net/</id>
  <author>
    <name>Sander Mak</name>
@@ -14,9 +14,299 @@
  
  <entry>
    <author><name>Sander Mak</name></author>
+   <title>From OSGi to Jigsaw</title>
+   <link href="http://branchandbound.net/blog/java/2015/10/osgi-to-jigsaw"/>
+   <updated>2015-10-27T00:00:00-07:00</updated>
+   <id>http://branchandbound.net/blog/java/2015/10/osgi-to-jigsaw</id>
+   <content type="html">
+       &lt;p&gt;In my &lt;a href=&quot;/blog/java/2015/09/java-module-system-first-look&quot;&gt;last post&lt;/a&gt; I introduced the new Java Platform Module system with a small example. As of September, there is an implementation to play with, codename Jigsaw. After some introductory toy examples, I did what any curious coder does: port a familiar (and not entirely trivial) codebase to the new shiny technology. In this case, I took a small dynamic dashboard based on OSGi and implemented it using the proposed Java Platform Module System.&lt;/p&gt;
+
+       &lt;p&gt;If you want an introduction on what the new Java Platform Module System (referred to as JPMS hereafter) entails and how to get started, read &lt;a href=&quot;/blog/java/2015/09/java-module-system-first-look&quot;&gt;&#39;The Java Module system: a first look&#39;&lt;/a&gt;.
+This post assumes you&#39;re familiar with the basics of the proposed module system. And if you&#39;re the kind of person who just wants to see the code: &lt;a href=&quot;https://github.com/sandermak/carprov-jigsaw&quot;&gt;here you go&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3&gt;The original OSGi application&lt;/h3&gt;
+
+&lt;p&gt;Before diving into the Jigsaw port, let&#39;s have a look what the original application is all about:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/pics/carprov.png&quot; alt=&quot;Carprov application&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;As you can see, it mimics a car entertainment system dashboard.
+However, the requirement is that this car entertainment system can be dynamically extended and updated.
+Each of the &#39;apps&#39; come from a separate OSGi bundle.
+The dashboard only collects applications that are currently provisioned to the OSGi runtime and shows them.
+You can click on the icons to access the underlying &#39;app&#39; (music player, navigaton, phone), which come from the same bundle that contributes the dashboard icon.
+This example has served as demo for a conference talk by myself and my colleague &lt;a href=&quot;https://twitter.com/pbakker&quot;&gt;Paul Bakker&lt;/a&gt; called &#39;Provisioning the IoT&#39;.
+In this talk, we use &lt;a href=&quot;https://ace.apache.org&quot;&gt;Apache ACE&lt;/a&gt; to dynamically update and provision OSGi bundles to running instances of the car entertainment system on multiple devices.
+It&#39;s actually really cool to see your system update in real-time without restarting.
+If you want to see it in action I recommend &lt;a href=&quot;https://vimeo.com/126446916&quot;&gt;watching the talk&lt;/a&gt;.
+The demo starts around the 11 minute mark.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/pics/carprov-arch.png&quot; alt=&quot;Carprov architecture&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Technically, the dynamic dashboard looks up all instances of the &lt;code&gt;App&lt;/code&gt; interface in the OSGi service registry.
+This interface is almost the only piece of code that is publicly shared between bundles.
+In turn, bundles containing an &lt;code&gt;App&lt;/code&gt; implementation register themselves upon bundle start, and unregister when the bundle is stopped.
+This makes full use of the dynamic life-cycle afforded by OSGi.
+The dashboard gets &lt;code&gt;App&lt;/code&gt; instances from the service registry without having to know about the implementation classes.
+Inversion of control in action!
+Each app implementation bundle also provides its own resources such as images.
+You can check out the original application &lt;a href=&quot;https://github.com/sandermak/carprov&quot;&gt;on GitHub&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3&gt;Finding the right modules&lt;/h3&gt;
+
+&lt;p&gt;The question is, how hard is it to port this modularized OSGi application to the JPMS using the Jigsaw prototype?
+Being as dynamic as OSGi isn&#39;t a goal of the JPMS.
+So to keep expectations in check, I&#39;m already happy if we can port the module and service structure at startup.
+Adding and removing new modules dynamically will have to wait for now.&lt;/p&gt;
+
+&lt;p&gt;The first step for re-creating this example in the JPMS was to find out what should go into the &lt;code&gt;module-info.java&lt;/code&gt; descriptors.
+These module descriptors contain the dependency information for Java modules.
+It is similar to the OSGi meta-data in the manifest file of OSGi jars.&lt;/p&gt;
+
+&lt;p&gt;The most straightforward module definition is the one for the API bundle:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;&lt;span class=&quot;n&quot;&gt;module&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;carprov&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;dashboard&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;api&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+   &lt;span class=&quot;n&quot;&gt;exports&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;carprov&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;dashboard&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;api&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+   &lt;span class=&quot;n&quot;&gt;requires&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;javafx&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;graphics&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;You can find the full code for the Jigsaw version of the dashboard &lt;a href=&quot;https://github.com/sandermak/carprov-jigsaw&quot;&gt;on GitHub&lt;/a&gt; if you want to follow along. It compiles and runs on &lt;a href=&quot;http://openjdk.java.net/projects/jigsaw/ea&quot;&gt;build b86&lt;/a&gt; of the Jigsaw-enabled JDK.&lt;/p&gt;
+
+&lt;p&gt;We declare a module with the name &lt;code&gt;carprov.dashboard.api&lt;/code&gt;, exporting a package of the same name.
+Meaning the interface and helper class inside this package are visible to all modules that import this module.
+Next, we need to declare what this module needs in terms of dependencies.
+Since the &lt;code&gt;App&lt;/code&gt; interface uses JavaFX types, these need to be required somehow.
+An important goal of the JPMS is to modularize the itself JDK as well.
+Therefore we cannot just import types from the JDK without specifying which module they come from.
+Note that unlike the exports-clause, the requires-clause takes a module name rather than a package name.&lt;/p&gt;
+
+&lt;p&gt;So how do you find the right module to require amongst the ~80 modules that currently comprise the JDK in the Jigsaw prototype?
+Fortunately, we can do better than trial and error.
+The JDK provides a tool called jdeps, which analyzes the dependencies of an existing Java class.
+You provide the class name and an appropriate classpath that contains the class:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ jdeps -module -cp carprov.dashboard.api.jar carprov.dashboard.api.App
+carprov.dashboard.api -&amp;gt; java.base
+carprov.dashboard.api -&amp;gt; javafx.graphics
+   carprov.dashboard.api (carprov.dashboard.api)
+      -&amp;gt; java.lang                                          java.base
+      -&amp;gt; javafx.scene                                       javafx.graphics
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The last two lines indicate that the App interface imports from the java.lang and javafx.scene packages.
+By providing the &lt;code&gt;-module&lt;/code&gt; option, jdeps also outputs the source modules (on the far right).
+This way, you can identify the modules providing the packages that the analyzed class depends on.
+In this case, the dashboard module should require the java.base module and the javafx.graphics module from the JDK.
+That&#39;s exactly what we did in the module-info.java descriptor earlier.
+Except, the java.base module is always implicitly required for all modules.
+You can&#39;t live without it.&lt;/p&gt;
+
+&lt;p&gt;Another option for finding the right modules is to peruse the &lt;a href=&quot;http://cr.openjdk.java.net/~mr/jigsaw/ea/module-summary.html&quot;&gt;module overview&lt;/a&gt; page of the early access Jigsaw build.
+It gives a comprehensive overview of all JDK modules and their dependencies.
+To get a feeling for the new modularized Java platform, it&#39;s indispensable.&lt;/p&gt;
+
+&lt;p&gt;There&#39;s on last twist: what does the &lt;code&gt;public&lt;/code&gt; in &lt;code&gt;requires public&lt;/code&gt; mean in the module descriptor?
+Let&#39;s have a look at the App interface:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;javafx.scene.Node&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;interface&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;App&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+   &lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;getAppName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+   &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;getPreferredPosition&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;   
+   &lt;span class=&quot;n&quot;&gt;Node&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;getDashboardIcon&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+   &lt;span class=&quot;n&quot;&gt;Node&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;getMainApp&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;If only the carprov.dashboard.api package would be exported by the Dashboard API module, what happens if another module imports it and tries to use it?
+That consuming module is then forced to also require the module containing javafx.scene.Node (in this case javafx.graphics).
+Since Node is used as return type in App, the interface cannot be used without access to this class as well.
+You could document this as part of the Dashboard API module, but that&#39;s error-prone and generally unsatisfactory.
+The &lt;code&gt;public&lt;/code&gt; keyword in the requires-clauses solves this.
+Effectively, it re-exports the public packages from the required module as part of the Dashboard API module.
+Now, the app implementation modules can require the Dashboard API module without having to worry about requiring javafx.graphics.
+This solution is similar to what OSGi calls &#39;uses-constraints&#39;.
+It goes a bit further though.
+With the re-exporting facility in the JPMS, you can create an &#39;empty&#39; module that acts as a façade.
+The public exports in the module descriptor of this empty module can aggregate several other modules.
+As an example, you can use this mechanism to split a module into multiple modules without breaking consumers.
+They still require the same module, only now it &#39;delegates&#39; to other modules.&lt;/p&gt;
+
+&lt;p&gt;However, we&#39;re getting off track.
+Back to porting the dashboard example.
+How do the apps actually end up on the dashboard using the JPMS?&lt;/p&gt;
+
+&lt;h3&gt;Services with ServiceLoader&lt;/h3&gt;
+
+&lt;p&gt;So far, we&#39;ve talked about a single module and its dependencies: the dashboard API.
+However, the diagram above shows 5 modules in the sample application.
+What about the dashboard implementation module, and the App implementation modules?
+We explicitly do not want the dashboard to know about the concrete App implementation classes.
+It just needs to gather instances of those implementation classes, without doing the instantiation itself.
+Loose coupling, remember?&lt;/p&gt;
+
+&lt;p&gt;This means we don&#39;t require any App implementation modules in the dashboard&#39;s module-info:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;&lt;span class=&quot;n&quot;&gt;module&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;carprov&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;dashboard&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;jfx&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+   &lt;span class=&quot;n&quot;&gt;requires&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;carprov&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;dashboard&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;api&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+   &lt;span class=&quot;n&quot;&gt;requires&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;javafx&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;base&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+   &lt;span class=&quot;n&quot;&gt;requires&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;javafx&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;controls&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+   &lt;span class=&quot;n&quot;&gt;requires&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;javafx&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;swing&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+
+   &lt;span class=&quot;n&quot;&gt;uses&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;carprov&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;dashboard&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;api&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;App&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+   &lt;span class=&quot;n&quot;&gt;provides&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;carprov&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;dashboard&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;api&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;App&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;carprov&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;dashboard&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;jfx&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;ConfigurationApp&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The interesting part is the penultimate line of the module descriptor: &lt;code&gt;uses carprov.dashboard.api.App;&lt;/code&gt;.
+With this uses-clause, we tell the JPMS that we are interested in instances of App interface.
+Subsequently, the dashboard can use the &lt;a href=&quot;http://cr.openjdk.java.net/~mr/jigsaw/spec/api/java/util/ServiceLoader.html&quot;&gt;ServiceLoader API&lt;/a&gt; to retrieve these instances:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;&lt;span class=&quot;n&quot;&gt;Iterable&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;App&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;apps&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ServiceLoader&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;load&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;App&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;class&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;App&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;app:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;apps&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;renderDashboardIcon&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;app&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Instances are created by the module system.
+Of course, the big question is: how does the module system locate service providers?&lt;/p&gt;
+
+&lt;p&gt;Let&#39;s look at an example of a module providing an App service.
+The Phone module exposes its App implementation as follows:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;&lt;span class=&quot;n&quot;&gt;module&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;carprov&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;phone&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+   &lt;span class=&quot;n&quot;&gt;requires&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;carprov&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;dashboard&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;api&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+   &lt;span class=&quot;n&quot;&gt;requires&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;javafx&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;controls&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+
+   &lt;span class=&quot;n&quot;&gt;provides&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;carprov&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;dashboard&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;api&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;App&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;carprov&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;phone&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;PhoneApp&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The magic happens in the last line.
+It indicates that we want to expose an App instance, using the concrete PhoneApp implementation class.
+Note that PhoneApp&#39;s package is not exported.
+Nobody can instantiate it but the JPMS, or another class inside the same module.
+There is one requirement for a service class: it must have a default no-arg constructor.
+You can even provide services and consume them in the same module, as witnessed by the provides-clause following the uses-clause in the module descriptor of the dashboard implementation module earlier.&lt;/p&gt;
+
+&lt;p&gt;Now the JPMS knows that the dashboard implementation module wants to see App instances, and the Phone module (and others) provide these instances.
+If at any time an additional service implementing the App interface is put on the modulepath, the dashboard will pick it up without modifications to the module descriptor.
+It&#39;s not as dynamic as the original OSGi application, though.
+Only after a restart of the whole application (JVM) are these new modules loaded.&lt;/p&gt;
+
+&lt;p&gt;For those who know the OSGi service model, statically describing service dependencies is quite a difference.
+OSGi services come and go at run-time.
+On the one hand, this is more powerful and dynamic.
+On the other hand, the JPMS approach could provide errors in case wiring is not possible at startup time.
+By the way, the current prototype does not appear to do so.
+Declaring a uses-clause on an interface without any implementations on the modulepath at runtime does not trigger any warnings or errors.
+It&#39;s still on my list to experiment with the &lt;a href=&quot;http://cr.openjdk.java.net/~mr/jigsaw/spec/api/java/lang/reflect/Layer.html&quot;&gt;Layer&lt;/a&gt; construct of the JPMS.
+Let&#39;s see how close it can bring us to loading additional modules on-the-fly.&lt;/p&gt;
+
+&lt;p&gt;In short, the ServiceLoader mechanism allows us to hide implementations in a modular world.
+It&#39;s not quite dependency &lt;em&gt;injection&lt;/em&gt; but it is a form of inversion of control.
+I&#39;m sure dependency injection models will be built upon this foundation.&lt;/p&gt;
+
+&lt;h3&gt;Resources&lt;/h3&gt;
+
+&lt;p&gt;Modules can encapsulate more than just code.
+In this application, we need images as well.
+Loading resources using &lt;a href=&quot;http://cr.openjdk.java.net/~mr/jigsaw/spec/api/java/lang/Class.html#getResourceAsStream-java.lang.String-&quot;&gt;Class.getResourceAsStream&lt;/a&gt; still works, with some caveats.
+The class calling this method must be in the same module that contains the resource.
+Otherwise, null is returned.&lt;/p&gt;
+
+&lt;p&gt;The original OSGi implementation delegated loading resources to a helper class in the Dashboard API bundle.
+It did this by passing the &lt;a href=&quot;https://osgi.org/javadoc/r4v43/core/org/osgi/framework/BundleContext.html&quot;&gt;BundleContext&lt;/a&gt;  of the requesting bundle to this helper class:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ImageView&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;getImageByFullname&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;BundleContext&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bundleContext&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;URL&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;entry&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bundleContext&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getBundle&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getEntry&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;try&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Image&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;image&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;Image&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;entry&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;openStream&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;());&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ImageView&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;view&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;ImageView&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;image&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;view&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setPreserveRatio&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;view&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;catch&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;IOException&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;throw&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;RuntimeException&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;I tried to emulate this by passing a Class object from the requesting module to a similar helper class in the JPMS version:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ImageView&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;getImageT&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Class&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;?&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;loadingContext&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;Image&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;image&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;Image&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;loadingContext&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getResourceAsStream&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;));&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;ImageView&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;view&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;ImageView&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;image&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;view&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setPreserveRatio&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;view&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;However, the access checks do not seem to care about the Class object which &lt;code&gt;getResourceAsStream&lt;/code&gt; is invoked on, but rather on which class is on top of the call-stack.
+That&#39;s of course the module that contains the helper class, which cannot read resources from the module that called the helper method.
+In that case, getResourceAsStream just returns null.
+That lead to some interesting NullPointerExceptions and confused looks on my face.
+In the end, I just had my requesting modules call &lt;code&gt;getResourceAsStream&lt;/code&gt; and pass the resulting InputStream to the helper instead:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ImageView&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;getImage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;InputStream&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;stream&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+     &lt;span class=&quot;n&quot;&gt;Image&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;image&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;Image&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;stream&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+     &lt;span class=&quot;n&quot;&gt;ImageView&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;view&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;ImageView&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;image&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+     &lt;span class=&quot;n&quot;&gt;view&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setPreserveRatio&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+     &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;view&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;After talking to Mark Reinhold at JavaOne, I learned this behavior is by design.
+There is an alternative that looks more like the BundleContext solution: you can also pass a &lt;code&gt;java.lang.reflect.Module&lt;/code&gt; to a helper method like the one above.
+This reified module instance effectively allows the recipient to do anything they would like with the calling module.
+Including getResourceAsStream on that module.&lt;/p&gt;
+
+&lt;h3&gt;List loaded modules&lt;/h3&gt;
+
+&lt;p&gt;&lt;img src=&quot;/pics/carprov-list.png&quot; alt=&quot;Carprov modules loaded&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The original dashboard had an app that lists the loaded OSGi bundles comprising the whole application.
+Naturally, that needs to be ported as well.
+There is a new API for introspecting modules of the JPMS.
+Using it is fairly straightforward:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;&lt;span class=&quot;n&quot;&gt;Layer&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;layer&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Layer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;boot&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Module&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;m:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;layer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;modules&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;())&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;startsWith&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;carprov&amp;quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+     &lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+     &lt;span class=&quot;n&quot;&gt;Optional&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Version&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;version&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getDescriptor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getVersion&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+     &lt;span class=&quot;c1&quot;&gt;// Show it in the ui&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Modules are organized into Layers.
+Since we do not specifically create a module Layer ourselves, the loaded modules are part of the boot-layer.
+We retrieve this layer, and ask it for all the loaded modules.
+Then, we only process modules that start with &quot;carprov&quot;, in order to not show JDK modules in the overview.&lt;/p&gt;
+
+&lt;h3&gt;Conclusion&lt;/h3&gt;
+
+&lt;p&gt;It&#39;s going to be interesting to see how the current JPMS prototype will morph into a production-ready module system for Java 9.
+One thing is sure: it&#39;s a big step forward for the Java platform.&lt;/p&gt;
+
+&lt;p&gt;All in all I was pleasantly surprised how far I could come with the Jigsaw prototype.
+Yes, it is less dynamic than the OSGi original.
+On the other hand, it is also vastly less complex.
+OSGi service dynamics are cool, but it makes you handle lots of (concurrency) edge-cases.
+Do you really need these dynamics all the time?
+Nevertheless, my next challenge will be to bring some of the original dynamics back using the JPMS.
+Stay tuned!&lt;/p&gt;
+
+   </content>
+ </entry>
+ 
+ <entry>
+   <author><name>Sander Mak</name></author>
    <title>The Java Module system: a first look</title>
    <link href="http://branchandbound.net/blog/java/2015/09/java-module-system-first-look"/>
-   <updated>2015-09-10T00:00:00+02:00</updated>
+   <updated>2015-09-10T00:00:00-07:00</updated>
    <id>http://branchandbound.net/blog/java/2015/09/java-module-system-first-look</id>
    <content type="html">
        &lt;p&gt;A module system for Java has been a long time coming. Late 2014, a new JSR requirements document (JSR-376) was created to this end. The changes are slated for Java 9. However, no working prototype was available. Until yesterday, that is. There now is an OpenJDK early access build that includes Project Jigsaw.&lt;/p&gt;
@@ -164,7 +454,7 @@ src/module2/module-info.java:1: error: expected &#39;module&#39;
    <author><name>Sander Mak</name></author>
    <title>On monoliths, microservices and critical thinking</title>
    <link href="http://branchandbound.net/blog/architecture/2015/06/on-microservices-monoliths-and-critical-thinking"/>
-   <updated>2015-06-10T00:00:00+02:00</updated>
+   <updated>2015-06-10T00:00:00-07:00</updated>
    <id>http://branchandbound.net/blog/architecture/2015/06/on-microservices-monoliths-and-critical-thinking</id>
    <content type="html">
        &lt;p&gt;Something very interesting happened last week. At first I wasn&#39;t sure whether it was a misguided attempt at humor. Sure enough, Twitter timelines switched en masse from advocating microservices to glorifying monoliths. What a strange world we live in.&lt;/p&gt;
@@ -202,7 +492,7 @@ src/module2/module-info.java:1: error: expected &#39;module&#39;
    <author><name>Sander Mak</name></author>
    <title>The Road to Data Science</title>
    <link href="http://branchandbound.net/blog/data/2014/10/road-to-data-science"/>
-   <updated>2014-10-27T00:00:00+01:00</updated>
+   <updated>2014-10-27T00:00:00-07:00</updated>
    <id>http://branchandbound.net/blog/data/2014/10/road-to-data-science</id>
    <content type="html">
        &lt;p&gt;Data is invariably a large part of the applications we deliver. Thinking about data, we often are concerned with ACID, scalability and other operational aspects. Building an (enterprise) app means we want our data to be safe, accessible and acted upon by our business rules. Sure, there is the occasional reporting need, but usually nothing a few well-placed queries won&#39;t be able to solve.&lt;/p&gt;
@@ -273,7 +563,7 @@ src/module2/module-info.java:1: error: expected &#39;module&#39;
    <author><name>Sander Mak</name></author>
    <title>Facebook announces Apollo at QCon NY 2014</title>
    <link href="http://branchandbound.net/blog/conferences/2014/06/facebook-announces-appolo-qcon"/>
-   <updated>2014-06-11T00:00:00+02:00</updated>
+   <updated>2014-06-11T00:00:00-07:00</updated>
    <id>http://branchandbound.net/blog/conferences/2014/06/facebook-announces-appolo-qcon</id>
    <content type="html">
        &lt;p&gt;Today I attended a talk &lt;a href=&quot;https://qconnewyork.com/presentation/how-facebook-scales-big-data-systems&quot;&gt;&#39;How Facebook Scales Big Data Systems&#39;&lt;/a&gt; at QCon NY 2014. It turns out that Jeff Johnson took this opportunity to announce a new project by Facebook: Apollo. The following is a rough transcript of the talk.&lt;/p&gt;
@@ -355,7 +645,7 @@ src/module2/module-info.java:1: error: expected &#39;module&#39;
    <author><name>Sander Mak</name></author>
    <title>Generating JUnit test reports with Jasmine 2.0</title>
    <link href="http://branchandbound.net/blog/web/2014/03/generating-junit-testreports-jasmine-20"/>
-   <updated>2014-03-06T00:00:00+01:00</updated>
+   <updated>2014-03-06T00:00:00-08:00</updated>
    <id>http://branchandbound.net/blog/web/2014/03/generating-junit-testreports-jasmine-20</id>
    <content type="html">
        &lt;p&gt;While setting up a new project at work, a seemingly small upgrade from Jasmine 1.3 to Jasmine 2.0 broke a vital feature: the ability to generate JUnit XML reports for JavaScript unit tests. Long story short: I created &lt;a href=&quot;https://github.com/sandermak/jasmine2-junit&quot;&gt;jasmine2-junit&lt;/a&gt; to bring this feature to Jasmine 2.0 again.&lt;/p&gt;
@@ -424,7 +714,7 @@ src/module2/module-info.java:1: error: expected &#39;module&#39;
    <author><name>Sander Mak</name></author>
    <title>ng-conf 2014: the world's first AngularJS conference</title>
    <link href="http://branchandbound.net/blog/conferences/2014/01/ng-conf-2014-world-first-angular-conference"/>
-   <updated>2014-01-20T00:00:00+01:00</updated>
+   <updated>2014-01-20T00:00:00-08:00</updated>
    <id>http://branchandbound.net/blog/conferences/2014/01/ng-conf-2014-world-first-angular-conference</id>
    <content type="html">
        &lt;p&gt;Last week I attended the world’s first ever dedicated AngularJS conference in Salt Lake City. More than 700 JavaScript developers gathered in the Little America hotel for two days to learn from Angular core-devs and community members.&lt;/p&gt;
@@ -491,7 +781,7 @@ src/module2/module-info.java:1: error: expected &#39;module&#39;
    <author><name>Sander Mak</name></author>
    <title>A failed experiment: improving the Builder pattern</title>
    <link href="http://branchandbound.net/blog/java/2013/10/failed-experiment-improving-builder-pattern"/>
-   <updated>2013-10-21T00:00:00+02:00</updated>
+   <updated>2013-10-21T00:00:00-07:00</updated>
    <id>http://branchandbound.net/blog/java/2013/10/failed-experiment-improving-builder-pattern</id>
    <content type="html">
        &lt;p&gt;Sometimes, you want to try something new. Like last week, when I wanted to implement a builder for a domain object. In Java, lest you wonder why the code samples in this post are so long.&lt;/p&gt;
@@ -727,7 +1017,7 @@ src/module2/module-info.java:1: error: expected &#39;module&#39;
    <author><name>Sander Mak</name></author>
    <title>JavaOne 2013 trip report</title>
    <link href="http://branchandbound.net/blog/conferences/2013/09/javaone-2013-tripreport"/>
-   <updated>2013-09-30T00:00:00+02:00</updated>
+   <updated>2013-09-30T00:00:00-07:00</updated>
    <id>http://branchandbound.net/blog/conferences/2013/09/javaone-2013-tripreport</id>
    <content type="html">
        &lt;p&gt;Last week, San Francisco was sprawling with developers. It was that time of the year again: JavaOne 2013 took place. Thousands of Java developers gathered September 22-26 to learn new things and meet new people.&lt;/p&gt;
@@ -794,7 +1084,7 @@ During both talks there was a lot of audience interaction, which is always an en
    <author><name>Sander Mak</name></author>
    <title>Some AngularJS pitfalls</title>
    <link href="http://branchandbound.net/blog/web/2013/08/some-angularjs-pitfalls"/>
-   <updated>2013-08-05T00:00:00+02:00</updated>
+   <updated>2013-08-05T00:00:00-07:00</updated>
    <id>http://branchandbound.net/blog/web/2013/08/some-angularjs-pitfalls</id>
    <content type="html">
        &lt;p&gt;In the past few months I&#39;ve been heavily using AngularJS. It&#39;s a marvelous framework for modern web applications. But as with every new toy, there are some rough edges that you have to be aware of. In this post I&#39;ll round up some gotcha&#39;s I encountered. Assuming you already know your way around Angular, these may be helpful.&lt;/p&gt;
@@ -932,7 +1222,7 @@ During both talks there was a lot of audience interaction, which is always an en
    <author><name>Sander Mak</name></author>
    <title>The Java Modularity Story</title>
    <link href="http://branchandbound.net/blog/java/2013/07/java-modularity-story"/>
-   <updated>2013-07-18T00:00:00+02:00</updated>
+   <updated>2013-07-18T00:00:00-07:00</updated>
    <id>http://branchandbound.net/blog/java/2013/07/java-modularity-story</id>
    <content type="html">
        &lt;p&gt;So you&#39;ve got a growing Java application with a nice feature set. Unfortunately adding new features gets harder over time and things start breaking in unexpected places. Chances are that your applications is not as modular as it could be. Relax, it&#39;s not (just) your fault. Plain Java is notoriously lacking in the modularity department. But it doesn&#39;t have be this way.&lt;/p&gt;
@@ -1025,7 +1315,7 @@ During both talks there was a lot of audience interaction, which is always an en
    <author><name>Sander Mak</name></author>
    <title>Annoyances in the daily life of a developer</title>
    <link href="http://branchandbound.net/blog/development/2013/06/annoyances-daily-life-developer"/>
-   <updated>2013-06-24T00:00:00+02:00</updated>
+   <updated>2013-06-24T00:00:00-07:00</updated>
    <id>http://branchandbound.net/blog/development/2013/06/annoyances-daily-life-developer</id>
    <content type="html">
        &lt;p&gt;I&#39;m not complaining and I love my job, but sometimes...&lt;/p&gt;
@@ -1075,7 +1365,7 @@ During both talks there was a lot of audience interaction, which is always an en
    <author><name>Sander Mak</name></author>
    <title>JEEConf 2013 trip report</title>
    <link href="http://branchandbound.net/blog/conferences/2013/05/jeeconf-2013-tripreport"/>
-   <updated>2013-05-25T00:00:00+02:00</updated>
+   <updated>2013-05-25T00:00:00-07:00</updated>
    <id>http://branchandbound.net/blog/conferences/2013/05/jeeconf-2013-tripreport</id>
    <content type="html">
        &lt;p&gt;Like &lt;a href=&quot;/blog/conferences/2012/05/jeeconf-tripreport&quot;&gt;last year&lt;/a&gt;, I had the opportunity to speak at JEEConf Kiev, the leading Java conference in Eastern Europe. More than 700 people from countries like Ukraine, Russia and Belarus attended JEEConf. Most talks are therefore in Russian. However, there was just enough English content to keep me entertained as well.&lt;/p&gt;
@@ -1124,7 +1414,7 @@ During both talks there was a lot of audience interaction, which is always an en
    <author><name>Sander Mak</name></author>
    <title>Launching Scalabitz</title>
    <link href="http://branchandbound.net/blog/scala/2013/05/launching-scalabitz"/>
-   <updated>2013-05-12T00:00:00+02:00</updated>
+   <updated>2013-05-12T00:00:00-07:00</updated>
    <id>http://branchandbound.net/blog/scala/2013/05/launching-scalabitz</id>
    <content type="html">
        &lt;p&gt;Today marks the launch of my lingering weekend-project: &lt;a href=&quot;http://scalabitz.com&quot;&gt;scalabitz.com&lt;/a&gt;. It tries to surface interesting Scala content through the API of link-shortener Bit.ly. The site was built using Scala and Play (and a bit of Akka) with a MongoDB storage layer and can be found on &lt;a href=&quot;https://github.com/sandermak/scalabitz&quot;&gt;GitHub&lt;/a&gt;.&lt;/p&gt;
@@ -1188,7 +1478,7 @@ During both talks there was a lot of audience interaction, which is always an en
    <author><name>Sander Mak</name></author>
    <title>A year of blogging analyzed with R</title>
    <link href="http://branchandbound.net/blog/data/2013/03/year-blogging-analyzed-r"/>
-   <updated>2013-03-23T00:00:00+01:00</updated>
+   <updated>2013-03-23T00:00:00-07:00</updated>
    <id>http://branchandbound.net/blog/data/2013/03/year-blogging-analyzed-r</id>
    <content type="html">
        &lt;p&gt;Today it&#39;s exactly one year ago that I published my first blogpost on branchandbound.net. During this year I&#39;ve written 12 posts, including this one. Since we live in the age of analytics, I thought it would be nice to show how this blog has fared during its first year.&lt;/p&gt;
@@ -1298,7 +1588,7 @@ ga.df &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; ga&lt;span class=&q
    <author><name>Sander Mak</name></author>
    <title>Book review: Infinity and the Mind</title>
    <link href="http://branchandbound.net/blog/bookreview/2013/01/bookreview-infinity-and-the-mind"/>
-   <updated>2013-01-31T00:00:00+01:00</updated>
+   <updated>2013-01-31T00:00:00-08:00</updated>
    <id>http://branchandbound.net/blog/bookreview/2013/01/bookreview-infinity-and-the-mind</id>
    <content type="html">
        &lt;p&gt;&lt;a href=&quot;http://www.amazon.com/gp/product/0691121273/ref=as_li_ss_tl?ie=UTF8&amp;amp;camp=1789&amp;amp;creative=390957&amp;amp;creativeASIN=0691121273&amp;amp;linkCode=as2&amp;amp;tag=branandboun-20&quot;&gt;Infinity and the Mind&lt;/a&gt; provides a rare mixture of mathematical, scientific and philosophical explorations.  It gives both an account of the theory of transfinite numbers and discusses its implications from a philosophical point of view. With &#39;The science and philosophy of the infinite&#39; as its subtitle, it is one of the most challenging books I&#39;ve read in a while. Granted, this may be because I&#39;m neither a mathematician nor a philosopher, just a software developer who has some interest in both fields. And yes, the book is relatively old, but it has stood the test of time.&lt;/p&gt;
@@ -1342,7 +1632,7 @@ ga.df &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; ga&lt;span class=&q
    <author><name>Sander Mak</name></author>
    <title>Scala is like Git</title>
    <link href="http://branchandbound.net/blog/scala/2012/12/scala-is-like-git"/>
-   <updated>2012-12-20T00:00:00+01:00</updated>
+   <updated>2012-12-20T00:00:00-08:00</updated>
    <id>http://branchandbound.net/blog/scala/2012/12/scala-is-like-git</id>
    <content type="html">
        &lt;p&gt;Scala is often portrayed as being too complex. Many times these discussions about complexity remind me of similar arguments around the complexity of Git. I know, the comparison between a source control system and a programming language falls flat quickly when pushed too hard. But bear with me, because I do believe it can put the Scala complexity discussion in a new perspective.&lt;/p&gt;
@@ -1396,7 +1686,7 @@ ga.df &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; ga&lt;span class=&q
    <author><name>Sander Mak</name></author>
    <title>Unify client-side and server-side rendering by embedding JSON</title>
    <link href="http://branchandbound.net/blog/web/2012/11/unify-server-side-client-side-rendering-embedding-json"/>
-   <updated>2012-11-21T00:00:00+01:00</updated>
+   <updated>2012-11-21T00:00:00-08:00</updated>
    <id>http://branchandbound.net/blog/web/2012/11/unify-server-side-client-side-rendering-embedding-json</id>
    <content type="html">
        &lt;p&gt;Not many applications I work on these days are solely using the traditional server-side rendering model. Neither do they employ 100% client-side rendering and templating. Usually it&#39;s a mix in which the &#39;old&#39; world meets the new world, giving rise to some interesting design decisions. In this article I want to explore a solution that combines both worlds while minimizing the duplication of rendering logic by embedding JSON in the view.&lt;/p&gt;
@@ -1521,7 +1811,7 @@ ga.df &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; ga&lt;span class=&q
    <author><name>Sander Mak</name></author>
    <title>JFall 2012: Dutch Java awesomeness</title>
    <link href="http://branchandbound.net/blog/conferences/2012/11/jfall-2012-dutch-java-awesomeness"/>
-   <updated>2012-11-01T00:00:00+01:00</updated>
+   <updated>2012-11-01T00:00:00-07:00</updated>
    <id>http://branchandbound.net/blog/conferences/2012/11/jfall-2012-dutch-java-awesomeness</id>
    <content type="html">
        &lt;p&gt;The J-Fall conference has been a stable factor in the Dutch Java community for many years now. The 2012 edition was again jam-packed with excellent content. But above all, it&#39;s a place where more than thousand like-minded developers can meet (again) and exchange fresh new ideas!&lt;/p&gt;
@@ -1572,7 +1862,7 @@ ga.df &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; ga&lt;span class=&q
    <author><name>Sander Mak</name></author>
    <title>Cross-Build Injection in action</title>
    <link href="http://branchandbound.net/blog/security/2012/10/cross-build-injection-in-action"/>
-   <updated>2012-10-08T00:00:00+02:00</updated>
+   <updated>2012-10-08T00:00:00-07:00</updated>
    <id>http://branchandbound.net/blog/security/2012/10/cross-build-injection-in-action</id>
    <content type="html">
        &lt;p&gt;A &lt;a href=&quot;/blog/security/2012/03/crossbuild-injection-how-safe-is-your-build&quot;&gt;previous post&lt;/a&gt; introduced Cross-Build Injection (XBI) attacks. Recently, I&#39;ve had the opportunity to present this work at JavaOne. In that session, I used a live example to show what could go wrong. By popular request, this post outlines the example XBI attack that I used as demonstration.&lt;/p&gt;
@@ -1683,7 +1973,7 @@ Hi, you&lt;span class=&quot;err&quot;&gt;&amp;#39;&lt;/span&gt;ve been p0wned!&l
    <author><name>Sander Mak</name></author>
    <title>Verify dependencies using PGP</title>
    <link href="http://branchandbound.net/blog/security/2012/08/verify-dependencies-using-pgp"/>
-   <updated>2012-08-22T00:00:00+02:00</updated>
+   <updated>2012-08-22T00:00:00-07:00</updated>
    <id>http://branchandbound.net/blog/security/2012/08/verify-dependencies-using-pgp</id>
    <content type="html">
        &lt;p&gt;Many builds use automatic dependency retrieval from repositories like Maven Central. In an earlier post, I&#39;ve outlined the dangers of so-called &lt;a href=&quot;/blog/security/2012/03/crossbuild-injection-how-safe-is-your-build&quot;&gt;cross-build injection attacks&lt;/a&gt; when using automatic dependency management. In this post, I&#39;ll show how you can counter such attacks by verifying PGP signatures of artifacts downloaded from Maven Central.&lt;/p&gt;
@@ -1819,7 +2109,7 @@ gpg: Good signature from &quot;Sonatype, Inc. (Sonatype release key) &amp;lt;dev
    <author><name>Sander Mak</name></author>
    <title>Book review: DSLs in Action</title>
    <link href="http://branchandbound.net/blog/bookreview/2012/08/bookreview-dsls-in-action"/>
-   <updated>2012-08-04T00:00:00+02:00</updated>
+   <updated>2012-08-04T00:00:00-07:00</updated>
    <id>http://branchandbound.net/blog/bookreview/2012/08/bookreview-dsls-in-action</id>
    <content type="html">
        &lt;p&gt;Domain-Specific Languages are not the most used tools in the toolbox of developers. According to the author of &#39;DSLs in Action&#39; this is a missed opportunity: these little languages can deliver lots of benefits. In this book he argues this position with fervor. But be warned: this is not a book for beginners.&lt;/p&gt;
@@ -1855,7 +2145,7 @@ gpg: Good signature from &quot;Sonatype, Inc. (Sonatype release key) &amp;lt;dev
    <author><name>Sander Mak</name></author>
    <title>Modern concurrency and Java EE</title>
    <link href="http://branchandbound.net/blog/java/2012/07/modern-concurrency-and-javaee"/>
-   <updated>2012-07-23T00:00:00+02:00</updated>
+   <updated>2012-07-23T00:00:00-07:00</updated>
    <id>http://branchandbound.net/blog/java/2012/07/modern-concurrency-and-javaee</id>
    <content type="html">
        &lt;p&gt;Managing your own threads within a Java EE container is not recommended and even illegal in some circumstances. But where does that leave us when we want to use the shiny new Java concurrency frameworks like Fork/Join and Akka in Java EE applications? The addition of new concurrency facilities to the Java EE 7 spec may open some doors.&lt;/p&gt;
@@ -1920,7 +2210,7 @@ submitted the task. All tasks will then run on the selected process/server.&lt;/
    <author><name>Sander Mak</name></author>
    <title>Preparing a technical talk</title>
    <link href="http://branchandbound.net/blog/conferences/2012/06/preparing-a-technical-talk"/>
-   <updated>2012-06-06T00:00:00+02:00</updated>
+   <updated>2012-06-06T00:00:00-07:00</updated>
    <id>http://branchandbound.net/blog/conferences/2012/06/preparing-a-technical-talk</id>
    <content type="html">
        &lt;p&gt;We software engineers love giving talks. Fortunately, the abundance of technical conferences shows that we like listening too. A lot of talks on these conferences are given by software engineers who love sharing knowledge, rather than professional speakers. This especially holds true for conferences organized by user groups. Since I&#39;m one of those software engineers who likes to give talks, I&#39;d like to share my thoughts on what you can do to prepare a technical talk.&lt;/p&gt;
@@ -1985,7 +2275,7 @@ submitted the task. All tasks will then run on the selected process/server.&lt;/
    <author><name>Sander Mak</name></author>
    <title>JEEConf 2012 trip report</title>
    <link href="http://branchandbound.net/blog/conferences/2012/05/jeeconf-tripreport"/>
-   <updated>2012-05-20T00:00:00+02:00</updated>
+   <updated>2012-05-20T00:00:00-07:00</updated>
    <id>http://branchandbound.net/blog/conferences/2012/05/jeeconf-tripreport</id>
    <content type="html">
        &lt;p&gt;What do Eastern European developers do on their free Saturday? Well, at least 650 of them go and attend a technical conference: JEEConf in Kiev, Ukraine. This is the second year that JEEConf is organized, and they&#39;ve already grown from 400 attendants last year to 650 this year, coming from 9 countries surrounding Ukraine. I was invited to give two talks, one on Hibernate Performance Tuning and another on Scala &amp;amp; Lift.&lt;/p&gt;
@@ -2045,7 +2335,7 @@ Beautiful Kiev University building&lt;/p&gt;
    <author><name>Sander Mak</name></author>
    <title>Cross-build injection attacks: how safe is your build?</title>
    <link href="http://branchandbound.net/blog/security/2012/03/crossbuild-injection-how-safe-is-your-build"/>
-   <updated>2012-03-23T00:00:00+01:00</updated>
+   <updated>2012-03-23T00:00:00-07:00</updated>
    <id>http://branchandbound.net/blog/security/2012/03/crossbuild-injection-how-safe-is-your-build</id>
    <content type="html">
        &lt;p&gt;Imagine a world in which people blindly trust binaries uploaded to the internet by random strangers. Certainly not a world in which we as software engineers want to live. Except that many of us, including myself, do exactly that.  On a regular  basis. In our most precious environment: the software build process.&lt;/p&gt;

@@ -1,0 +1,506 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>From OSGi to Jigsaw - Branch and Bound</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Sander Mak">
+
+    <link href="http://feeds.feedburner.com/BranchAndBound" rel="alternate" title="Branch and Bound Blog Feed" type="application/atom+xml" />
+    <!-- Le styles -->
+    <link href="/assets/themes/sander/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="/assets/themes/sander/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="/assets/themes/sander/syntax.css" rel="stylesheet">
+    <link href="/assets/themes/sander/style.css" rel="stylesheet">
+
+    <style type="text/css">
+      body {
+        padding-top: 10px;
+        padding-bottom: 40px;
+      }
+    </style>
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="assets/bootstrap/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="assets/bootstrap/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/bootstrap/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="assets/bootstrap/ico/apple-touch-icon-57-precomposed.png">
+
+  </head>
+
+  <body>
+
+
+    <div class="container">
+      <div class="row">
+        <div class="span11">
+    <div class="navbar">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="/">Branch and Bound</a>
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li><a href="/">Home</a></li>
+              <li><a href="/about.html">About</a></li>
+              <li><a href="/talks.html">Talks</a></li>
+              <li><a href="/archive.html">Archive</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+        </div>
+      </div>
+      <div class="row">
+        <div class="span6 offset2">
+          
+<article>
+  <header>
+    <h1>From OSGi to Jigsaw</h1>
+    <strong><time datetime="2015-10-27" pubdate>27 October 2015</time></strong>
+
+    <br>
+    <br>
+
+    <p><em><p>In my <a href="/blog/java/2015/09/java-module-system-first-look">last post</a> I introduced the new Java Platform Module system with a small example. As of September, there is an implementation to play with, codename Jigsaw. After some introductory toy examples, I did what any curious coder does: port a familiar (and not entirely trivial) codebase to the new shiny technology. In this case, I took a small dynamic dashboard based on OSGi and implemented it using the proposed Java Platform Module System.</p>
+</em></p>
+  </header>
+  
+
+  <section>
+   <p>If you want an introduction on what the new Java Platform Module System (referred to as JPMS hereafter) entails and how to get started, read <a href="/blog/java/2015/09/java-module-system-first-look">'The Java Module system: a first look'</a>.
+This post assumes you're familiar with the basics of the proposed module system. And if you're the kind of person who just wants to see the code: <a href="https://github.com/sandermak/carprov-jigsaw">here you go</a>.</p>
+
+<h3>The original OSGi application</h3>
+
+<p>Before diving into the Jigsaw port, let's have a look what the original application is all about:</p>
+
+<p><img src="/pics/carprov.png" alt="Carprov application" /></p>
+
+<p>As you can see, it mimics a car entertainment system dashboard.
+However, the requirement is that this car entertainment system can be dynamically extended and updated.
+Each of the 'apps' come from a separate OSGi bundle.
+The dashboard only collects applications that are currently provisioned to the OSGi runtime and shows them.
+You can click on the icons to access the underlying 'app' (music player, navigaton, phone), which come from the same bundle that contributes the dashboard icon.
+This example has served as demo for a conference talk by myself and my colleague <a href="https://twitter.com/pbakker">Paul Bakker</a> called 'Provisioning the IoT'.
+In this talk, we use <a href="https://ace.apache.org">Apache ACE</a> to dynamically update and provision OSGi bundles to running instances of the car entertainment system on multiple devices.
+It's actually really cool to see your system update in real-time without restarting.
+If you want to see it in action I recommend <a href="https://vimeo.com/126446916">watching the talk</a>.
+The demo starts around the 11 minute mark.</p>
+
+<p><img src="/pics/carprov-arch.png" alt="Carprov architecture" /></p>
+
+<p>Technically, the dynamic dashboard looks up all instances of the <code>App</code> interface in the OSGi service registry.
+This interface is almost the only piece of code that is publicly shared between bundles.
+In turn, bundles containing an <code>App</code> implementation register themselves upon bundle start, and unregister when the bundle is stopped.
+This makes full use of the dynamic life-cycle afforded by OSGi.
+The dashboard gets <code>App</code> instances from the service registry without having to know about the implementation classes.
+Inversion of control in action!
+Each app implementation bundle also provides its own resources such as images.
+You can check out the original application <a href="https://github.com/sandermak/carprov">on GitHub</a>.</p>
+
+<h3>Finding the right modules</h3>
+
+<p>The question is, how hard is it to port this modularized OSGi application to the JPMS using the Jigsaw prototype?
+Being as dynamic as OSGi isn't a goal of the JPMS.
+So to keep expectations in check, I'm already happy if we can port the module and service structure at startup.
+Adding and removing new modules dynamically will have to wait for now.</p>
+
+<p>The first step for re-creating this example in the JPMS was to find out what should go into the <code>module-info.java</code> descriptors.
+These module descriptors contain the dependency information for Java modules.
+It is similar to the OSGi meta-data in the manifest file of OSGi jars.</p>
+
+<p>The most straightforward module definition is the one for the API bundle:</p>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="n">module</span> <span class="n">carprov</span><span class="o">.</span><span class="na">dashboard</span><span class="o">.</span><span class="na">api</span> <span class="o">{</span>
+   <span class="n">exports</span> <span class="n">carprov</span><span class="o">.</span><span class="na">dashboard</span><span class="o">.</span><span class="na">api</span><span class="o">;</span>
+   <span class="n">requires</span> <span class="kd">public</span> <span class="n">javafx</span><span class="o">.</span><span class="na">graphics</span><span class="o">;</span>
+<span class="o">}</span></code></pre></div>
+
+
+<p>You can find the full code for the Jigsaw version of the dashboard <a href="https://github.com/sandermak/carprov-jigsaw">on GitHub</a> if you want to follow along. It compiles and runs on <a href="http://openjdk.java.net/projects/jigsaw/ea">build b86</a> of the Jigsaw-enabled JDK.</p>
+
+<p>We declare a module with the name <code>carprov.dashboard.api</code>, exporting a package of the same name.
+Meaning the interface and helper class inside this package are visible to all modules that import this module.
+Next, we need to declare what this module needs in terms of dependencies.
+Since the <code>App</code> interface uses JavaFX types, these need to be required somehow.
+An important goal of the JPMS is to modularize the itself JDK as well.
+Therefore we cannot just import types from the JDK without specifying which module they come from.
+Note that unlike the exports-clause, the requires-clause takes a module name rather than a package name.</p>
+
+<p>So how do you find the right module to require amongst the ~80 modules that currently comprise the JDK in the Jigsaw prototype?
+Fortunately, we can do better than trial and error.
+The JDK provides a tool called jdeps, which analyzes the dependencies of an existing Java class.
+You provide the class name and an appropriate classpath that contains the class:</p>
+
+<pre><code>$ jdeps -module -cp carprov.dashboard.api.jar carprov.dashboard.api.App
+carprov.dashboard.api -&gt; java.base
+carprov.dashboard.api -&gt; javafx.graphics
+   carprov.dashboard.api (carprov.dashboard.api)
+      -&gt; java.lang                                          java.base
+      -&gt; javafx.scene                                       javafx.graphics
+</code></pre>
+
+<p>The last two lines indicate that the App interface imports from the java.lang and javafx.scene packages.
+By providing the <code>-module</code> option, jdeps also outputs the source modules (on the far right).
+This way, you can identify the modules providing the packages that the analyzed class depends on.
+In this case, the dashboard module should require the java.base module and the javafx.graphics module from the JDK.
+That's exactly what we did in the module-info.java descriptor earlier.
+Except, the java.base module is always implicitly required for all modules.
+You can't live without it.</p>
+
+<p>Another option for finding the right modules is to peruse the <a href="http://cr.openjdk.java.net/~mr/jigsaw/ea/module-summary.html">module overview</a> page of the early access Jigsaw build.
+It gives a comprehensive overview of all JDK modules and their dependencies.
+To get a feeling for the new modularized Java platform, it's indispensable.</p>
+
+<p>There's on last twist: what does the <code>public</code> in <code>requires public</code> mean in the module descriptor?
+Let's have a look at the App interface:</p>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="kn">import</span> <span class="nn">javafx.scene.Node</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">App</span> <span class="o">{</span>
+   <span class="n">String</span> <span class="nf">getAppName</span><span class="o">();</span>
+   <span class="kt">int</span> <span class="nf">getPreferredPosition</span><span class="o">();</span>   
+   <span class="n">Node</span> <span class="nf">getDashboardIcon</span><span class="o">();</span>
+   <span class="n">Node</span> <span class="nf">getMainApp</span><span class="o">();</span>
+<span class="o">}</span></code></pre></div>
+
+
+<p>If only the carprov.dashboard.api package would be exported by the Dashboard API module, what happens if another module imports it and tries to use it?
+That consuming module is then forced to also require the module containing javafx.scene.Node (in this case javafx.graphics).
+Since Node is used as return type in App, the interface cannot be used without access to this class as well.
+You could document this as part of the Dashboard API module, but that's error-prone and generally unsatisfactory.
+The <code>public</code> keyword in the requires-clauses solves this.
+Effectively, it re-exports the public packages from the required module as part of the Dashboard API module.
+Now, the app implementation modules can require the Dashboard API module without having to worry about requiring javafx.graphics.
+This solution is similar to what OSGi calls 'uses-constraints'.
+It goes a bit further though.
+With the re-exporting facility in the JPMS, you can create an 'empty' module that acts as a façade.
+The public exports in the module descriptor of this empty module can aggregate several other modules.
+As an example, you can use this mechanism to split a module into multiple modules without breaking consumers.
+They still require the same module, only now it 'delegates' to other modules.</p>
+
+<p>However, we're getting off track.
+Back to porting the dashboard example.
+How do the apps actually end up on the dashboard using the JPMS?</p>
+
+<h3>Services with ServiceLoader</h3>
+
+<p>So far, we've talked about a single module and its dependencies: the dashboard API.
+However, the diagram above shows 5 modules in the sample application.
+What about the dashboard implementation module, and the App implementation modules?
+We explicitly do not want the dashboard to know about the concrete App implementation classes.
+It just needs to gather instances of those implementation classes, without doing the instantiation itself.
+Loose coupling, remember?</p>
+
+<p>This means we don't require any App implementation modules in the dashboard's module-info:</p>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="n">module</span> <span class="n">carprov</span><span class="o">.</span><span class="na">dashboard</span><span class="o">.</span><span class="na">jfx</span> <span class="o">{</span>
+   <span class="n">requires</span> <span class="n">carprov</span><span class="o">.</span><span class="na">dashboard</span><span class="o">.</span><span class="na">api</span><span class="o">;</span>
+   <span class="n">requires</span> <span class="n">javafx</span><span class="o">.</span><span class="na">base</span><span class="o">;</span>
+   <span class="n">requires</span> <span class="n">javafx</span><span class="o">.</span><span class="na">controls</span><span class="o">;</span>
+   <span class="n">requires</span> <span class="n">javafx</span><span class="o">.</span><span class="na">swing</span><span class="o">;</span>
+
+   <span class="n">uses</span> <span class="n">carprov</span><span class="o">.</span><span class="na">dashboard</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">App</span><span class="o">;</span>
+   <span class="n">provides</span> <span class="n">carprov</span><span class="o">.</span><span class="na">dashboard</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">App</span> <span class="n">with</span> <span class="n">carprov</span><span class="o">.</span><span class="na">dashboard</span><span class="o">.</span><span class="na">jfx</span><span class="o">.</span><span class="na">ConfigurationApp</span><span class="o">;</span>
+<span class="o">}</span></code></pre></div>
+
+
+<p>The interesting part is the penultimate line of the module descriptor: <code>uses carprov.dashboard.api.App;</code>.
+With this uses-clause, we tell the JPMS that we are interested in instances of App interface.
+Subsequently, the dashboard can use the <a href="http://cr.openjdk.java.net/~mr/jigsaw/spec/api/java/util/ServiceLoader.html">ServiceLoader API</a> to retrieve these instances:</p>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="n">Iterable</span><span class="o">&lt;</span><span class="n">App</span><span class="o">&gt;</span> <span class="n">apps</span> <span class="o">=</span> <span class="n">ServiceLoader</span><span class="o">.</span><span class="na">load</span><span class="o">(</span><span class="n">App</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+
+<span class="k">for</span><span class="o">(</span><span class="n">App</span> <span class="nl">app:</span> <span class="n">apps</span><span class="o">)</span> <span class="o">{</span>
+  <span class="n">renderDashboardIcon</span><span class="o">(</span><span class="n">app</span><span class="o">);</span>
+<span class="o">}</span></code></pre></div>
+
+
+<p>Instances are created by the module system.
+Of course, the big question is: how does the module system locate service providers?</p>
+
+<p>Let's look at an example of a module providing an App service.
+The Phone module exposes its App implementation as follows:</p>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="n">module</span> <span class="n">carprov</span><span class="o">.</span><span class="na">phone</span> <span class="o">{</span>
+   <span class="n">requires</span> <span class="n">carprov</span><span class="o">.</span><span class="na">dashboard</span><span class="o">.</span><span class="na">api</span><span class="o">;</span>
+   <span class="n">requires</span> <span class="n">javafx</span><span class="o">.</span><span class="na">controls</span><span class="o">;</span>
+
+   <span class="n">provides</span> <span class="n">carprov</span><span class="o">.</span><span class="na">dashboard</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">App</span> <span class="n">with</span> <span class="n">carprov</span><span class="o">.</span><span class="na">phone</span><span class="o">.</span><span class="na">PhoneApp</span><span class="o">;</span>
+<span class="o">}</span></code></pre></div>
+
+
+<p>The magic happens in the last line.
+It indicates that we want to expose an App instance, using the concrete PhoneApp implementation class.
+Note that PhoneApp's package is not exported.
+Nobody can instantiate it but the JPMS, or another class inside the same module.
+There is one requirement for a service class: it must have a default no-arg constructor.
+You can even provide services and consume them in the same module, as witnessed by the provides-clause following the uses-clause in the module descriptor of the dashboard implementation module earlier.</p>
+
+<p>Now the JPMS knows that the dashboard implementation module wants to see App instances, and the Phone module (and others) provide these instances.
+If at any time an additional service implementing the App interface is put on the modulepath, the dashboard will pick it up without modifications to the module descriptor.
+It's not as dynamic as the original OSGi application, though.
+Only after a restart of the whole application (JVM) are these new modules loaded.</p>
+
+<p>For those who know the OSGi service model, statically describing service dependencies is quite a difference.
+OSGi services come and go at run-time.
+On the one hand, this is more powerful and dynamic.
+On the other hand, the JPMS approach could provide errors in case wiring is not possible at startup time.
+By the way, the current prototype does not appear to do so.
+Declaring a uses-clause on an interface without any implementations on the modulepath at runtime does not trigger any warnings or errors.
+It's still on my list to experiment with the <a href="http://cr.openjdk.java.net/~mr/jigsaw/spec/api/java/lang/reflect/Layer.html">Layer</a> construct of the JPMS.
+Let's see how close it can bring us to loading additional modules on-the-fly.</p>
+
+<p>In short, the ServiceLoader mechanism allows us to hide implementations in a modular world.
+It's not quite dependency <em>injection</em> but it is a form of inversion of control.
+I'm sure dependency injection models will be built upon this foundation.</p>
+
+<h3>Resources</h3>
+
+<p>Modules can encapsulate more than just code.
+In this application, we need images as well.
+Loading resources using <a href="http://cr.openjdk.java.net/~mr/jigsaw/spec/api/java/lang/Class.html#getResourceAsStream-java.lang.String-">Class.getResourceAsStream</a> still works, with some caveats.
+The class calling this method must be in the same module that contains the resource.
+Otherwise, null is returned.</p>
+
+<p>The original OSGi implementation delegated loading resources to a helper class in the Dashboard API bundle.
+It did this by passing the <a href="https://osgi.org/javadoc/r4v43/core/org/osgi/framework/BundleContext.html">BundleContext</a>  of the requesting bundle to this helper class:</p>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">static</span> <span class="n">ImageView</span> <span class="nf">getImageByFullname</span><span class="o">(</span><span class="n">BundleContext</span> <span class="n">bundleContext</span><span class="o">,</span> <span class="n">String</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
+  <span class="n">URL</span> <span class="n">entry</span> <span class="o">=</span> <span class="n">bundleContext</span><span class="o">.</span><span class="na">getBundle</span><span class="o">().</span><span class="na">getEntry</span><span class="o">(</span><span class="n">name</span><span class="o">);</span>
+  <span class="k">try</span> <span class="o">{</span>
+    <span class="n">Image</span> <span class="n">image</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Image</span><span class="o">(</span><span class="n">entry</span><span class="o">.</span><span class="na">openStream</span><span class="o">());</span>
+    <span class="n">ImageView</span> <span class="n">view</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">ImageView</span><span class="o">(</span><span class="n">image</span><span class="o">);</span>
+    <span class="n">view</span><span class="o">.</span><span class="na">setPreserveRatio</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+    <span class="k">return</span> <span class="n">view</span><span class="o">;</span>
+  <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IOException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">throw</span> <span class="k">new</span> <span class="nf">RuntimeException</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
+  <span class="o">}</span>
+<span class="o">}</span></code></pre></div>
+
+
+<p>I tried to emulate this by passing a Class object from the requesting module to a similar helper class in the JPMS version:</p>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">static</span> <span class="n">ImageView</span> <span class="nf">getImageT</span><span class="o">(</span><span class="n">Class</span><span class="o">&lt;?&gt;</span> <span class="n">loadingContext</span><span class="o">,</span> <span class="n">String</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
+  <span class="n">Image</span> <span class="n">image</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Image</span><span class="o">(</span><span class="n">loadingContext</span><span class="o">.</span><span class="na">getResourceAsStream</span><span class="o">(</span><span class="n">name</span><span class="o">));</span>
+  <span class="n">ImageView</span> <span class="n">view</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">ImageView</span><span class="o">(</span><span class="n">image</span><span class="o">);</span>
+  <span class="n">view</span><span class="o">.</span><span class="na">setPreserveRatio</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+  <span class="k">return</span> <span class="n">view</span><span class="o">;</span>
+<span class="o">}</span></code></pre></div>
+
+
+<p>However, the access checks do not seem to care about the Class object which <code>getResourceAsStream</code> is invoked on, but rather on which class is on top of the call-stack.
+That's of course the module that contains the helper class, which cannot read resources from the module that called the helper method.
+In that case, getResourceAsStream just returns null.
+That lead to some interesting NullPointerExceptions and confused looks on my face.
+In the end, I just had my requesting modules call <code>getResourceAsStream</code> and pass the resulting InputStream to the helper instead:</p>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">static</span> <span class="n">ImageView</span> <span class="nf">getImage</span><span class="o">(</span><span class="n">InputStream</span> <span class="n">stream</span><span class="o">)</span> <span class="o">{</span>
+     <span class="n">Image</span> <span class="n">image</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">Image</span><span class="o">(</span><span class="n">stream</span><span class="o">);</span>
+     <span class="n">ImageView</span> <span class="n">view</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">ImageView</span><span class="o">(</span><span class="n">image</span><span class="o">);</span>
+     <span class="n">view</span><span class="o">.</span><span class="na">setPreserveRatio</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+     <span class="k">return</span> <span class="n">view</span><span class="o">;</span>
+<span class="o">}</span></code></pre></div>
+
+
+<p>After talking to Mark Reinhold at JavaOne, I learned this behavior is by design.
+There is an alternative that looks more like the BundleContext solution: you can also pass a <code>java.lang.reflect.Module</code> to a helper method like the one above.
+This reified module instance effectively allows the recipient to do anything they would like with the calling module.
+Including getResourceAsStream on that module.</p>
+
+<h3>List loaded modules</h3>
+
+<p><img src="/pics/carprov-list.png" alt="Carprov modules loaded" /></p>
+
+<p>The original dashboard had an app that lists the loaded OSGi bundles comprising the whole application.
+Naturally, that needs to be ported as well.
+There is a new API for introspecting modules of the JPMS.
+Using it is fairly straightforward:</p>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="n">Layer</span> <span class="n">layer</span> <span class="o">=</span> <span class="n">Layer</span><span class="o">.</span><span class="na">boot</span><span class="o">();</span>
+<span class="k">for</span> <span class="o">(</span><span class="n">Module</span> <span class="nl">m:</span> <span class="n">layer</span><span class="o">.</span><span class="na">modules</span><span class="o">())</span> <span class="o">{</span>
+  <span class="k">if</span><span class="o">(</span><span class="n">m</span><span class="o">.</span><span class="na">getName</span><span class="o">().</span><span class="na">startsWith</span><span class="o">(</span><span class="s">&quot;carprov&quot;</span><span class="o">))</span> <span class="o">{</span>
+     <span class="n">String</span> <span class="n">name</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="na">getName</span><span class="o">();</span>
+     <span class="n">Optional</span><span class="o">&lt;</span><span class="n">Version</span><span class="o">&gt;</span> <span class="n">version</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="na">getDescriptor</span><span class="o">().</span><span class="na">getVersion</span><span class="o">();</span>
+     <span class="c1">// Show it in the ui</span>
+  <span class="o">}</span>
+<span class="o">}</span></code></pre></div>
+
+
+<p>Modules are organized into Layers.
+Since we do not specifically create a module Layer ourselves, the loaded modules are part of the boot-layer.
+We retrieve this layer, and ask it for all the loaded modules.
+Then, we only process modules that start with "carprov", in order to not show JDK modules in the overview.</p>
+
+<h3>Conclusion</h3>
+
+<p>It's going to be interesting to see how the current JPMS prototype will morph into a production-ready module system for Java 9.
+One thing is sure: it's a big step forward for the Java platform.</p>
+
+<p>All in all I was pleasantly surprised how far I could come with the Jigsaw prototype.
+Yes, it is less dynamic than the OSGi original.
+On the other hand, it is also vastly less complex.
+OSGi service dynamics are cool, but it makes you handle lots of (concurrency) edge-cases.
+Do you really need these dynamics all the time?
+Nevertheless, my next challenge will be to bring some of the original dynamics back using the JPMS.
+Stay tuned!</p>
+
+  </section>
+</article>
+<div>
+  <strong>If you liked this post, please share it!</strong>
+  <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://branchandbound.net/blog/java/2015/10/osgi-to-jigsaw" data-via="Sander_Mak" data-dnt="true">Tweet</a>
+  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</div>
+
+<br>
+<br>
+
+<div id="related">
+  <h3>Related Posts</h3>
+  <ul class="posts">
+    
+      <li><span>18 Jul 2013</span> &raquo; <a href="/blog/java/2013/07/java-modularity-story">The Java Modularity Story</a></li>
+    
+      <li><span>10 Sep 2015</span> &raquo; <a href="/blog/java/2015/09/java-module-system-first-look">The Java Module system: a first look</a></li>
+    
+      <li><span>27 Oct 2014</span> &raquo; <a href="/blog/data/2014/10/road-to-data-science">The Road to Data Science</a></li>
+    
+  </ul>
+</div>
+
+
+
+
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_developer = 1;
+    var disqus_shortname = 'branchandbound'; // required: replace example with your forum shortname
+    
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+
+
+
+        </div>
+        <div class="span3">
+         <div class="hero-unit sidebar">
+           <a href="http://feeds.feedburner.com/BranchAndBound"><img class="rss pull-right" title="Branch and Bound Blog RSS Feed" alt="RSS Feed" src="/assets/themes/sander/rss.png"></a>
+           <h4 class="sidebar"><strong>Branch and Bound Blog</strong></h4>
+           <em>... pruning the software universe</em> 
+           <hr>
+           <ul class="sidebar unstyled">
+             <li><a href="/about.html">About Sander</a></li>
+           </ul>
+           <span class="sidebar pull-right">
+             <a href="http://www.twitter.com/Sander_Mak" target="_blank"><img title="Twitter" alt="Twitter" class="small" src="/assets/themes/sander/twitter.png"></a>
+             <a href="http://nl.linkedin.com/in/SanderMak" target="_blank"><img title="Linkedin profile" alt="Linkedin profile" class="small" src="/assets/themes/sander/linkedin.png"><a>
+             <a href="http://www.github.com/SanderMak" target="_blank"><img  title="GitHub" alt="GitHub" class="small" src="/assets/themes/sander/github.png"></a>
+             <a href="http://www.slideshare.net/SanderMak/presentations" target="_blank"><img title="Slideshare presentations"  alt="Slideshare presentations" class="small" src="/assets/themes/sander/slideshare.png"></a>
+           </span>
+           <hr>
+           <h5 class="sidebar">&nbsp;View archive by:</h5>
+           <ul class="sidebar unstyled">
+             <li><a href="/archive.html">Date</a></li>
+             <li><a href="/categories.html">Category</a></li>
+             <li><a href="/tags.html">Tag</a></li>
+           </ul>
+          </div>
+          <div class="hero-unit twittersidebar">
+            <h5 class="sidebar">Featured articles:</h5>
+            <br>
+            <ul>
+              <li>&raquo; <a href="/blog/scala/2013/05/launching-scalabitz/?src=featured">Launching Scalabitz</a></li>
+              <li>&raquo; <a href="/blog/bookreview/2013/01/bookreview-infinity-and-the-mind/?src=featured">Infinity and the Mind</a></li>      
+  	          <li>&raquo; <a href="/blog/conferences/2012/06/preparing-a-technical-talk/?src=featured">Preparing a technical talk</a></li>
+            </ul>
+          </div>
+          <div class="hero-unit readingsidebar">
+            <h5 class="sidebar">Currently reading:</h5>
+            <br>
+            <ul>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/1933988916/ref=as_li_ss_tl?ie=UTF8&tag=branandboun-20&linkCode=as2&camp=1789&creative=390957&creativeASIN=1933988916" target="_blank">OSGi in action</a></li>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/1593273886/ref=as_li_ss_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=1593273886&linkCode=as2&tag=branandboun-20" target="_blank">The Tangled Web</a></li>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/0321125215/ref=as_li_ss_tl?ie=UTF8&tag=branandboun-20&linkCode=as2&camp=1789&creative=390957&creativeASIN=0321125215" target="_blank">Domain-driven design</a></li>
+            </ul>
+          </div>
+          <div class="hero-unit sidebar">
+           <a class="twitter-timeline" width="250" height="500" data-dnt=true href="https://twitter.com/Sander_Mak" data-widget-id="266609354059431938">Tweets by @Sander_Mak</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+
+                       
+          </div>
+        </div>
+       </div>
+      </div>
+     </div>
+
+
+      <footer>
+        <div class="container">
+         <div class="row">
+           <div class="span9 offset2">
+            <br>
+            <hr>
+           </div>
+         </div>
+         <div class="row">
+          <div class="span4 offset2">
+            <p>Branch and Bound - ... pruning the software universe</p>
+          </div>   
+          <div class="span5">  
+            <p class="pull-right">by Sander Mak</p>
+          </div>
+         </div>
+        </div>
+      </footer>
+
+    <!-- Scripts at the end for faster loading. -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
+    <script src="/assets/themes/sander/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+   
+
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-15335121-2']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+
+    </script>
+
+  </body>
+</html>
+
+
+
