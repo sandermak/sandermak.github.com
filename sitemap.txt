@@ -8,6 +8,7 @@ http://branchandbound.net/sitemap.txt
 http://branchandbound.net/tags.html
 http://branchandbound.net/talks.html
 
+http://branchandbound.net/blog/web/2015/11/exploring-angular2
 http://branchandbound.net/blog/java/2015/10/osgi-to-jigsaw
 http://branchandbound.net/blog/java/2015/09/java-module-system-first-look
 http://branchandbound.net/blog/architecture/2015/06/on-microservices-monoliths-and-critical-thinking

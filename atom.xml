@@ -4,7 +4,7 @@
  <title>Branch and Bound</title>
  <link href="http://branchandbound.net/atom.xml" rel="self"/>
  <link href="http://branchandbound.net"/>
- <updated>2015-10-27T13:00:59-07:00</updated>
+ <updated>2015-11-10T16:29:45+01:00</updated>
  <id>http://branchandbound.net/</id>
  <author>
    <name>Sander Mak</name>
@@ -14,15 +14,350 @@
  
  <entry>
    <author><name>Sander Mak</name></author>
+   <title>Exploring Angular2</title>
+   <link href="http://branchandbound.net/blog/web/2015/11/exploring-angular2"/>
+   <updated>2015-11-10T00:00:00+01:00</updated>
+   <id>http://branchandbound.net/blog/web/2015/11/exploring-angular2</id>
+   <content type="html">
+       &lt;p&gt;AngularJS 1.x gained an unprecedented following in the past few years. We use it heavily in our applications, too. All the more reason to dive into the next iteration of this widely popular framework: Angular2.&lt;/p&gt;
+
+       &lt;p&gt;The Angular team is currently chipping away at their backlog, promising a &lt;a href=&quot;https://github.com/angular/angular/milestones&quot;&gt;beta version&lt;/a&gt; &#39;real soon now&#39;™.
+Meanwhile, I&#39;ve been playing around with their alpha releases.
+Yes, that is as painful as &lt;a href=&quot;https://github.com/angular/angular/blob/master/CHANGELOG.md&quot;&gt;it sounds&lt;/a&gt;.
+Still, it gave me a solid understanding of where the framework is conceptually heading.
+Check out &lt;a href=&quot;https://github.com/sandermak/ytlive-angular2&quot;&gt;the code&lt;/a&gt;, then come back for some much-needed context!&lt;/p&gt;
+
+&lt;p&gt;The sample app provides an alternative front-end to YouTube.
+You can search for live music by providing an artist name.
+Search results can either be stored, or played directly.
+The playlist is backed by localstorage.
+It&#39;s not a large application by any means, but it&#39;s not a toy application either.
+This is &#39;YouTube live!&#39; in action:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/pics/ytlive.png&quot; alt=&quot;YT Live example app&quot; /&gt;&lt;/p&gt;
+
+&lt;h3&gt;TypeScript&lt;/h3&gt;
+
+&lt;p&gt;First thing you&#39;ll notice when looking at &lt;a href=&quot;https://github.com/sandermak/ytlive-angular2&quot;&gt;the code&lt;/a&gt; is that YouTube live! is written in TypeScript.
+Why? Well, first of all I think TypeScript is a huge improvement over plain JavaScript.
+Watch &lt;a href=&quot;https://www.youtube.com/watch?v=sNot2qxYujU&quot;&gt;my talk on TypeScript&lt;/a&gt; to see why.
+This post assumes some familiarity with ES6 and TypeScript.
+Again, watch &lt;a href=&quot;https://www.youtube.com/watch?v=sNot2qxYujU&quot;&gt;the talk&lt;/a&gt; if you want to brush up on that.
+It has lots of live coding, so I promise you won&#39;t be bored.&lt;/p&gt;
+
+&lt;p&gt;The biggest reason for writing Angular2 apps in TypeScript is that Angular2 itself is written in TypeScript.
+You can still write Angular2 apps in plain JavaScript (ES5 or ES6), but you&#39;ll miss out on some syntactic niceties.
+And miss out on full compile-time type-checking of your clientside app.
+Trust me, it&#39;s a big deal.&lt;/p&gt;
+
+&lt;p&gt;After cloning the repo, you can install and run the app with &lt;code&gt;npm install &amp;amp;&amp;amp; npm start&lt;/code&gt;.
+The layout of the application then looks like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;src/
+├── index.html
+├── tsconfig.json
+├── node_modules/
+├── lib/
+└── ytlive/
+    ├── playlist/
+    │   ├── PlaylistBackend.ts
+    │   ├── PlaylistComponents.ts
+    │   ├── playlist.html
+    │   └── playlistentry.html
+    ├── search/
+    │   ├── SearchComponents.ts
+    │   ├── YTLiveBackend.ts
+    │   ├── search.html
+    │   └── searchresult.html
+    ├── ytlive.html
+    └── ytlive.ts
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The code is nicely modularised using ES6 modules, supported by TypeScript.
+Angular2 does away with its own module system.
+This solves the awkward problems of duplicate module definition when combining AngularJS 1.x  with module loaders like require.js.
+Notice that Angular2 is distributed as &lt;a href=&quot;https://www.npmjs.com/package/angular2&quot;&gt;npm package&lt;/a&gt; so installing (and later upgrading) is a breeze.&lt;/p&gt;
+
+&lt;h3&gt;Components&lt;/h3&gt;
+
+&lt;p&gt;When opening up the source files, it is immediately clear that Angular2 is a completely different framework from AngularJS 1.x.
+Conceptually you&#39;ll recognize some things, but at a technical level it&#39;s a clean slate.
+If that scares you a bit: I sympathize wholeheartedly.
+However, the component-based approach of Angular2 definitely is a step up.
+Starting over was a bold move by the Angular team, and it pays off as evidenced by some preliminary &lt;a href=&quot;http://info.meteor.com/blog/comparing-performance-of-blaze-react-angular-meteor-and-angular-2-with-meteor&quot;&gt;performance figures&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Reminiscent of React, your whole application is constructed as a tree of components:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/pics/ytlive-components.png&quot; alt=&quot;YT Live components&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Angular2 components replace a whole host of abstractions we know from AngularJS 1.x.
+It essentially unifies services, controllers and directives.
+A component is an annotated class, that can refer to an associated HTML template:&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;PlaylistComponents.ts&lt;/em&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;&lt;span class=&quot;kr&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;Component&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;View&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;NgFor&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&amp;#39;angular2/angular2&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kr&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;LocalStoragePlayList&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&amp;#39;./PlaylistBackend&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;// PlaylistEntryComponent class definition omitted for brevity.&lt;/span&gt;
+
+&lt;span class=&quot;err&quot;&gt;@&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;Component&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;({&lt;/span&gt;
+  &lt;span class=&quot;nx&quot;&gt;selector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&amp;#39;playlist&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+  &lt;span class=&quot;nx&quot;&gt;providers&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;LocalStoragePlayList&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;
+&lt;span class=&quot;err&quot;&gt;@&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;View&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;({&lt;/span&gt;
+  &lt;span class=&quot;nx&quot;&gt;templateUrl&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;ytlive/playlist/playlist.html&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+  &lt;span class=&quot;nx&quot;&gt;directives&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;NgFor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;PlaylistEntryComponent&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;
+&lt;span class=&quot;kr&quot;&gt;export&lt;/span&gt; &lt;span class=&quot;kr&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;PlaylistComponent&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+
+  &lt;span class=&quot;nx&quot;&gt;constructor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kr&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;playlistService&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;LocalStoragePlayList&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+  &lt;span class=&quot;nx&quot;&gt;get&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;entries&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ConcertSummary&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;playlistService&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;getPlaylist&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;In particular, the @View annotation contains a reference to this template:&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;playlist.html&lt;/em&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-html&quot; data-lang=&quot;html&quot;&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;playlist row&amp;quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;ng-for=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;#entry of entries&amp;quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;playlist-entry&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;entry&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;]=&amp;quot;&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;entry&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/playlist-entry&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/div&amp;gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Together, the template and component class form a reusable whole.
+Through the selector property on the @Component annotation, we control how this component can be instantiated in templates.
+In the template above, we similarly use the &lt;code&gt;playlist-entry&lt;/code&gt; element to instantiate nested components for each &lt;code&gt;entry&lt;/code&gt; we have in the &lt;code&gt;PlaylistComponent&lt;/code&gt;.
+These entries come from the getter method &lt;code&gt;entries()&lt;/code&gt; on that component.
+Using the &lt;code&gt;[entry]=&quot;entry&quot;&lt;/code&gt; syntax we pass the current entry in the iteration to the nested component instance&#39;s &lt;code&gt;entry&lt;/code&gt; property (which is just a plain class member on the PlaylistEntryComponent class).&lt;/p&gt;
+
+&lt;p&gt;Note that we use two custom elements in the template: &lt;code&gt;ng-for&lt;/code&gt; and &lt;code&gt;playlist-entry&lt;/code&gt;.
+Looking at the PlaylistComponent class, you see these are explicitly listed under &lt;code&gt;directives&lt;/code&gt; in the @View annotation.
+No more guessing where the &#39;magic&#39; elements are coming from!
+It&#39;s right there. And not just as strings, but properly imported and referenced from the file they are defined.
+In this case, ng-for hails from Angular2 itself, and PlaylistEntryComponent is defined earlier in the same file (omitted above).
+You might be wondering about the slightly funky syntax with asterisks and brackets.
+There&#39;s a method to the madness, fortunately.
+Read &lt;a href=&quot;http://victorsavkin.com/post/119943127151/angular-2-template-syntax&quot;&gt;this post&lt;/a&gt; for a more in-depth treatment of Angular2 template syntax. And yes, it is 100% valid &lt;a href=&quot;http://www.w3.org/TR/html-markup/syntax.html#syntax-attributes&quot;&gt;HTML attribute syntax&lt;/a&gt;, in case you were wondering.&lt;/p&gt;
+
+&lt;p&gt;One fair warning when working with components: component declaration order within a single source file &lt;em&gt;does&lt;/em&gt; matter.
+I started out defining PlaylistComponent first, and the PlaylistEntryComponent later in the file.
+It seemed so logical, but it broke at runtime.
+There&#39;s a forward reference to a class that doesn&#39;t exist yet in the &lt;code&gt;directives&lt;/code&gt; property of PlaylistComponent.
+That makes for some nice error messages and stacktraces in the console, I can tell you.
+(for the unlucky googler who is suffering from this problem: &#39;EXCEPTION: Unexpected directive value &#39;undefined&#39; on the View of component &#39;PlaylistComponent&#39; was the error with Angular2.alpha45 and earlier)&lt;/p&gt;
+
+&lt;p&gt;Moral of the story: define (or import) your components before referencing them in other components. Or resort to &lt;a href=&quot;http://blog.thoughtram.io/angular/2015/09/03/forward-references-in-angular-2.html&quot;&gt;ugly workarounds&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3&gt;Component interaction&lt;/h3&gt;
+
+&lt;p&gt;So we have a component tree, components encapsulate data and can render themselves initially.
+Next question: how does anything get done?
+How do components interact with the user and each other?&lt;/p&gt;
+
+&lt;p&gt;With AngularJS 1.x, you&#39;re used to 2-way databinding by default.
+In Angular2, by default data flows uni-directionally, from the root component to the children.
+We already saw an example of passing down data to child components through their attributes, which end up on component class members.
+This is a one-way street.
+You have two main ways of communicating between arbitrary, non-hierarchical components: events, and shared components.&lt;/p&gt;
+
+&lt;p&gt;This example uses shared components.
+It is also possible to define custom events and trigger behavior throughout the component tree.
+However, not all custom events are propagated correctly yet in the alpha-versions I worked with.
+You will not find an example of using custom events in YouTube live!, but you can find more information in &lt;a href=&quot;http://schwarty.com/2015/08/14/angular2-eventemitter-and-custom-event-name/&quot;&gt;this post&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;An example of shared components in action is playing a video in YouTube live.
+It&#39;s possible to start a video both from the playlist entries and the search results.
+This shared functionality can be achieved by simply creating a VideoPlayer class with the appropriate methods and state:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;&lt;span class=&quot;kr&quot;&gt;export&lt;/span&gt; &lt;span class=&quot;kr&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;VideoPlayer&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;kr&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;isPlaying&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;kr&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;currentVideoUrl&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;string&lt;/span&gt;
+
+  &lt;span class=&quot;kr&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;playConcert&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;isPlaying&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;currentVideoUrl&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;concertIdToEmbedUrl&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+  &lt;span class=&quot;kr&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;stop&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;isPlaying&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;currentVideoUrl&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;undefined&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+  &lt;span class=&quot;kr&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;concertIdToEmbedUrl&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;yt_embed&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;id&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&amp;#39;?showinfo=0&amp;amp;autoplay=1&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;It&#39;s just a plain class, no special Angular annotations necessary.
+There is no view attached.
+One caveat: if we wanted to inject other components into this class, an @Injectable annotation would have been necessary.
+We can inject this VideoPlayer class into existing components through their constructors.
+It&#39;s a bit like services in AngularJS 1.x.&lt;/p&gt;
+
+&lt;p&gt;Take for example the SearchResult component, showing the constructor injection:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;&lt;span class=&quot;err&quot;&gt;@&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;Component&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;({&lt;/span&gt;
+  &lt;span class=&quot;nx&quot;&gt;selector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&amp;#39;search-result&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+  &lt;span class=&quot;nx&quot;&gt;properties&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;concert&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;
+  &lt;span class=&quot;nx&quot;&gt;providers&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;LocalStoragePlayList&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;
+&lt;span class=&quot;err&quot;&gt;@&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;View&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;({&lt;/span&gt;
+  &lt;span class=&quot;nx&quot;&gt;templateUrl&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;ytlive/search/searchresult.html&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+  &lt;span class=&quot;nx&quot;&gt;directives&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;
+&lt;span class=&quot;kr&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;SearchResultComponent&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;nx&quot;&gt;concert&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ytbackend&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;ConcertSummary&lt;/span&gt;
+
+  &lt;span class=&quot;nx&quot;&gt;constructor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kr&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;playlistService&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;LocalStoragePlayList&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+     &lt;span class=&quot;kr&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;videoPlayer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ytbackend&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;VideoPlayer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{}&lt;/span&gt;
+
+  &lt;span class=&quot;nx&quot;&gt;addToPlaylist&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;concert&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ytbackend&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;ConcertSummary&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;playlistService&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;addConcert&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;concert&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+  &lt;span class=&quot;nx&quot;&gt;playConcert&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;videoPlayer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;playConcert&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Two things are injected into the constructor: LocalStoragePlayList (so we can save search results) and VideoPlayer (so we can play search results).
+In the @Component annotation, you can see that the injection of LocalStoragePlaylist is setup in the &lt;code&gt;providers&lt;/code&gt; property.
+But VideoPlayer is not mentioned there. How come?
+When you define a provider, that is also the level where the to-be-injected component is instantiated.
+This instance is then available to the component &lt;em&gt;and all its child components&lt;/em&gt; for injection.
+Therefore, the VideoPlayer provider is setup in the root &lt;code&gt;YTLiveComponent&lt;/code&gt;.
+This way, the same instance of the VideoPlayer is injected into all components that request it in their constructors.
+That&#39;s good, because there is only one viewport for the videos.
+One video can be played at the time, which makes the VideoPlayer is a shared resource that&#39;s used by multiple other components.&lt;/p&gt;
+
+&lt;p&gt;Playing a concert is as simple as calling the &lt;code&gt;playConcert&lt;/code&gt; method on the SearchResultComponent from the searchresult template:&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;searchresult.html&lt;/em&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-html&quot; data-lang=&quot;html&quot;&gt;&lt;span class=&quot;c&quot;&gt;&amp;lt;!-- lots of stuff omitted --&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;button&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;title=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;Play now&amp;quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;play btn btn-success&amp;quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;span&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;click&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;)=&amp;quot;&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;playConcert&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;concert&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;)&amp;quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;glyphicon glyphicon-play-circle&amp;quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/span&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/button&amp;gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;It binds the click-event on this span to the &lt;code&gt;playConcert&lt;/code&gt; method on the SearchResultComponent, which in turn calls the shared VideoPlayer component.
+Binding to DOM-events like this is the primary means of user-interaction.
+Obviously, higher-level components are available for easily integration input components et cetera.&lt;/p&gt;
+
+&lt;p&gt;The state of the VideoPlayer instance is watched in another component/template:&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;search.html&lt;/em&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-html&quot; data-lang=&quot;html&quot;&gt;&lt;span class=&quot;c&quot;&gt;&amp;lt;!-- lots of stuff omitted --&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;ng-if=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;playing&amp;quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;id=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;concerts&amp;quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;row&amp;quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;iframe&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;width=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;100%&amp;quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;height=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;100%&amp;quot;&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;src&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;]=&amp;quot;&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;embedUrl&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;&amp;quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;frameborder=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;0&amp;quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;allowfullscreen&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/iframe&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/div&amp;gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The &lt;code&gt;[src]&lt;/code&gt; syntax binds the src property of the iframe to the &lt;code&gt;embedUrl&lt;/code&gt; property of the component for this template.
+If the embedUrl changes, the src of the iframe is automatically updated (but not the other way around).&lt;/p&gt;
+
+&lt;h3&gt;Http service&lt;/h3&gt;
+
+&lt;p&gt;Angular is more than just a front-end component framework.
+In AngularJS 1.x there was an $http service to do backend calls.
+The same applies to Angular2.
+Instead of returning (their own flavor) of Promises like in 1.x, the new Http component returns &lt;a href=&quot;https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md&quot;&gt;RX Observables&lt;/a&gt;.
+Angular2 adopts RxJs as core dependency, you see it popping up in several APIs.
+It takes some getting used to, but RxJs is a proven library offering a great way to compose asynchronous data flows.&lt;/p&gt;
+
+&lt;p&gt;In YouTube live!, we use an injected Http component to do the YouTube API calls:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;&lt;span class=&quot;err&quot;&gt;@&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;Injectable&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;kr&quot;&gt;export&lt;/span&gt; &lt;span class=&quot;kr&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ConcertService&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+
+  &lt;span class=&quot;kr&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;concerts&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ConcertSummary&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[];&lt;/span&gt;
+
+  &lt;span class=&quot;nx&quot;&gt;constructor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kr&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;http&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;Http&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+  &lt;span class=&quot;kr&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;findConcerts&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;artist&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;duration&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;Duration&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;FULLCONCERT&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;any&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ytDuration&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    
+    &lt;span class=&quot;c1&quot;&gt;// .. snipped for brevity ..&lt;/span&gt;
+
+    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;searchString&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;yt_search&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ytDuration&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&amp;#39;&amp;amp;q=&amp;#39;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;encodeURIComponent&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;#39;live &amp;#39;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;artist&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;http&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;searchString&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;map&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;res&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;any&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+      &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ytResults&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;items&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;YTSearchResult&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;res&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;json&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+      &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;transformedResults&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ytResults&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;items&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;map&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;toConcertSummary&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;concerts&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;transformedResults&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;transformedResults&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Again, we see a viewless component, but this time with the @Injectable annotation since we need Angular to inject the Http component in the constructor.
+After performing a &lt;code&gt;get&lt;/code&gt; call, the result is transformed using &lt;code&gt;map&lt;/code&gt; on the observable.
+This returns another observable, now containing data in a format we can use.
+One slight annoyance is that the Http.get returns &lt;code&gt;any&lt;/code&gt; in the current typing definition of Angular2.
+It would be nice to use the RxJS type definitions for Observables, so we can get some compile-time sanity back here as well.&lt;/p&gt;
+
+&lt;p&gt;The resulting Observable is used in the &lt;code&gt;searchConcerts&lt;/code&gt; method on SearchComponent:&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;&lt;span class=&quot;kr&quot;&gt;export&lt;/span&gt; &lt;span class=&quot;kr&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;SearchComponent&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  
+  &lt;span class=&quot;kr&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;concerts&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ytbackend&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;ConcertSummary&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[];&lt;/span&gt;
+
+  &lt;span class=&quot;nx&quot;&gt;constructor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kr&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;concertService&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ytbackend&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;ConcertService&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+      &lt;span class=&quot;kr&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;videoPlayer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ytbackend&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;VideoPlayer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+  &lt;span class=&quot;nx&quot;&gt;searchConcerts&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;videoPlayer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;stop&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;concertService&lt;/span&gt;
+      &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;findConcerts&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;searchTerm&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+      &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;subscribe&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;results&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ytbackend&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;ConcertSummary&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[])&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;concerts&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;results&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Since the ConcertService returns an observable, we cannot assign it directly to a class member of type &lt;code&gt;ConcertSummary[]&lt;/code&gt;.
+Instead, we subscribe to the observable and assign the result once our subscriber is called when results are available.
+The template automatically detects changes to &lt;code&gt;concerts&lt;/code&gt; and shows the new results from the API call.
+It would be nice if this manual &#39;unwrapping&#39; of Observables would not be necessary.&lt;/p&gt;
+
+&lt;h3&gt;Wrapping up&lt;/h3&gt;
+
+&lt;p&gt;This post barely scratches the surface of what features are in Angular2.
+There&#39;s a whole new approach to &lt;a href=&quot;http://blog.ng-book.com/the-ultimate-guide-to-forms-in-angular-2/&quot;&gt;Forms&lt;/a&gt;, a new &lt;a href=&quot;https://angular.github.io/router/&quot;&gt;Router&lt;/a&gt; and much more.
+You will find the documentation to be inadequate though.
+There&#39;s also lots of outdated information on the web, especially given the pace of the alpha releases and the amount of breakage between releases.
+This article itself will be no exception, probably.&lt;/p&gt;
+
+&lt;p&gt;Still, a more stable period is forthcoming with the Angular2 beta nearing.
+Now is definitely a good time to start learning the concepts of Angular2, but don&#39;t expect it to be a beginner-friendly experience.
+There&#39;s definitely some rough edges to Angular2, but all in all it looks very promising to me.&lt;/p&gt;
+
+&lt;p&gt;Play around with &lt;a href=&quot;https://github.com/sandermak/ytlive-angular2&quot;&gt;the code&lt;/a&gt; for YouTube live and let me know what you think!&lt;/p&gt;
+
+   </content>
+ </entry>
+ 
+ <entry>
+   <author><name>Sander Mak</name></author>
    <title>From OSGi to Jigsaw</title>
    <link href="http://branchandbound.net/blog/java/2015/10/osgi-to-jigsaw"/>
-   <updated>2015-10-27T00:00:00-07:00</updated>
+   <updated>2015-10-27T00:00:00+01:00</updated>
    <id>http://branchandbound.net/blog/java/2015/10/osgi-to-jigsaw</id>
    <content type="html">
        &lt;p&gt;In my &lt;a href=&quot;/blog/java/2015/09/java-module-system-first-look&quot;&gt;last post&lt;/a&gt; I introduced the new Java Platform Module system with a small example. As of September, there is an implementation to play with, codename Jigsaw. After some introductory toy examples, I did what any curious coder does: port a familiar (and not entirely trivial) codebase to the new shiny technology. In this case, I took a small dynamic dashboard based on OSGi and implemented it using the proposed Java Platform Module System.&lt;/p&gt;
 
        &lt;p&gt;If you want an introduction on what the new Java Platform Module System (referred to as JPMS hereafter) entails and how to get started, read &lt;a href=&quot;/blog/java/2015/09/java-module-system-first-look&quot;&gt;&#39;The Java Module system: a first look&#39;&lt;/a&gt;.
-This post assumes you&#39;re familiar with the basics of the proposed module system. And if you&#39;re the kind of person who just wants to see the code: &lt;a href=&quot;https://github.com/sandermak/carprov-jigsaw&quot;&gt;here you go&lt;/a&gt;.&lt;/p&gt;
+This post assumes you&#39;re familiar with the basics of the proposed module system. And if you&#39;re the kind of person who just wants to see the code: &lt;a href=&quot;https://github.com/sandermak/carprov-jigsaw/tree/v1&quot;&gt;here you go&lt;/a&gt;.&lt;/p&gt;
 
 &lt;h3&gt;The original OSGi application&lt;/h3&gt;
 
@@ -72,7 +407,7 @@ It is similar to the OSGi meta-data in the manifest file of OSGi jars.&lt;/p&gt;
 &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;You can find the full code for the Jigsaw version of the dashboard &lt;a href=&quot;https://github.com/sandermak/carprov-jigsaw&quot;&gt;on GitHub&lt;/a&gt; if you want to follow along. It compiles and runs on &lt;a href=&quot;http://openjdk.java.net/projects/jigsaw/ea&quot;&gt;build b86&lt;/a&gt; of the Jigsaw-enabled JDK.&lt;/p&gt;
+&lt;p&gt;You can find the full code for the Jigsaw version of the dashboard &lt;a href=&quot;https://github.com/sandermak/carprov-jigsaw/tree/v1&quot;&gt;on GitHub&lt;/a&gt; if you want to follow along. It compiles and runs on &lt;a href=&quot;http://openjdk.java.net/projects/jigsaw/ea&quot;&gt;build b86&lt;/a&gt; of the Jigsaw-enabled JDK.&lt;/p&gt;
 
 &lt;p&gt;We declare a module with the name &lt;code&gt;carprov.dashboard.api&lt;/code&gt;, exporting a package of the same name.
 Meaning the interface and helper class inside this package are visible to all modules that import this module.
@@ -308,7 +643,7 @@ Stay tuned!&lt;/p&gt;
    <author><name>Sander Mak</name></author>
    <title>The Java Module system: a first look</title>
    <link href="http://branchandbound.net/blog/java/2015/09/java-module-system-first-look"/>
-   <updated>2015-09-10T00:00:00-07:00</updated>
+   <updated>2015-09-10T00:00:00+02:00</updated>
    <id>http://branchandbound.net/blog/java/2015/09/java-module-system-first-look</id>
    <content type="html">
        &lt;p&gt;A module system for Java has been a long time coming. Late 2014, a new JSR requirements document (JSR-376) was created to this end. The changes are slated for Java 9. However, no working prototype was available. Until yesterday, that is. There now is an OpenJDK early access build that includes Project Jigsaw.&lt;/p&gt;
@@ -456,7 +791,7 @@ src/module2/module-info.java:1: error: expected &#39;module&#39;
    <author><name>Sander Mak</name></author>
    <title>On monoliths, microservices and critical thinking</title>
    <link href="http://branchandbound.net/blog/architecture/2015/06/on-microservices-monoliths-and-critical-thinking"/>
-   <updated>2015-06-10T00:00:00-07:00</updated>
+   <updated>2015-06-10T00:00:00+02:00</updated>
    <id>http://branchandbound.net/blog/architecture/2015/06/on-microservices-monoliths-and-critical-thinking</id>
    <content type="html">
        &lt;p&gt;Something very interesting happened last week. At first I wasn&#39;t sure whether it was a misguided attempt at humor. Sure enough, Twitter timelines switched en masse from advocating microservices to glorifying monoliths. What a strange world we live in.&lt;/p&gt;
@@ -494,7 +829,7 @@ src/module2/module-info.java:1: error: expected &#39;module&#39;
    <author><name>Sander Mak</name></author>
    <title>The Road to Data Science</title>
    <link href="http://branchandbound.net/blog/data/2014/10/road-to-data-science"/>
-   <updated>2014-10-27T00:00:00-07:00</updated>
+   <updated>2014-10-27T00:00:00+01:00</updated>
    <id>http://branchandbound.net/blog/data/2014/10/road-to-data-science</id>
    <content type="html">
        &lt;p&gt;Data is invariably a large part of the applications we deliver. Thinking about data, we often are concerned with ACID, scalability and other operational aspects. Building an (enterprise) app means we want our data to be safe, accessible and acted upon by our business rules. Sure, there is the occasional reporting need, but usually nothing a few well-placed queries won&#39;t be able to solve.&lt;/p&gt;
@@ -565,7 +900,7 @@ src/module2/module-info.java:1: error: expected &#39;module&#39;
    <author><name>Sander Mak</name></author>
    <title>Facebook announces Apollo at QCon NY 2014</title>
    <link href="http://branchandbound.net/blog/conferences/2014/06/facebook-announces-appolo-qcon"/>
-   <updated>2014-06-11T00:00:00-07:00</updated>
+   <updated>2014-06-11T00:00:00+02:00</updated>
    <id>http://branchandbound.net/blog/conferences/2014/06/facebook-announces-appolo-qcon</id>
    <content type="html">
        &lt;p&gt;Today I attended a talk &lt;a href=&quot;https://qconnewyork.com/presentation/how-facebook-scales-big-data-systems&quot;&gt;&#39;How Facebook Scales Big Data Systems&#39;&lt;/a&gt; at QCon NY 2014. It turns out that Jeff Johnson took this opportunity to announce a new project by Facebook: Apollo. The following is a rough transcript of the talk.&lt;/p&gt;
@@ -647,7 +982,7 @@ src/module2/module-info.java:1: error: expected &#39;module&#39;
    <author><name>Sander Mak</name></author>
    <title>Generating JUnit test reports with Jasmine 2.0</title>
    <link href="http://branchandbound.net/blog/web/2014/03/generating-junit-testreports-jasmine-20"/>
-   <updated>2014-03-06T00:00:00-08:00</updated>
+   <updated>2014-03-06T00:00:00+01:00</updated>
    <id>http://branchandbound.net/blog/web/2014/03/generating-junit-testreports-jasmine-20</id>
    <content type="html">
        &lt;p&gt;While setting up a new project at work, a seemingly small upgrade from Jasmine 1.3 to Jasmine 2.0 broke a vital feature: the ability to generate JUnit XML reports for JavaScript unit tests. Long story short: I created &lt;a href=&quot;https://github.com/sandermak/jasmine2-junit&quot;&gt;jasmine2-junit&lt;/a&gt; to bring this feature to Jasmine 2.0 again.&lt;/p&gt;
@@ -716,7 +1051,7 @@ src/module2/module-info.java:1: error: expected &#39;module&#39;
    <author><name>Sander Mak</name></author>
    <title>ng-conf 2014: the world's first AngularJS conference</title>
    <link href="http://branchandbound.net/blog/conferences/2014/01/ng-conf-2014-world-first-angular-conference"/>
-   <updated>2014-01-20T00:00:00-08:00</updated>
+   <updated>2014-01-20T00:00:00+01:00</updated>
    <id>http://branchandbound.net/blog/conferences/2014/01/ng-conf-2014-world-first-angular-conference</id>
    <content type="html">
        &lt;p&gt;Last week I attended the world’s first ever dedicated AngularJS conference in Salt Lake City. More than 700 JavaScript developers gathered in the Little America hotel for two days to learn from Angular core-devs and community members.&lt;/p&gt;
@@ -783,7 +1118,7 @@ src/module2/module-info.java:1: error: expected &#39;module&#39;
    <author><name>Sander Mak</name></author>
    <title>A failed experiment: improving the Builder pattern</title>
    <link href="http://branchandbound.net/blog/java/2013/10/failed-experiment-improving-builder-pattern"/>
-   <updated>2013-10-21T00:00:00-07:00</updated>
+   <updated>2013-10-21T00:00:00+02:00</updated>
    <id>http://branchandbound.net/blog/java/2013/10/failed-experiment-improving-builder-pattern</id>
    <content type="html">
        &lt;p&gt;Sometimes, you want to try something new. Like last week, when I wanted to implement a builder for a domain object. In Java, lest you wonder why the code samples in this post are so long.&lt;/p&gt;
@@ -1019,7 +1354,7 @@ src/module2/module-info.java:1: error: expected &#39;module&#39;
    <author><name>Sander Mak</name></author>
    <title>JavaOne 2013 trip report</title>
    <link href="http://branchandbound.net/blog/conferences/2013/09/javaone-2013-tripreport"/>
-   <updated>2013-09-30T00:00:00-07:00</updated>
+   <updated>2013-09-30T00:00:00+02:00</updated>
    <id>http://branchandbound.net/blog/conferences/2013/09/javaone-2013-tripreport</id>
    <content type="html">
        &lt;p&gt;Last week, San Francisco was sprawling with developers. It was that time of the year again: JavaOne 2013 took place. Thousands of Java developers gathered September 22-26 to learn new things and meet new people.&lt;/p&gt;
@@ -1086,7 +1421,7 @@ During both talks there was a lot of audience interaction, which is always an en
    <author><name>Sander Mak</name></author>
    <title>Some AngularJS pitfalls</title>
    <link href="http://branchandbound.net/blog/web/2013/08/some-angularjs-pitfalls"/>
-   <updated>2013-08-05T00:00:00-07:00</updated>
+   <updated>2013-08-05T00:00:00+02:00</updated>
    <id>http://branchandbound.net/blog/web/2013/08/some-angularjs-pitfalls</id>
    <content type="html">
        &lt;p&gt;In the past few months I&#39;ve been heavily using AngularJS. It&#39;s a marvelous framework for modern web applications. But as with every new toy, there are some rough edges that you have to be aware of. In this post I&#39;ll round up some gotcha&#39;s I encountered. Assuming you already know your way around Angular, these may be helpful.&lt;/p&gt;
@@ -1224,7 +1559,7 @@ During both talks there was a lot of audience interaction, which is always an en
    <author><name>Sander Mak</name></author>
    <title>The Java Modularity Story</title>
    <link href="http://branchandbound.net/blog/java/2013/07/java-modularity-story"/>
-   <updated>2013-07-18T00:00:00-07:00</updated>
+   <updated>2013-07-18T00:00:00+02:00</updated>
    <id>http://branchandbound.net/blog/java/2013/07/java-modularity-story</id>
    <content type="html">
        &lt;p&gt;So you&#39;ve got a growing Java application with a nice feature set. Unfortunately adding new features gets harder over time and things start breaking in unexpected places. Chances are that your applications is not as modular as it could be. Relax, it&#39;s not (just) your fault. Plain Java is notoriously lacking in the modularity department. But it doesn&#39;t have be this way.&lt;/p&gt;
@@ -1317,7 +1652,7 @@ During both talks there was a lot of audience interaction, which is always an en
    <author><name>Sander Mak</name></author>
    <title>Annoyances in the daily life of a developer</title>
    <link href="http://branchandbound.net/blog/development/2013/06/annoyances-daily-life-developer"/>
-   <updated>2013-06-24T00:00:00-07:00</updated>
+   <updated>2013-06-24T00:00:00+02:00</updated>
    <id>http://branchandbound.net/blog/development/2013/06/annoyances-daily-life-developer</id>
    <content type="html">
        &lt;p&gt;I&#39;m not complaining and I love my job, but sometimes...&lt;/p&gt;
@@ -1367,7 +1702,7 @@ During both talks there was a lot of audience interaction, which is always an en
    <author><name>Sander Mak</name></author>
    <title>JEEConf 2013 trip report</title>
    <link href="http://branchandbound.net/blog/conferences/2013/05/jeeconf-2013-tripreport"/>
-   <updated>2013-05-25T00:00:00-07:00</updated>
+   <updated>2013-05-25T00:00:00+02:00</updated>
    <id>http://branchandbound.net/blog/conferences/2013/05/jeeconf-2013-tripreport</id>
    <content type="html">
        &lt;p&gt;Like &lt;a href=&quot;/blog/conferences/2012/05/jeeconf-tripreport&quot;&gt;last year&lt;/a&gt;, I had the opportunity to speak at JEEConf Kiev, the leading Java conference in Eastern Europe. More than 700 people from countries like Ukraine, Russia and Belarus attended JEEConf. Most talks are therefore in Russian. However, there was just enough English content to keep me entertained as well.&lt;/p&gt;
@@ -1416,7 +1751,7 @@ During both talks there was a lot of audience interaction, which is always an en
    <author><name>Sander Mak</name></author>
    <title>Launching Scalabitz</title>
    <link href="http://branchandbound.net/blog/scala/2013/05/launching-scalabitz"/>
-   <updated>2013-05-12T00:00:00-07:00</updated>
+   <updated>2013-05-12T00:00:00+02:00</updated>
    <id>http://branchandbound.net/blog/scala/2013/05/launching-scalabitz</id>
    <content type="html">
        &lt;p&gt;Today marks the launch of my lingering weekend-project: &lt;a href=&quot;http://scalabitz.com&quot;&gt;scalabitz.com&lt;/a&gt;. It tries to surface interesting Scala content through the API of link-shortener Bit.ly. The site was built using Scala and Play (and a bit of Akka) with a MongoDB storage layer and can be found on &lt;a href=&quot;https://github.com/sandermak/scalabitz&quot;&gt;GitHub&lt;/a&gt;.&lt;/p&gt;
@@ -1480,7 +1815,7 @@ During both talks there was a lot of audience interaction, which is always an en
    <author><name>Sander Mak</name></author>
    <title>A year of blogging analyzed with R</title>
    <link href="http://branchandbound.net/blog/data/2013/03/year-blogging-analyzed-r"/>
-   <updated>2013-03-23T00:00:00-07:00</updated>
+   <updated>2013-03-23T00:00:00+01:00</updated>
    <id>http://branchandbound.net/blog/data/2013/03/year-blogging-analyzed-r</id>
    <content type="html">
        &lt;p&gt;Today it&#39;s exactly one year ago that I published my first blogpost on branchandbound.net. During this year I&#39;ve written 12 posts, including this one. Since we live in the age of analytics, I thought it would be nice to show how this blog has fared during its first year.&lt;/p&gt;
@@ -1590,7 +1925,7 @@ ga.df &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; ga&lt;span class=&q
    <author><name>Sander Mak</name></author>
    <title>Book review: Infinity and the Mind</title>
    <link href="http://branchandbound.net/blog/bookreview/2013/01/bookreview-infinity-and-the-mind"/>
-   <updated>2013-01-31T00:00:00-08:00</updated>
+   <updated>2013-01-31T00:00:00+01:00</updated>
    <id>http://branchandbound.net/blog/bookreview/2013/01/bookreview-infinity-and-the-mind</id>
    <content type="html">
        &lt;p&gt;&lt;a href=&quot;http://www.amazon.com/gp/product/0691121273/ref=as_li_ss_tl?ie=UTF8&amp;amp;camp=1789&amp;amp;creative=390957&amp;amp;creativeASIN=0691121273&amp;amp;linkCode=as2&amp;amp;tag=branandboun-20&quot;&gt;Infinity and the Mind&lt;/a&gt; provides a rare mixture of mathematical, scientific and philosophical explorations.  It gives both an account of the theory of transfinite numbers and discusses its implications from a philosophical point of view. With &#39;The science and philosophy of the infinite&#39; as its subtitle, it is one of the most challenging books I&#39;ve read in a while. Granted, this may be because I&#39;m neither a mathematician nor a philosopher, just a software developer who has some interest in both fields. And yes, the book is relatively old, but it has stood the test of time.&lt;/p&gt;
@@ -1634,7 +1969,7 @@ ga.df &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; ga&lt;span class=&q
    <author><name>Sander Mak</name></author>
    <title>Scala is like Git</title>
    <link href="http://branchandbound.net/blog/scala/2012/12/scala-is-like-git"/>
-   <updated>2012-12-20T00:00:00-08:00</updated>
+   <updated>2012-12-20T00:00:00+01:00</updated>
    <id>http://branchandbound.net/blog/scala/2012/12/scala-is-like-git</id>
    <content type="html">
        &lt;p&gt;Scala is often portrayed as being too complex. Many times these discussions about complexity remind me of similar arguments around the complexity of Git. I know, the comparison between a source control system and a programming language falls flat quickly when pushed too hard. But bear with me, because I do believe it can put the Scala complexity discussion in a new perspective.&lt;/p&gt;
@@ -1688,7 +2023,7 @@ ga.df &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; ga&lt;span class=&q
    <author><name>Sander Mak</name></author>
    <title>Unify client-side and server-side rendering by embedding JSON</title>
    <link href="http://branchandbound.net/blog/web/2012/11/unify-server-side-client-side-rendering-embedding-json"/>
-   <updated>2012-11-21T00:00:00-08:00</updated>
+   <updated>2012-11-21T00:00:00+01:00</updated>
    <id>http://branchandbound.net/blog/web/2012/11/unify-server-side-client-side-rendering-embedding-json</id>
    <content type="html">
        &lt;p&gt;Not many applications I work on these days are solely using the traditional server-side rendering model. Neither do they employ 100% client-side rendering and templating. Usually it&#39;s a mix in which the &#39;old&#39; world meets the new world, giving rise to some interesting design decisions. In this article I want to explore a solution that combines both worlds while minimizing the duplication of rendering logic by embedding JSON in the view.&lt;/p&gt;
@@ -1813,7 +2148,7 @@ ga.df &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; ga&lt;span class=&q
    <author><name>Sander Mak</name></author>
    <title>JFall 2012: Dutch Java awesomeness</title>
    <link href="http://branchandbound.net/blog/conferences/2012/11/jfall-2012-dutch-java-awesomeness"/>
-   <updated>2012-11-01T00:00:00-07:00</updated>
+   <updated>2012-11-01T00:00:00+01:00</updated>
    <id>http://branchandbound.net/blog/conferences/2012/11/jfall-2012-dutch-java-awesomeness</id>
    <content type="html">
        &lt;p&gt;The J-Fall conference has been a stable factor in the Dutch Java community for many years now. The 2012 edition was again jam-packed with excellent content. But above all, it&#39;s a place where more than thousand like-minded developers can meet (again) and exchange fresh new ideas!&lt;/p&gt;
@@ -1864,7 +2199,7 @@ ga.df &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; ga&lt;span class=&q
    <author><name>Sander Mak</name></author>
    <title>Cross-Build Injection in action</title>
    <link href="http://branchandbound.net/blog/security/2012/10/cross-build-injection-in-action"/>
-   <updated>2012-10-08T00:00:00-07:00</updated>
+   <updated>2012-10-08T00:00:00+02:00</updated>
    <id>http://branchandbound.net/blog/security/2012/10/cross-build-injection-in-action</id>
    <content type="html">
        &lt;p&gt;A &lt;a href=&quot;/blog/security/2012/03/crossbuild-injection-how-safe-is-your-build&quot;&gt;previous post&lt;/a&gt; introduced Cross-Build Injection (XBI) attacks. Recently, I&#39;ve had the opportunity to present this work at JavaOne. In that session, I used a live example to show what could go wrong. By popular request, this post outlines the example XBI attack that I used as demonstration.&lt;/p&gt;
@@ -1975,7 +2310,7 @@ Hi, you&lt;span class=&quot;err&quot;&gt;&amp;#39;&lt;/span&gt;ve been p0wned!&l
    <author><name>Sander Mak</name></author>
    <title>Verify dependencies using PGP</title>
    <link href="http://branchandbound.net/blog/security/2012/08/verify-dependencies-using-pgp"/>
-   <updated>2012-08-22T00:00:00-07:00</updated>
+   <updated>2012-08-22T00:00:00+02:00</updated>
    <id>http://branchandbound.net/blog/security/2012/08/verify-dependencies-using-pgp</id>
    <content type="html">
        &lt;p&gt;Many builds use automatic dependency retrieval from repositories like Maven Central. In an earlier post, I&#39;ve outlined the dangers of so-called &lt;a href=&quot;/blog/security/2012/03/crossbuild-injection-how-safe-is-your-build&quot;&gt;cross-build injection attacks&lt;/a&gt; when using automatic dependency management. In this post, I&#39;ll show how you can counter such attacks by verifying PGP signatures of artifacts downloaded from Maven Central.&lt;/p&gt;
@@ -2111,7 +2446,7 @@ gpg: Good signature from &quot;Sonatype, Inc. (Sonatype release key) &amp;lt;dev
    <author><name>Sander Mak</name></author>
    <title>Book review: DSLs in Action</title>
    <link href="http://branchandbound.net/blog/bookreview/2012/08/bookreview-dsls-in-action"/>
-   <updated>2012-08-04T00:00:00-07:00</updated>
+   <updated>2012-08-04T00:00:00+02:00</updated>
    <id>http://branchandbound.net/blog/bookreview/2012/08/bookreview-dsls-in-action</id>
    <content type="html">
        &lt;p&gt;Domain-Specific Languages are not the most used tools in the toolbox of developers. According to the author of &#39;DSLs in Action&#39; this is a missed opportunity: these little languages can deliver lots of benefits. In this book he argues this position with fervor. But be warned: this is not a book for beginners.&lt;/p&gt;
@@ -2147,7 +2482,7 @@ gpg: Good signature from &quot;Sonatype, Inc. (Sonatype release key) &amp;lt;dev
    <author><name>Sander Mak</name></author>
    <title>Modern concurrency and Java EE</title>
    <link href="http://branchandbound.net/blog/java/2012/07/modern-concurrency-and-javaee"/>
-   <updated>2012-07-23T00:00:00-07:00</updated>
+   <updated>2012-07-23T00:00:00+02:00</updated>
    <id>http://branchandbound.net/blog/java/2012/07/modern-concurrency-and-javaee</id>
    <content type="html">
        &lt;p&gt;Managing your own threads within a Java EE container is not recommended and even illegal in some circumstances. But where does that leave us when we want to use the shiny new Java concurrency frameworks like Fork/Join and Akka in Java EE applications? The addition of new concurrency facilities to the Java EE 7 spec may open some doors.&lt;/p&gt;
@@ -2212,7 +2547,7 @@ submitted the task. All tasks will then run on the selected process/server.&lt;/
    <author><name>Sander Mak</name></author>
    <title>Preparing a technical talk</title>
    <link href="http://branchandbound.net/blog/conferences/2012/06/preparing-a-technical-talk"/>
-   <updated>2012-06-06T00:00:00-07:00</updated>
+   <updated>2012-06-06T00:00:00+02:00</updated>
    <id>http://branchandbound.net/blog/conferences/2012/06/preparing-a-technical-talk</id>
    <content type="html">
        &lt;p&gt;We software engineers love giving talks. Fortunately, the abundance of technical conferences shows that we like listening too. A lot of talks on these conferences are given by software engineers who love sharing knowledge, rather than professional speakers. This especially holds true for conferences organized by user groups. Since I&#39;m one of those software engineers who likes to give talks, I&#39;d like to share my thoughts on what you can do to prepare a technical talk.&lt;/p&gt;
@@ -2277,7 +2612,7 @@ submitted the task. All tasks will then run on the selected process/server.&lt;/
    <author><name>Sander Mak</name></author>
    <title>JEEConf 2012 trip report</title>
    <link href="http://branchandbound.net/blog/conferences/2012/05/jeeconf-tripreport"/>
-   <updated>2012-05-20T00:00:00-07:00</updated>
+   <updated>2012-05-20T00:00:00+02:00</updated>
    <id>http://branchandbound.net/blog/conferences/2012/05/jeeconf-tripreport</id>
    <content type="html">
        &lt;p&gt;What do Eastern European developers do on their free Saturday? Well, at least 650 of them go and attend a technical conference: JEEConf in Kiev, Ukraine. This is the second year that JEEConf is organized, and they&#39;ve already grown from 400 attendants last year to 650 this year, coming from 9 countries surrounding Ukraine. I was invited to give two talks, one on Hibernate Performance Tuning and another on Scala &amp;amp; Lift.&lt;/p&gt;
@@ -2337,7 +2672,7 @@ Beautiful Kiev University building&lt;/p&gt;
    <author><name>Sander Mak</name></author>
    <title>Cross-build injection attacks: how safe is your build?</title>
    <link href="http://branchandbound.net/blog/security/2012/03/crossbuild-injection-how-safe-is-your-build"/>
-   <updated>2012-03-23T00:00:00-07:00</updated>
+   <updated>2012-03-23T00:00:00+01:00</updated>
    <id>http://branchandbound.net/blog/security/2012/03/crossbuild-injection-how-safe-is-your-build</id>
    <content type="html">
        &lt;p&gt;Imagine a world in which people blindly trust binaries uploaded to the internet by random strangers. Certainly not a world in which we as software engineers want to live. Except that many of us, including myself, do exactly that.  On a regular  basis. In our most precious environment: the software build process.&lt;/p&gt;

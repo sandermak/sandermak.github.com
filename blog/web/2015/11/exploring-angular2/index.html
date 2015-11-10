@@ -1,0 +1,551 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Exploring Angular2 - Branch and Bound</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Sander Mak">
+
+    <link href="http://feeds.feedburner.com/BranchAndBound" rel="alternate" title="Branch and Bound Blog Feed" type="application/atom+xml" />
+    <!-- Le styles -->
+    <link href="/assets/themes/sander/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="/assets/themes/sander/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="/assets/themes/sander/syntax.css" rel="stylesheet">
+    <link href="/assets/themes/sander/style.css" rel="stylesheet">
+
+    <style type="text/css">
+      body {
+        padding-top: 10px;
+        padding-bottom: 40px;
+      }
+    </style>
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="assets/bootstrap/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="assets/bootstrap/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/bootstrap/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="assets/bootstrap/ico/apple-touch-icon-57-precomposed.png">
+
+  </head>
+
+  <body>
+
+
+    <div class="container">
+      <div class="row">
+        <div class="span11">
+    <div class="navbar">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="/">Branch and Bound</a>
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li><a href="/">Home</a></li>
+              <li><a href="/about.html">About</a></li>
+              <li><a href="/talks.html">Talks</a></li>
+              <li><a href="/archive.html">Archive</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+        </div>
+      </div>
+      <div class="row">
+        <div class="span6 offset2">
+          
+<article>
+  <header>
+    <h1>Exploring Angular2</h1>
+    <strong><time datetime="2015-11-10" pubdate>10 November 2015</time></strong>
+
+    <br>
+    <br>
+
+    <p><em><p>AngularJS 1.x gained an unprecedented following in the past few years. We use it heavily in our applications, too. All the more reason to dive into the next iteration of this widely popular framework: Angular2.</p>
+</em></p>
+  </header>
+  
+
+  <section>
+   <p>The Angular team is currently chipping away at their backlog, promising a <a href="https://github.com/angular/angular/milestones">beta version</a> 'real soon now'™.
+Meanwhile, I've been playing around with their alpha releases.
+Yes, that is as painful as <a href="https://github.com/angular/angular/blob/master/CHANGELOG.md">it sounds</a>.
+Still, it gave me a solid understanding of where the framework is conceptually heading.
+Check out <a href="https://github.com/sandermak/ytlive-angular2">the code</a>, then come back for some much-needed context!</p>
+
+<p>The sample app provides an alternative front-end to YouTube.
+You can search for live music by providing an artist name.
+Search results can either be stored, or played directly.
+The playlist is backed by localstorage.
+It's not a large application by any means, but it's not a toy application either.
+This is 'YouTube live!' in action:</p>
+
+<p><img src="/pics/ytlive.png" alt="YT Live example app" /></p>
+
+<h3>TypeScript</h3>
+
+<p>First thing you'll notice when looking at <a href="https://github.com/sandermak/ytlive-angular2">the code</a> is that YouTube live! is written in TypeScript.
+Why? Well, first of all I think TypeScript is a huge improvement over plain JavaScript.
+Watch <a href="https://www.youtube.com/watch?v=sNot2qxYujU">my talk on TypeScript</a> to see why.
+This post assumes some familiarity with ES6 and TypeScript.
+Again, watch <a href="https://www.youtube.com/watch?v=sNot2qxYujU">the talk</a> if you want to brush up on that.
+It has lots of live coding, so I promise you won't be bored.</p>
+
+<p>The biggest reason for writing Angular2 apps in TypeScript is that Angular2 itself is written in TypeScript.
+You can still write Angular2 apps in plain JavaScript (ES5 or ES6), but you'll miss out on some syntactic niceties.
+And miss out on full compile-time type-checking of your clientside app.
+Trust me, it's a big deal.</p>
+
+<p>After cloning the repo, you can install and run the app with <code>npm install &amp;&amp; npm start</code>.
+The layout of the application then looks like this:</p>
+
+<pre><code>src/
+├── index.html
+├── tsconfig.json
+├── node_modules/
+├── lib/
+└── ytlive/
+    ├── playlist/
+    │   ├── PlaylistBackend.ts
+    │   ├── PlaylistComponents.ts
+    │   ├── playlist.html
+    │   └── playlistentry.html
+    ├── search/
+    │   ├── SearchComponents.ts
+    │   ├── YTLiveBackend.ts
+    │   ├── search.html
+    │   └── searchresult.html
+    ├── ytlive.html
+    └── ytlive.ts
+</code></pre>
+
+<p>The code is nicely modularised using ES6 modules, supported by TypeScript.
+Angular2 does away with its own module system.
+This solves the awkward problems of duplicate module definition when combining AngularJS 1.x  with module loaders like require.js.
+Notice that Angular2 is distributed as <a href="https://www.npmjs.com/package/angular2">npm package</a> so installing (and later upgrading) is a breeze.</p>
+
+<h3>Components</h3>
+
+<p>When opening up the source files, it is immediately clear that Angular2 is a completely different framework from AngularJS 1.x.
+Conceptually you'll recognize some things, but at a technical level it's a clean slate.
+If that scares you a bit: I sympathize wholeheartedly.
+However, the component-based approach of Angular2 definitely is a step up.
+Starting over was a bold move by the Angular team, and it pays off as evidenced by some preliminary <a href="http://info.meteor.com/blog/comparing-performance-of-blaze-react-angular-meteor-and-angular-2-with-meteor">performance figures</a>.</p>
+
+<p>Reminiscent of React, your whole application is constructed as a tree of components:</p>
+
+<p><img src="/pics/ytlive-components.png" alt="YT Live components" /></p>
+
+<p>Angular2 components replace a whole host of abstractions we know from AngularJS 1.x.
+It essentially unifies services, controllers and directives.
+A component is an annotated class, that can refer to an associated HTML template:</p>
+
+<p><em>PlaylistComponents.ts</em>:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kr">import</span> <span class="p">{</span> <span class="nx">Component</span><span class="p">,</span> <span class="nx">View</span><span class="p">,</span> <span class="nx">NgFor</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;angular2/angular2&#39;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="p">{</span> <span class="nx">LocalStoragePlayList</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;./PlaylistBackend&#39;</span><span class="p">;</span>
+
+<span class="c1">// PlaylistEntryComponent class definition omitted for brevity.</span>
+
+<span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;playlist&#39;</span><span class="p">,</span>
+  <span class="nx">providers</span><span class="o">:</span> <span class="p">[</span><span class="nx">LocalStoragePlayList</span><span class="p">]</span>
+<span class="p">})</span>
+<span class="err">@</span><span class="nx">View</span><span class="p">({</span>
+  <span class="nx">templateUrl</span><span class="o">:</span> <span class="s2">&quot;ytlive/playlist/playlist.html&quot;</span><span class="p">,</span>
+  <span class="nx">directives</span><span class="o">:</span> <span class="p">[</span><span class="nx">NgFor</span><span class="p">,</span> <span class="nx">PlaylistEntryComponent</span><span class="p">]</span>
+<span class="p">})</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">PlaylistComponent</span> <span class="p">{</span>
+
+  <span class="nx">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">playlistService</span><span class="o">:</span> <span class="nx">LocalStoragePlayList</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span>
+
+  <span class="nx">get</span> <span class="nx">entries</span><span class="p">()</span><span class="o">:</span> <span class="nx">ConcertSummary</span><span class="p">[]</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">playlistService</span><span class="p">.</span><span class="nx">getPlaylist</span><span class="p">();</span>
+  <span class="p">}</span>
+
+<span class="p">}</span></code></pre></div>
+
+
+<p>In particular, the @View annotation contains a reference to this template:</p>
+
+<p><em>playlist.html</em>:</p>
+
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;playlist row&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;div</span> <span class="err">*</span><span class="na">ng-for=</span><span class="s">&quot;#entry of entries&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;playlist-entry</span> <span class="err">[</span><span class="na">entry</span><span class="err">]=&quot;</span><span class="na">entry</span><span class="err">&quot;</span><span class="nt">&gt;&lt;/playlist-entry&gt;</span>
+  <span class="nt">&lt;/div&gt;</span>
+<span class="nt">&lt;/div&gt;</span></code></pre></div>
+
+
+<p>Together, the template and component class form a reusable whole.
+Through the selector property on the @Component annotation, we control how this component can be instantiated in templates.
+In the template above, we similarly use the <code>playlist-entry</code> element to instantiate nested components for each <code>entry</code> we have in the <code>PlaylistComponent</code>.
+These entries come from the getter method <code>entries()</code> on that component.
+Using the <code>[entry]="entry"</code> syntax we pass the current entry in the iteration to the nested component instance's <code>entry</code> property (which is just a plain class member on the PlaylistEntryComponent class).</p>
+
+<p>Note that we use two custom elements in the template: <code>ng-for</code> and <code>playlist-entry</code>.
+Looking at the PlaylistComponent class, you see these are explicitly listed under <code>directives</code> in the @View annotation.
+No more guessing where the 'magic' elements are coming from!
+It's right there. And not just as strings, but properly imported and referenced from the file they are defined.
+In this case, ng-for hails from Angular2 itself, and PlaylistEntryComponent is defined earlier in the same file (omitted above).
+You might be wondering about the slightly funky syntax with asterisks and brackets.
+There's a method to the madness, fortunately.
+Read <a href="http://victorsavkin.com/post/119943127151/angular-2-template-syntax">this post</a> for a more in-depth treatment of Angular2 template syntax. And yes, it is 100% valid <a href="http://www.w3.org/TR/html-markup/syntax.html#syntax-attributes">HTML attribute syntax</a>, in case you were wondering.</p>
+
+<p>One fair warning when working with components: component declaration order within a single source file <em>does</em> matter.
+I started out defining PlaylistComponent first, and the PlaylistEntryComponent later in the file.
+It seemed so logical, but it broke at runtime.
+There's a forward reference to a class that doesn't exist yet in the <code>directives</code> property of PlaylistComponent.
+That makes for some nice error messages and stacktraces in the console, I can tell you.
+(for the unlucky googler who is suffering from this problem: 'EXCEPTION: Unexpected directive value 'undefined' on the View of component 'PlaylistComponent' was the error with Angular2.alpha45 and earlier)</p>
+
+<p>Moral of the story: define (or import) your components before referencing them in other components. Or resort to <a href="http://blog.thoughtram.io/angular/2015/09/03/forward-references-in-angular-2.html">ugly workarounds</a>.</p>
+
+<h3>Component interaction</h3>
+
+<p>So we have a component tree, components encapsulate data and can render themselves initially.
+Next question: how does anything get done?
+How do components interact with the user and each other?</p>
+
+<p>With AngularJS 1.x, you're used to 2-way databinding by default.
+In Angular2, by default data flows uni-directionally, from the root component to the children.
+We already saw an example of passing down data to child components through their attributes, which end up on component class members.
+This is a one-way street.
+You have two main ways of communicating between arbitrary, non-hierarchical components: events, and shared components.</p>
+
+<p>This example uses shared components.
+It is also possible to define custom events and trigger behavior throughout the component tree.
+However, not all custom events are propagated correctly yet in the alpha-versions I worked with.
+You will not find an example of using custom events in YouTube live!, but you can find more information in <a href="http://schwarty.com/2015/08/14/angular2-eventemitter-and-custom-event-name/">this post</a>.</p>
+
+<p>An example of shared components in action is playing a video in YouTube live.
+It's possible to start a video both from the playlist entries and the search results.
+This shared functionality can be achieved by simply creating a VideoPlayer class with the appropriate methods and state:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kr">export</span> <span class="kr">class</span> <span class="nx">VideoPlayer</span> <span class="p">{</span>
+  <span class="kr">public</span> <span class="nx">isPlaying</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+  <span class="kr">public</span> <span class="nx">currentVideoUrl</span><span class="o">:</span> <span class="nx">string</span>
+
+  <span class="kr">public</span> <span class="nx">playConcert</span><span class="p">(</span><span class="nx">id</span><span class="o">:</span> <span class="nx">string</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">isPlaying</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">currentVideoUrl</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">concertIdToEmbedUrl</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="kr">public</span> <span class="nx">stop</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">isPlaying</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">currentVideoUrl</span> <span class="o">=</span> <span class="kc">undefined</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="kr">private</span> <span class="nx">concertIdToEmbedUrl</span><span class="p">(</span><span class="nx">id</span><span class="o">:</span> <span class="nx">string</span><span class="p">)</span><span class="o">:</span> <span class="nx">string</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">yt_embed</span> <span class="o">+</span> <span class="nx">id</span> <span class="o">+</span> <span class="s1">&#39;?showinfo=0&amp;autoplay=1&#39;</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></div>
+
+
+<p>It's just a plain class, no special Angular annotations necessary.
+There is no view attached.
+One caveat: if we wanted to inject other components into this class, an @Injectable annotation would have been necessary.
+We can inject this VideoPlayer class into existing components through their constructors.
+It's a bit like services in AngularJS 1.x.</p>
+
+<p>Take for example the SearchResult component, showing the constructor injection:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
+  <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;search-result&#39;</span><span class="p">,</span>
+  <span class="nx">properties</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;concert&quot;</span><span class="p">],</span>
+  <span class="nx">providers</span><span class="o">:</span> <span class="p">[</span><span class="nx">LocalStoragePlayList</span><span class="p">]</span>
+<span class="p">})</span>
+<span class="err">@</span><span class="nx">View</span><span class="p">({</span>
+  <span class="nx">templateUrl</span><span class="o">:</span> <span class="s2">&quot;ytlive/search/searchresult.html&quot;</span><span class="p">,</span>
+  <span class="nx">directives</span><span class="o">:</span> <span class="p">[]</span>
+<span class="p">})</span>
+<span class="kr">class</span> <span class="nx">SearchResultComponent</span> <span class="p">{</span>
+  <span class="nx">concert</span><span class="o">:</span> <span class="nx">ytbackend</span><span class="p">.</span><span class="nx">ConcertSummary</span>
+
+  <span class="nx">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">playlistService</span><span class="o">:</span> <span class="nx">LocalStoragePlayList</span><span class="p">,</span>
+     <span class="kr">private</span> <span class="nx">videoPlayer</span><span class="o">:</span> <span class="nx">ytbackend</span><span class="p">.</span><span class="nx">VideoPlayer</span><span class="p">)</span> <span class="p">{}</span>
+
+  <span class="nx">addToPlaylist</span><span class="p">(</span><span class="nx">concert</span><span class="o">:</span> <span class="nx">ytbackend</span><span class="p">.</span><span class="nx">ConcertSummary</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">playlistService</span><span class="p">.</span><span class="nx">addConcert</span><span class="p">(</span><span class="nx">concert</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="nx">playConcert</span><span class="p">(</span><span class="nx">id</span><span class="o">:</span> <span class="nx">string</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">videoPlayer</span><span class="p">.</span><span class="nx">playConcert</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></div>
+
+
+<p>Two things are injected into the constructor: LocalStoragePlayList (so we can save search results) and VideoPlayer (so we can play search results).
+In the @Component annotation, you can see that the injection of LocalStoragePlaylist is setup in the <code>providers</code> property.
+But VideoPlayer is not mentioned there. How come?
+When you define a provider, that is also the level where the to-be-injected component is instantiated.
+This instance is then available to the component <em>and all its child components</em> for injection.
+Therefore, the VideoPlayer provider is setup in the root <code>YTLiveComponent</code>.
+This way, the same instance of the VideoPlayer is injected into all components that request it in their constructors.
+That's good, because there is only one viewport for the videos.
+One video can be played at the time, which makes the VideoPlayer is a shared resource that's used by multiple other components.</p>
+
+<p>Playing a concert is as simple as calling the <code>playConcert</code> method on the SearchResultComponent from the searchresult template:</p>
+
+<p><em>searchresult.html</em>:</p>
+
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="c">&lt;!-- lots of stuff omitted --&gt;</span>
+<span class="nt">&lt;button</span> <span class="na">title=</span><span class="s">&quot;Play now&quot;</span> <span class="na">class=</span><span class="s">&quot;play btn btn-success&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;span</span> <span class="err">(</span><span class="na">click</span><span class="err">)=&quot;</span><span class="na">playConcert</span><span class="err">(</span><span class="na">concert</span><span class="err">.</span><span class="na">id</span><span class="err">)&quot;</span> <span class="na">class=</span><span class="s">&quot;glyphicon glyphicon-play-circle&quot;</span><span class="nt">&gt;&lt;/span&gt;</span>
+<span class="nt">&lt;/button&gt;</span></code></pre></div>
+
+
+<p>It binds the click-event on this span to the <code>playConcert</code> method on the SearchResultComponent, which in turn calls the shared VideoPlayer component.
+Binding to DOM-events like this is the primary means of user-interaction.
+Obviously, higher-level components are available for easily integration input components et cetera.</p>
+
+<p>The state of the VideoPlayer instance is watched in another component/template:</p>
+
+<p><em>search.html</em>:</p>
+
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="c">&lt;!-- lots of stuff omitted --&gt;</span>
+<span class="nt">&lt;div</span> <span class="err">*</span><span class="na">ng-if=</span><span class="s">&quot;playing&quot;</span> <span class="na">id=</span><span class="s">&quot;concerts&quot;</span> <span class="na">class=</span><span class="s">&quot;row&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;iframe</span> <span class="na">width=</span><span class="s">&quot;100%&quot;</span> <span class="na">height=</span><span class="s">&quot;100%&quot;</span> <span class="err">[</span><span class="na">src</span><span class="err">]=&quot;</span><span class="na">embedUrl</span><span class="err">&quot;</span> <span class="na">frameborder=</span><span class="s">&quot;0&quot;</span> <span class="na">allowfullscreen</span><span class="nt">&gt;&lt;/iframe&gt;</span>
+<span class="nt">&lt;/div&gt;</span></code></pre></div>
+
+
+<p>The <code>[src]</code> syntax binds the src property of the iframe to the <code>embedUrl</code> property of the component for this template.
+If the embedUrl changes, the src of the iframe is automatically updated (but not the other way around).</p>
+
+<h3>Http service</h3>
+
+<p>Angular is more than just a front-end component framework.
+In AngularJS 1.x there was an $http service to do backend calls.
+The same applies to Angular2.
+Instead of returning (their own flavor) of Promises like in 1.x, the new Http component returns <a href="https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/core/observable.md">RX Observables</a>.
+Angular2 adopts RxJs as core dependency, you see it popping up in several APIs.
+It takes some getting used to, but RxJs is a proven library offering a great way to compose asynchronous data flows.</p>
+
+<p>In YouTube live!, we use an injected Http component to do the YouTube API calls:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="err">@</span><span class="nx">Injectable</span><span class="p">()</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">ConcertService</span> <span class="p">{</span>
+
+  <span class="kr">private</span> <span class="nx">concerts</span><span class="o">:</span> <span class="nx">ConcertSummary</span><span class="p">[];</span>
+
+  <span class="nx">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">http</span><span class="o">:</span> <span class="nx">Http</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span>
+
+  <span class="kr">public</span> <span class="nx">findConcerts</span><span class="p">(</span><span class="nx">artist</span><span class="o">:</span> <span class="nx">string</span><span class="p">,</span> <span class="nx">duration</span> <span class="o">=</span> <span class="nx">Duration</span><span class="p">.</span><span class="nx">FULLCONCERT</span><span class="p">)</span><span class="o">:</span> <span class="nx">any</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">ytDuration</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
+    
+    <span class="c1">// .. snipped for brevity ..</span>
+
+    <span class="kd">var</span> <span class="nx">searchString</span> <span class="o">=</span> <span class="nx">yt_search</span> <span class="o">+</span> <span class="nx">ytDuration</span> <span class="o">+</span> <span class="s1">&#39;&amp;q=&#39;</span> <span class="o">+</span> <span class="nb">encodeURIComponent</span><span class="p">(</span><span class="s1">&#39;live &#39;</span> <span class="o">+</span> <span class="nx">artist</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">http</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">searchString</span><span class="p">).</span><span class="nx">map</span><span class="p">((</span><span class="nx">res</span><span class="o">:</span> <span class="nx">any</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="kd">var</span> <span class="nx">ytResults</span><span class="o">:</span> <span class="p">{</span><span class="nx">items</span><span class="o">:</span> <span class="nx">YTSearchResult</span><span class="p">[]</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">res</span><span class="p">.</span><span class="nx">json</span><span class="p">();</span>
+      <span class="kd">var</span> <span class="nx">transformedResults</span> <span class="o">=</span> <span class="nx">ytResults</span><span class="p">.</span><span class="nx">items</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">toConcertSummary</span><span class="p">)</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">concerts</span> <span class="o">=</span> <span class="nx">transformedResults</span><span class="p">;</span>
+      <span class="k">return</span> <span class="nx">transformedResults</span><span class="p">;</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></div>
+
+
+<p>Again, we see a viewless component, but this time with the @Injectable annotation since we need Angular to inject the Http component in the constructor.
+After performing a <code>get</code> call, the result is transformed using <code>map</code> on the observable.
+This returns another observable, now containing data in a format we can use.
+One slight annoyance is that the Http.get returns <code>any</code> in the current typing definition of Angular2.
+It would be nice to use the RxJS type definitions for Observables, so we can get some compile-time sanity back here as well.</p>
+
+<p>The resulting Observable is used in the <code>searchConcerts</code> method on SearchComponent:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kr">export</span> <span class="kr">class</span> <span class="nx">SearchComponent</span> <span class="p">{</span>
+  
+  <span class="kr">private</span> <span class="nx">concerts</span><span class="o">:</span> <span class="nx">ytbackend</span><span class="p">.</span><span class="nx">ConcertSummary</span><span class="p">[]</span> <span class="o">=</span> <span class="p">[];</span>
+
+  <span class="nx">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">concertService</span><span class="o">:</span> <span class="nx">ytbackend</span><span class="p">.</span><span class="nx">ConcertService</span><span class="p">,</span>
+      <span class="kr">private</span> <span class="nx">videoPlayer</span><span class="o">:</span> <span class="nx">ytbackend</span><span class="p">.</span><span class="nx">VideoPlayer</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span>
+
+  <span class="nx">searchConcerts</span><span class="p">()</span><span class="o">:</span> <span class="k">void</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">videoPlayer</span><span class="p">.</span><span class="nx">stop</span><span class="p">();</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">concertService</span>
+      <span class="p">.</span><span class="nx">findConcerts</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">searchTerm</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">subscribe</span><span class="p">((</span><span class="nx">results</span><span class="o">:</span> <span class="nx">ytbackend</span><span class="p">.</span><span class="nx">ConcertSummary</span><span class="p">[])</span> <span class="o">=&gt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">concerts</span> <span class="o">=</span> <span class="nx">results</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></div>
+
+
+<p>Since the ConcertService returns an observable, we cannot assign it directly to a class member of type <code>ConcertSummary[]</code>.
+Instead, we subscribe to the observable and assign the result once our subscriber is called when results are available.
+The template automatically detects changes to <code>concerts</code> and shows the new results from the API call.
+It would be nice if this manual 'unwrapping' of Observables would not be necessary.</p>
+
+<h3>Wrapping up</h3>
+
+<p>This post barely scratches the surface of what features are in Angular2.
+There's a whole new approach to <a href="http://blog.ng-book.com/the-ultimate-guide-to-forms-in-angular-2/">Forms</a>, a new <a href="https://angular.github.io/router/">Router</a> and much more.
+You will find the documentation to be inadequate though.
+There's also lots of outdated information on the web, especially given the pace of the alpha releases and the amount of breakage between releases.
+This article itself will be no exception, probably.</p>
+
+<p>Still, a more stable period is forthcoming with the Angular2 beta nearing.
+Now is definitely a good time to start learning the concepts of Angular2, but don't expect it to be a beginner-friendly experience.
+There's definitely some rough edges to Angular2, but all in all it looks very promising to me.</p>
+
+<p>Play around with <a href="https://github.com/sandermak/ytlive-angular2">the code</a> for YouTube live and let me know what you think!</p>
+
+  </section>
+</article>
+<div>
+  <strong>If you liked this post, please share it!</strong>
+  <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://branchandbound.net/blog/web/2015/11/exploring-angular2" data-via="Sander_Mak" data-dnt="true">Tweet</a>
+  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</div>
+
+<br>
+<br>
+
+<div id="related">
+  <h3>Related Posts</h3>
+  <ul class="posts">
+    
+      <li><span>27 Oct 2015</span> &raquo; <a href="/blog/java/2015/10/osgi-to-jigsaw">From OSGi to Jigsaw</a></li>
+    
+      <li><span>10 Sep 2015</span> &raquo; <a href="/blog/java/2015/09/java-module-system-first-look">The Java Module system: a first look</a></li>
+    
+      <li><span>18 Jul 2013</span> &raquo; <a href="/blog/java/2013/07/java-modularity-story">The Java Modularity Story</a></li>
+    
+  </ul>
+</div>
+
+
+
+
+  <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_developer = 1;
+    var disqus_shortname = 'branchandbound'; // required: replace example with your forum shortname
+    
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+
+
+
+
+        </div>
+        <div class="span3">
+         <div class="hero-unit sidebar">
+           <a href="http://feeds.feedburner.com/BranchAndBound"><img class="rss pull-right" title="Branch and Bound Blog RSS Feed" alt="RSS Feed" src="/assets/themes/sander/rss.png"></a>
+           <h4 class="sidebar"><strong>Branch and Bound Blog</strong></h4>
+           <em>... pruning the software universe</em> 
+           <hr>
+           <ul class="sidebar unstyled">
+             <li><a href="/about.html">About Sander</a></li>
+           </ul>
+           <span class="sidebar pull-right">
+             <a href="http://www.twitter.com/Sander_Mak" target="_blank"><img title="Twitter" alt="Twitter" class="small" src="/assets/themes/sander/twitter.png"></a>
+             <a href="http://nl.linkedin.com/in/SanderMak" target="_blank"><img title="Linkedin profile" alt="Linkedin profile" class="small" src="/assets/themes/sander/linkedin.png"><a>
+             <a href="http://www.github.com/SanderMak" target="_blank"><img  title="GitHub" alt="GitHub" class="small" src="/assets/themes/sander/github.png"></a>
+             <a href="http://www.slideshare.net/SanderMak/presentations" target="_blank"><img title="Slideshare presentations"  alt="Slideshare presentations" class="small" src="/assets/themes/sander/slideshare.png"></a>
+           </span>
+           <hr>
+           <h5 class="sidebar">&nbsp;View archive by:</h5>
+           <ul class="sidebar unstyled">
+             <li><a href="/archive.html">Date</a></li>
+             <li><a href="/categories.html">Category</a></li>
+             <li><a href="/tags.html">Tag</a></li>
+           </ul>
+          </div>
+          <div class="hero-unit twittersidebar">
+            <h5 class="sidebar">Featured articles:</h5>
+            <br>
+            <ul>
+              <li>&raquo; <a href="/blog/scala/2013/05/launching-scalabitz/?src=featured">Launching Scalabitz</a></li>
+              <li>&raquo; <a href="/blog/bookreview/2013/01/bookreview-infinity-and-the-mind/?src=featured">Infinity and the Mind</a></li>      
+  	          <li>&raquo; <a href="/blog/conferences/2012/06/preparing-a-technical-talk/?src=featured">Preparing a technical talk</a></li>
+            </ul>
+          </div>
+          <div class="hero-unit readingsidebar">
+            <h5 class="sidebar">Currently reading:</h5>
+            <br>
+            <ul>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/1933988916/ref=as_li_ss_tl?ie=UTF8&tag=branandboun-20&linkCode=as2&camp=1789&creative=390957&creativeASIN=1933988916" target="_blank">OSGi in action</a></li>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/1593273886/ref=as_li_ss_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=1593273886&linkCode=as2&tag=branandboun-20" target="_blank">The Tangled Web</a></li>
+              <li>&raquo; <a href="http://www.amazon.com/gp/product/0321125215/ref=as_li_ss_tl?ie=UTF8&tag=branandboun-20&linkCode=as2&camp=1789&creative=390957&creativeASIN=0321125215" target="_blank">Domain-driven design</a></li>
+            </ul>
+          </div>
+          <div class="hero-unit sidebar">
+           <a class="twitter-timeline" width="250" height="500" data-dnt=true href="https://twitter.com/Sander_Mak" data-widget-id="266609354059431938">Tweets by @Sander_Mak</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+
+                       
+          </div>
+        </div>
+       </div>
+      </div>
+     </div>
+
+
+      <footer>
+        <div class="container">
+         <div class="row">
+           <div class="span9 offset2">
+            <br>
+            <hr>
+           </div>
+         </div>
+         <div class="row">
+          <div class="span4 offset2">
+            <p>Branch and Bound - ... pruning the software universe</p>
+          </div>   
+          <div class="span5">  
+            <p class="pull-right">by Sander Mak</p>
+          </div>
+         </div>
+        </div>
+      </footer>
+
+    <!-- Scripts at the end for faster loading. -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
+    <script src="/assets/themes/sander/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+   
+
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-15335121-2']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+
+    </script>
+
+  </body>
+</html>
+
+
+
