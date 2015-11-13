@@ -4,7 +4,7 @@
  <title>Branch and Bound</title>
  <link href="http://branchandbound.net/atom.xml" rel="self"/>
  <link href="http://branchandbound.net"/>
- <updated>2015-11-10T16:29:45+01:00</updated>
+ <updated>2015-11-13T15:21:08+01:00</updated>
  <id>http://branchandbound.net/</id>
  <author>
    <name>Sander Mak</name>
@@ -31,7 +31,7 @@ Check out &lt;a href=&quot;https://github.com/sandermak/ytlive-angular2&quot;&gt
 You can search for live music by providing an artist name.
 Search results can either be stored, or played directly.
 The playlist is backed by localstorage.
-It&#39;s not a large application by any means, but it&#39;s not a toy application either.
+It&#39;s not a large application by any means, but it&#39;s not a toy example either.
 This is &#39;YouTube live!&#39; in action:&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;/pics/ytlive.png&quot; alt=&quot;YT Live example app&quot; /&gt;&lt;/p&gt;
@@ -339,7 +339,7 @@ There&#39;s also lots of outdated information on the web, especially given the p
 This article itself will be no exception, probably.&lt;/p&gt;
 
 &lt;p&gt;Still, a more stable period is forthcoming with the Angular2 beta nearing.
-Now is definitely a good time to start learning the concepts of Angular2, but don&#39;t expect it to be a beginner-friendly experience.
+Now is a good time to start learning the concepts of Angular2, but don&#39;t expect it to be a beginner-friendly experience.
 There&#39;s definitely some rough edges to Angular2, but all in all it looks very promising to me.&lt;/p&gt;
 
 &lt;p&gt;Play around with &lt;a href=&quot;https://github.com/sandermak/ytlive-angular2&quot;&gt;the code&lt;/a&gt; for YouTube live and let me know what you think!&lt;/p&gt;
