@@ -3,7 +3,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>JavaOne 2013 trip report - Branch and Bound</title>
+    <title>Java 9 Modularity: O'Reilly Early Access Release - Branch and Bound</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="Sander Mak">
@@ -69,78 +69,91 @@
           
 <article>
   <header>
-    <h1>JavaOne 2013 trip report</h1>
-    <strong><time datetime="2013-09-30" pubdate>30 September 2013</time></strong>
+    <h1>Java 9 Modularity: O'Reilly Early Access Release</h1>
+    <strong><time datetime="2016-08-30" pubdate>30 August 2016</time></strong>
 
     <br>
     <br>
 
-    <p><em><p>Last week, San Francisco was sprawling with developers. It was that time of the year again: JavaOne 2013 took place. Thousands of Java developers gathered September 22-26 to learn new things and meet new people.</p>
+    <p><em><p>Early this year my colleague <a href="http://paulbakker.io">Paul Bakker</a> and I started working on the first drafts of Java 9 Modularity. We're proud to announce that the firsts bits of what will become the final book are now publicly available!</p>
 </em></p>
   </header>
   
 
   <section>
-   <p>I started visiting JavaOne in 2010, just after Oracle took over the reigns from Sun. In that sense, my past four JavaOnes gave a consistent experience. Not incredibly exciting, but lots of good content when you look hard enough at the enormous <a href="https://oracleus.activeevents.com/2013/connect/search.ww?eventRef=javaone#loadSearch-event=null&amp;searchPhrase=&amp;searchType=session&amp;tc=0&amp;sortBy=&amp;p=&amp;i(11180)=20801">content catalog</a>. Whether this is a good or bad thing is a matter of taste. Sun over-promised and under-delivered, Oracle has a consistent and oftentimes conservative message. At least they deliver, with schedule slippages of months rather than years.</p>
+   <p>You can now order the Early Access release of our upcoming book through O'Reilly's webshop: <a href="http://shop.oreilly.com/product/0636920049494.do">http://shop.oreilly.com/product/0636920049494.do</a>.
+It is also available on <a href="http://my.safaribooksonline.com/book/programming/java/9781491954157">Safari Books</a> online, if you have a subscription there.
+If prefer reading the final edition on real paper, you can even pre-order <a href="http://amzn.to/2buO9bZ">at Amazon</a> already.</p>
 
-<h3>Announcements</h3>
+<p><img src="/pics/java9mod_earlyaccess.jpg" alt="Java 9 Modularity Early Access Release" /></p>
 
-<p>This can be pretty short: there were no big announcements at the JavaOne keynotes this year. It was all about consolidating the progress made in the past few years. Delivering Java EE 7, JavaFX and in the near future Java 8 is certainly something to be proud of. The demo's in the technical keynote were fun and engaging. However, the punch-line was missing, so to say.</p>
+<p>When you order the Early Access release, obviously you will get updates on the content as they come.
+No worries, there's more in the pipeline already.
+Be sure to follow <a href="https://twitter.com/javamodularity">@javamodularity</a> if you're interested in updates, or to give us - much appreciated! - feedback.</p>
 
-<p><img src="/pics/javaone2013.jpg" alt="The venue" /></p>
+<p>As of now, the first three chapters are available.
+If you happen to be at JavaOne this year, mark your calendar for Tuesday September 22nd, 1:30-2PM (PDT).
+Paul and I will be at the O'Reilly booth to sign printed copies of the early access release.
+Come by and say hi!</p>
 
-<p><em>(Just before the keynote in Moscone)</em></p>
+<h3>What's in there?</h3>
 
-<p>There was actually one new piece of information: an update on project Avatar. Project Avatar was originally announced without any details in 2011. Last year, it became clear that Avatar is a JavaScript framework to tie the browser and Java EE backends together more easily. This year, it finally became tangible. It is now <a href="https://avatar.java.net/">open-sourced</a> at java.net. No further story, that was it. Honestly, it feels a bit like this baby was left at the doorstep of the hospital. Who's going to take care of it, and will it ever grow up to be important?</p>
+<p>So, what's all the fuss about?
+Java's upcoming module system has been many years in the making.
+With Java 9 it's finally coming to fruition, and that's a big deal.</p>
 
-<p>Finally, while not really an announcement, it was interesting to note that Oracle is shifting the attention for Java to the 'Internet of things.' This term is used often to explain their heavy focus on embedded Java development. The cynic might say it's because this is the only part of Java that is traditionally well-monetized (with Java ME), so it makes sense to secure this cashflow for the future. Regardless of the motivation, I'm happy to see that a unified VM for Java 8 for all platforms is in the cards.</p>
+<p>On the one hand, it allows new ways of creating strictly more modular applications.
+The module system introduces a stronger notion encapsulation into the platform and allows for explicit dependencies between modules.
+On the other hand, it's a logical continuation of Java's existing features and philosophy on large-scale software development.
+Access control (private/protected/public), programming to interfaces and so on were, and still are, important enablers of modular application development.
+The module system takes these features to next level.</p>
 
-<h3>Java 8</h3>
+<p>The first chapter will take you from how Java works today, to how modules address pain points in the current situation (classpath hell, anyone?!).
+Then, the second chapter continues with an introduction of how the JDK itself was modularized using the very same module system application developers can use.
+Meanwhile, you'll gain an understanding of the most important concepts of the Java module system.
+After reading those two chapters you know why and what, so in the third chapters it's time for the how.
+Here, you'll learn how to create your own modules and work with them in practice.</p>
 
-<p>Java 8, and specifically its Lambda's took the center stage. With the GA date set for March 2014, now is the right time to <a href="http://cr.openjdk.java.net/~briangoetz/lambda/lambda-state-final.html">familiarize yourself</a> with Lambda's. Especially nice is the fact that the collections library <a href="http://cr.openjdk.java.net/~briangoetz/lambda/lambda-libraries-final.html">has been revamped</a> to support a more functional style. Even cooler, Streams are added on top of the improved collections library, providing stream fusion:</p>
+<h3>What can you expect?</h3>
 
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="kt">int</span> <span class="n">sum</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="na">stream</span><span class="o">()</span>
-                      <span class="o">.</span><span class="na">filter</span><span class="o">(</span><span class="n">w</span> <span class="o">-&gt;</span> <span class="n">w</span><span class="o">.</span><span class="na">getColor</span><span class="o">()</span> <span class="o">==</span> <span class="n">RED</span><span class="o">)</span>
-                      <span class="o">.</span><span class="na">mapToInt</span><span class="o">(</span><span class="n">w</span> <span class="o">-&gt;</span> <span class="n">w</span><span class="o">.</span><span class="na">getWeight</span><span class="o">())</span>
-                      <span class="o">.</span><span class="na">sum</span><span class="o">();</span></code></pre></div>
+<p>Of course, it doesn't end there (although it does end there, for now, in the early access release).
+The outline shown at the <a href="http://shop.oreilly.com/product/0636920049494.do">O'Reilly site</a> is  somewhat outdated already, but gives a good indication nevertheless.</p>
 
+<p>In subsequent chapters we discuss how modules and interfaces together do not fully solve the problem of decoupling consumers and providers of services.
+One of the solutions lies in the <a href="https://docs.oracle.com/javase/tutorial/ext/basics/spi.html">Services and ServiceLoader</a> model that has been updated in Java 9 to work with modules.</p>
 
-<p>In this example, there is only one traversal of the <code>widgets</code> collection because the operations are performed on a <a href="http://download.java.net/jdk8/docs/api/java/util/stream/Stream.html">stream</a>. Stream fusion means that the implementation collects all the transformations up until a terminal operation (like <code>sum</code>). The terminal operation then forces the evaluation of the preceding chain of expressions with a single pass over the actual underlying collection.</p>
+<p>The next chapters look at so-called <em>modularity patterns</em>.
+Existing wisdom, viewed in the light of the new Java module system.
+In these chapters, some of the more advanced APIs of the module system will be discussed as well.</p>
 
-<h3>Conference sessions</h3>
+<p>Currently, a big focus area for us is migration of existing codebases to Java 9.
+Fortunately, the Java module system is designed with migration in mind.
+That doesn't mean it will be a walk in the park in all situations.
+The book gives practical advice on how to migrate in several steps, both for application developers and library authors.</p>
 
-<p>As to be expected with a huge amount of parallel tracks, the quality of the sessions varied. I did attend some excellent sessions. Particularly interesting was the talk from one of the Jetty founders. <a href="http://www.eclipse.org/jetty/documentation/current/">Jetty 9.1</a> pushes the performance boundaries for Java-based webservers, with <a href="http://en.wikipedia.org/wiki/SPDY">SPDY</a> and <a href="http://webtide.intalio.com/2012/06/spdy-we-push/">SPDY-Push</a> support. All this is supported on top of the Servlet spec. You only need to <a href="http://www.eclipse.org/jetty/documentation/current/spdy.html">configure</a> the right endpoints.</p>
+<p>Last, you can expect an overview of how the Java tooling eco-system interacts with Java 9 modules.
+Since this is very much in flux at the moment, those chapters will probably be among the last to be pushed out in the early access release process.</p>
 
-<p>One of the other great talks I saw was by Ben Christensen of Netflix. He showed how RxJava enables <a href="https://github.com/Netflix/RxJava/wiki#functional-reactive-programming-frp">functional reactive programming</a> on the JVM. RxJava ports the <a href="http://rx.codeplex.com">Reactive Extensions</a> from the .Net world to the JVM world. Slides are <a href="https://speakerdeck.com/benjchristensen/functional-reactive-programming-with-rxjava-javaone-2013">here</a>.</p>
+<h3>Moving on</h3>
 
-<p>Another cool talk was by the Typesafe guys on <a href="http://slick.typesafe.com">SLICK</a> (Scala Language-Integrated Connection Kit.) In short, SLICK maps standard Scala collection methods and for-comprehensions to database access code in a type-safe manner. Kind of what Linq-to-SQL does for .Net, but slightly more ambitious. Definitely something to consider when accessing relational databases from Scala code without relying on a more traditional Java-inspired ORM approach. Slides can be found <a href="http://slick.typesafe.com/talks/2013-09-25_JavaOne/2013-09-25_JavaOne-Scaling-Scala-to-the-Database.pdf">here</a>.</p>
+<p>The process of writing Java 9 Modularity is quite challenging, since the final specifications of the module system have not been nailed down yet.
+Even before the Early Access release we already had some re-writing to do based on developments in the <a href="https://jdk9.java.net/jigsaw/">JDK 9 Jigsaw</a> prototype.
+We are very much indebted to Alan Bateman and Alex Buckley from the Oracle JDK team, who have been graciously reviewing our work and provided valuable feedback.
+Obviously Paul and I will stay on top of any developments in the period until the specification is stable, which is hopefully not too far off.</p>
 
-<h3>Talking at JavaOne</h3>
+<p>We are writing this book because we truly believe modular development is an enabler of both agile and reliable application development.
+Through this book, we want to show how you can take advantage of age-old principles of modularity in the shiny new version of Java.
+Please let us know what you think of the <a href="http://shop.oreilly.com/product/0636920049494.do">Java 9 Modularity Early Access</a> release.
+It's through feedback of early adopters like you we can shape the book into a useful resource for the whole Java community.</p>
 
-<p>Last year I had the opportunity to speak at JavaOne for the first time. Since it was an enjoyable experience, fate decided that I should double the amount of talks this year (hopefully this trend will not continue for too many years.)</p>
-
-<p>My first talk was 'Data Science with R for Java developers' on Tuesday. It was fun to introduce a completely new language to a group of Java developers. Understanding the data that lives in your application deeply is increasingly important. The main takeaway of the talk is that learning R gives you a powerful tool for doing <a href="/blog/data/2013/03/year-blogging-analyzed-r/">exploratory data analysis</a>. Here are the slides:
-<br></p>
-
-<iframe src="http://www.slideshare.net/slideshow/embed_code/26510955" width="425" height="355" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" allowfullscreen>embed</iframe>
-
-
-<p><br><br></p>
-
-<p>On Wednesday, I presented 'Modular JavaScript' with my co-worker <a href="https://twitter.com/pbakker/">Paul Bakker</a>. Modular development is something we value. For large Java codebases, we use modular designs <a href="/blog/java/2013/07/java-modularity-story/">on top of OSGi</a> to enforce runtime modularity as well. In JavaScript land, codebases are getting bigger and bigger too. Hence, you need a principled approach to modular development there as well. In this talk we introduce the primitives for modularity in JavaScript and compare several module systems for JavaScript.
-<br></p>
-
-<iframe src="http://www.slideshare.net/slideshow/embed_code/26558391" width="425" height="355" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" allowfullscreen>embed</iframe>
-
-
-<p><br><br>
-During both talks there was a lot of audience interaction, which is always an encouraging sign. All in all, JavaOne 2013 was a great experience. Hope to see you in 2014!</p>
+<p>The final release of the book is still set for February 2017, right ahead of the Java 9 GA release.
+Meanwhile, follow <a href="https://twitter.com/javamodularity">@javamodularity</a> for interesting news about the Java 9 module system and updates on the book!</p>
 
   </section>
 </article>
 <div>
   <strong>If you liked this post, please share it!</strong>
-  <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://branchandbound.net/blog/conferences/2013/09/javaone-2013-tripreport" data-via="Sander_Mak" data-dnt="true">Tweet</a>
+  <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://branchandbound.net/blog/java/2016/08/java9-modularity-oreilly-early-access-release" data-via="Sander_Mak" data-dnt="true">Tweet</a>
   <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
 </div>
 
@@ -151,9 +164,9 @@ During both talks there was a lot of audience interaction, which is always an en
   <h3>Related Posts</h3>
   <ul class="posts">
     
-      <li><span>25 May 2013</span> &raquo; <a href="/blog/conferences/2013/05/jeeconf-2013-tripreport">JEEConf 2013 trip report</a></li>
-    
       <li><span>27 Oct 2015</span> &raquo; <a href="/blog/java/2015/10/osgi-to-jigsaw">From OSGi to Jigsaw</a></li>
+    
+      <li><span>10 Sep 2015</span> &raquo; <a href="/blog/java/2015/09/java-module-system-first-look">The Java Module system: a first look</a></li>
     
       <li><span>18 Jul 2013</span> &raquo; <a href="/blog/java/2013/07/java-modularity-story">The Java Modularity Story</a></li>
     

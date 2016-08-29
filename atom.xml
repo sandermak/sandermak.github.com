@@ -4,13 +4,93 @@
  <title>Branch and Bound</title>
  <link href="http://branchandbound.net/atom.xml" rel="self"/>
  <link href="http://branchandbound.net"/>
- <updated>2016-08-18T09:52:59+02:00</updated>
+ <updated>2016-08-29T15:52:58+02:00</updated>
  <id>http://branchandbound.net/</id>
  <author>
    <name>Sander Mak</name>
    <email>sandermak@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <author><name>Sander Mak</name></author>
+   <title>Java 9 Modularity: O'Reilly Early Access Release</title>
+   <link href="http://branchandbound.net/blog/java/2016/08/java9-modularity-oreilly-early-access-release"/>
+   <updated>2016-08-30T00:00:00+02:00</updated>
+   <id>http://branchandbound.net/blog/java/2016/08/java9-modularity-oreilly-early-access-release</id>
+   <content type="html">
+       &lt;p&gt;Early this year my colleague &lt;a href=&quot;http://paulbakker.io&quot;&gt;Paul Bakker&lt;/a&gt; and I started working on the first drafts of Java 9 Modularity. We&#39;re proud to announce that the firsts bits of what will become the final book are now publicly available!&lt;/p&gt;
+
+       &lt;p&gt;You can now order the Early Access release of our upcoming book through O&#39;Reilly&#39;s webshop: &lt;a href=&quot;http://shop.oreilly.com/product/0636920049494.do&quot;&gt;http://shop.oreilly.com/product/0636920049494.do&lt;/a&gt;.
+It is also available on &lt;a href=&quot;http://my.safaribooksonline.com/book/programming/java/9781491954157&quot;&gt;Safari Books&lt;/a&gt; online, if you have a subscription there.
+If prefer reading the final edition on real paper, you can even pre-order &lt;a href=&quot;http://amzn.to/2buO9bZ&quot;&gt;at Amazon&lt;/a&gt; already.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/pics/java9mod_earlyaccess.jpg&quot; alt=&quot;Java 9 Modularity Early Access Release&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;When you order the Early Access release, obviously you will get updates on the content as they come.
+No worries, there&#39;s more in the pipeline already.
+Be sure to follow &lt;a href=&quot;https://twitter.com/javamodularity&quot;&gt;@javamodularity&lt;/a&gt; if you&#39;re interested in updates, or to give us - much appreciated! - feedback.&lt;/p&gt;
+
+&lt;p&gt;As of now, the first three chapters are available.
+If you happen to be at JavaOne this year, mark your calendar for Tuesday September 22nd, 1:30-2PM (PDT).
+Paul and I will be at the O&#39;Reilly booth to sign printed copies of the early access release.
+Come by and say hi!&lt;/p&gt;
+
+&lt;h3&gt;What&#39;s in there?&lt;/h3&gt;
+
+&lt;p&gt;So, what&#39;s all the fuss about?
+Java&#39;s upcoming module system has been many years in the making.
+With Java 9 it&#39;s finally coming to fruition, and that&#39;s a big deal.&lt;/p&gt;
+
+&lt;p&gt;On the one hand, it allows new ways of creating strictly more modular applications.
+The module system introduces a stronger notion encapsulation into the platform and allows for explicit dependencies between modules.
+On the other hand, it&#39;s a logical continuation of Java&#39;s existing features and philosophy on large-scale software development.
+Access control (private/protected/public), programming to interfaces and so on were, and still are, important enablers of modular application development.
+The module system takes these features to next level.&lt;/p&gt;
+
+&lt;p&gt;The first chapter will take you from how Java works today, to how modules address pain points in the current situation (classpath hell, anyone?!).
+Then, the second chapter continues with an introduction of how the JDK itself was modularized using the very same module system application developers can use.
+Meanwhile, you&#39;ll gain an understanding of the most important concepts of the Java module system.
+After reading those two chapters you know why and what, so in the third chapters it&#39;s time for the how.
+Here, you&#39;ll learn how to create your own modules and work with them in practice.&lt;/p&gt;
+
+&lt;h3&gt;What can you expect?&lt;/h3&gt;
+
+&lt;p&gt;Of course, it doesn&#39;t end there (although it does end there, for now, in the early access release).
+The outline shown at the &lt;a href=&quot;http://shop.oreilly.com/product/0636920049494.do&quot;&gt;O&#39;Reilly site&lt;/a&gt; is  somewhat outdated already, but gives a good indication nevertheless.&lt;/p&gt;
+
+&lt;p&gt;In subsequent chapters we discuss how modules and interfaces together do not fully solve the problem of decoupling consumers and providers of services.
+One of the solutions lies in the &lt;a href=&quot;https://docs.oracle.com/javase/tutorial/ext/basics/spi.html&quot;&gt;Services and ServiceLoader&lt;/a&gt; model that has been updated in Java 9 to work with modules.&lt;/p&gt;
+
+&lt;p&gt;The next chapters look at so-called &lt;em&gt;modularity patterns&lt;/em&gt;.
+Existing wisdom, viewed in the light of the new Java module system.
+In these chapters, some of the more advanced APIs of the module system will be discussed as well.&lt;/p&gt;
+
+&lt;p&gt;Currently, a big focus area for us is migration of existing codebases to Java 9.
+Fortunately, the Java module system is designed with migration in mind.
+That doesn&#39;t mean it will be a walk in the park in all situations.
+The book gives practical advice on how to migrate in several steps, both for application developers and library authors.&lt;/p&gt;
+
+&lt;p&gt;Last, you can expect an overview of how the Java tooling eco-system interacts with Java 9 modules.
+Since this is very much in flux at the moment, those chapters will probably be among the last to be pushed out in the early access release process.&lt;/p&gt;
+
+&lt;h3&gt;Moving on&lt;/h3&gt;
+
+&lt;p&gt;The process of writing Java 9 Modularity is quite challenging, since the final specifications of the module system have not been nailed down yet.
+Even before the Early Access release we already had some re-writing to do based on developments in the &lt;a href=&quot;https://jdk9.java.net/jigsaw/&quot;&gt;JDK 9 Jigsaw&lt;/a&gt; prototype.
+We are very much indebted to Alan Bateman and Alex Buckley from the Oracle JDK team, who have been graciously reviewing our work and provided valuable feedback.
+Obviously Paul and I will stay on top of any developments in the period until the specification is stable, which is hopefully not too far off.&lt;/p&gt;
+
+&lt;p&gt;We are writing this book because we truly believe modular development is an enabler of both agile and reliable application development.
+Through this book, we want to show how you can take advantage of age-old principles of modularity in the shiny new version of Java.
+Please let us know what you think of the &lt;a href=&quot;http://shop.oreilly.com/product/0636920049494.do&quot;&gt;Java 9 Modularity Early Access&lt;/a&gt; release.
+It&#39;s through feedback of early adopters like you we can shape the book into a useful resource for the whole Java community.&lt;/p&gt;
+
+&lt;p&gt;The final release of the book is still set for February 2017, right ahead of the Java 9 GA release.
+Meanwhile, follow &lt;a href=&quot;https://twitter.com/javamodularity&quot;&gt;@javamodularity&lt;/a&gt; for interesting news about the Java 9 module system and updates on the book!&lt;/p&gt;
+
+   </content>
+ </entry>
  
  <entry>
    <author><name>Sander Mak</name></author>
