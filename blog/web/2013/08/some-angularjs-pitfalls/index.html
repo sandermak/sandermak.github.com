@@ -10,10 +10,10 @@
 
     <link href="http://feeds.feedburner.com/BranchAndBound" rel="alternate" title="Branch and Bound Blog Feed" type="application/atom+xml" />
     <!-- Le styles -->
-    <link href="/assets/themes/sander/bootstrap/css/bootstrap.css" rel="stylesheet">
-    <link href="/assets/themes/sander/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
-    <link href="/assets/themes/sander/syntax.css" rel="stylesheet">
-    <link href="/assets/themes/sander/style.css" rel="stylesheet">
+    <link href="/assets/themes//bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="/assets/themes//bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="/assets/themes//syntax.css" rel="stylesheet">
+    <link href="/assets/themes//style.css" rel="stylesheet">
 
     <style type="text/css">
       body {
@@ -89,27 +89,25 @@
 
 <p>The above situation is a direct result of rendering this example from the <a href="http://docs.angularjs.org/tutorial/step_02">Angular tutorial</a>:</p>
 
-<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;body</span> <span class="na">ng-controller=</span><span class="s">&quot;PhoneListCtrl&quot;</span><span class="nt">&gt;</span>
-  <span class="nt">&lt;ul&gt;</span>
-    <span class="nt">&lt;li</span> <span class="na">ng-repeat=</span><span class="s">&quot;phone in phones&quot;</span><span class="nt">&gt;</span>
+<p><figure class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="p">&lt;</span><span class="nt">body</span> <span class="na">ng-controller</span><span class="o">=</span><span class="s">&quot;PhoneListCtrl&quot;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">ul</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">li</span> <span class="na">ng-repeat</span><span class="o">=</span><span class="s">&quot;phone in phones&quot;</span><span class="p">&gt;</span>
       {{ phone.name }}
-      <span class="nt">&lt;p&gt;</span>{{ phone.snippet }}<span class="nt">&lt;/p&gt;</span>
-    <span class="nt">&lt;/li&gt;</span>
-  <span class="nt">&lt;/ul&gt;</span>
-<span class="nt">&lt;/body&gt;</span></code></pre></div>
-
+      <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>{{ phone.snippet }}<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span></code></pre></figure></p>
 
 <p>If you have a single page application, this problem only occurs on the first page-load. Fortunately, it's easily prevented: don't use inline <code>{{ }}</code> expressions. Instead, use the ng-bind directive:</p>
 
-<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;body</span> <span class="na">ng-controller=</span><span class="s">&quot;PhoneListCtrl&quot;</span><span class="nt">&gt;</span>
-  <span class="nt">&lt;ul&gt;</span>
-    <span class="nt">&lt;li</span> <span class="na">ng-repeat=</span><span class="s">&quot;phone in phones&quot;</span><span class="nt">&gt;</span>
-      <span class="nt">&lt;span</span> <span class="na">ng-bind=</span><span class="s">&quot;phone.name&quot;</span><span class="nt">&gt;&lt;/span&gt;</span>
-      <span class="nt">&lt;p</span> <span class="na">ng-bind=</span><span class="s">&quot;phone.snippet&quot;</span><span class="nt">&gt;</span>Optional: visually pleasing placeholder<span class="nt">&lt;/p&gt;</span>
-    <span class="nt">&lt;/li&gt;</span>
-  <span class="nt">&lt;/ul&gt;</span>
-<span class="nt">&lt;/body&gt;</span></code></pre></div>
-
+<p><figure class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="p">&lt;</span><span class="nt">body</span> <span class="na">ng-controller</span><span class="o">=</span><span class="s">&quot;PhoneListCtrl&quot;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">ul</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">li</span> <span class="na">ng-repeat</span><span class="o">=</span><span class="s">&quot;phone in phones&quot;</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">span</span> <span class="na">ng-bind</span><span class="o">=</span><span class="s">&quot;phone.name&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">p</span> <span class="na">ng-bind</span><span class="o">=</span><span class="s">&quot;phone.snippet&quot;</span><span class="p">&gt;</span>Optional: visually pleasing placeholder<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span></code></pre></figure></p>
 
 <p>You need a tag to apply this directive, so I added a <code>&lt;span&gt;</code> around the phone name. What happens is that initially, the value inside the tag is shown (but you can choose to leave it empty.) Then, when Angular initializes and replaces the innards of the bound tag with the result of the expression. Note that you don't need to add the curly braces inside the <a href="http://docs.angularjs.org/api/ng.directive:ngBind">ng-bind</a> property. Much cleaner! If you need a compound expression, use <a href="http://docs.angularjs.org/api/ng.directive:ngBindTemplate">ng-bind-template</a> instead. With this variant you do need the curly braces though, in order to differentiate between string literals and expressions.</p>
 
@@ -119,7 +117,7 @@
 
 <p>Angular doesn't depend on jQuery. In fact, the Angular source contains an embedded lightweight alternative: <a href="http://docs.angularjs.org/api/angular.element">jqLite</a>. Still, when Angular detects the presence of a jQuery version in your page, it uses that full jQuery implementation in lieu of jqLite. One direct way in which this manifests itself is with Angular's element abstraction. For example, in a directive you get access to the element that the directive applies to:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;jqdependency&#39;</span><span class="p">,</span> <span class="p">[])</span>
+<p><figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;jqdependency&#39;</span><span class="p">,</span> <span class="p">[])</span>
   <span class="p">.</span><span class="nx">directive</span><span class="p">(</span><span class="s1">&#39;failswithoutjquery&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="p">{</span>
       <span class="nx">restrict</span> <span class="o">:</span> <span class="s1">&#39;A&#39;</span><span class="p">,</span>
@@ -127,8 +125,7 @@
                <span class="nx">element</span><span class="p">.</span><span class="nx">hide</span><span class="p">(</span><span class="mi">4000</span><span class="p">)</span>
              <span class="p">}</span>
     <span class="p">}</span>
-<span class="p">});</span></code></pre></div>
-
+<span class="p">});</span></code></pre></figure></p>
 
 <p>(see this example in action in <a href="http://plunker.co/edit/aqeDikqd6O2QaqH3eaIq?p=preview">this plunkr</a>)</p>
 
@@ -144,34 +141,33 @@
 
 <p>Special care should be taken for Angular applications that need to be minified. Otherwise error messages like <code>'Unknown provider: aProvider &lt;- a'</code> will hound you. Like with so many things, this information is hidden somewhere in the <a href="http://docs.angularjs.org/tutorial/step_05">official documentation</a>. In short, Angular depends on function parameter names to perform dependency injection. The minifier,  blissfully unaware of the special semantics of formal parameter names in Angular, mangles them to the shortest possible identifier. Solution? Use the minify-friendly method of method injection. From this:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">module</span><span class="p">.</span><span class="nx">service</span><span class="p">(</span><span class="s1">&#39;myservice&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$http</span><span class="p">,</span> <span class="nx">$q</span><span class="p">)</span> <span class="p">{</span> 
+<p><figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">module</span><span class="p">.</span><span class="nx">service</span><span class="p">(</span><span class="s1">&#39;myservice&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$http</span><span class="p">,</span> <span class="nx">$q</span><span class="p">)</span> <span class="p">{</span>
    <span class="c1">// This breaks when minified</span>
-<span class="p">});</span></code></pre></div>
-
+<span class="p">});</span></code></pre></figure></p>
 
 <p>to this:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">module</span><span class="p">.</span><span class="nx">service</span><span class="p">(</span><span class="s1">&#39;myservice&#39;</span><span class="p">,</span> <span class="p">[</span> <span class="s1">&#39;$http&#39;</span><span class="p">,</span> <span class="s1">&#39;$q&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$http</span><span class="p">,</span> <span class="nx">$q</span><span class="p">)</span> <span class="p">{</span> 
+<p><figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">module</span><span class="p">.</span><span class="nx">service</span><span class="p">(</span><span class="s1">&#39;myservice&#39;</span><span class="p">,</span> <span class="p">[</span> <span class="s1">&#39;$http&#39;</span><span class="p">,</span> <span class="s1">&#39;$q&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$http</span><span class="p">,</span> <span class="nx">$q</span><span class="p">)</span> <span class="p">{</span>
    <span class="c1">// Using the array syntax to declare dependencies works with minification!</span>
-<span class="p">}]);</span></code></pre></div>
-
+<span class="p">}]);</span></code></pre></figure></p>
 
 <p>The array syntax is accepted wherever a to-be-injected function is accepted. My advise is to use this syntax from the get-go. It will prevent a lot of pain later on if you decice to minify your JavaScript. There also seems to be a <a href="https://github.com/btford/ngmin">automatic rewriter</a>, although I don't know how well it works.</p>
 
 <p>One last bit of advice: when you need to rewrite your functions using the array syntax, apply it at every location where Angular injects dependencies. This includes directives, but also controllers on directives. A spot that is easily missed (speaking from experience):</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="c1">// the directive itself needs array injection syntax:</span>
+<p><figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="c1">// the directive itself needs array injection syntax:</span>
 <span class="nx">module</span><span class="p">.</span><span class="nx">directive</span><span class="p">(</span><span class="s1">&#39;directive-with-controller&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;myservice&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">myservice</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="p">{</span>
       <span class="nx">controller</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;$timeout&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$timeout</span><span class="p">)</span> <span class="p">{</span>
         <span class="c1">//  but this controller needs array injection syntax, too!  </span>
       <span class="p">}],</span>
-      <span class="nx">link</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">scope</span><span class="p">,</span> <span class="nx">element</span><span class="p">,</span> <span class="nx">attrs</span><span class="p">,</span> <span class="nx">ctrl</span><span class="p">)</span> <span class="p">{</span>
-                
-      <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}]);</span></code></pre></div>
+      <span class="nx">link</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">scope</span><span class="p">,</span> <span class="nx">element</span><span class="p">,</span> <span class="nx">attrs</span><span class="p">,</span> <span class="nx">ctrl</span><span class="p">)</span> <span class="p">{</span></p>
 
+<pre><code>  &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+</code></pre>
+
+<p><span class="p">}]);</span></code></pre></figure></p>
 
 <p>Note that the link function doesn't need the array syntax, since it is not actually an injection target. It is a fixed-arity function called directly by Angular. Injections from the directive level can be used inside the link function though.</p>
 
@@ -181,7 +177,7 @@
 
 <p>Why is that? Angular's data-binding is powered by a continuous digest-cycle which can lead to updates and re-rendering of directives. As such, there is never really a moment that the framework is 'at-rest' when applying directives. One (admittedly ugly) workaround is to schedule the jQuery dataTable call outside the current digest-cycle by using timeout:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;table&#39;</span><span class="p">,[]).</span><span class="nx">directive</span><span class="p">(</span><span class="s1">&#39;mytable&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;$timeout&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$timeout</span><span class="p">)</span> <span class="p">{</span>
+<p><figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;table&#39;</span><span class="p">,[]).</span><span class="nx">directive</span><span class="p">(</span><span class="s1">&#39;mytable&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;$timeout&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$timeout</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="p">{</span>
       <span class="nx">restrict</span> <span class="o">:</span> <span class="s1">&#39;E&#39;</span><span class="p">,</span>
       <span class="nx">template</span><span class="o">:</span> <span class="s1">&#39;&lt;table class=&quot;mytable&quot;&gt;&#39;</span> <span class="o">+</span>
@@ -193,13 +189,12 @@
          <span class="c1">// Doesn&#39;t work, shows an empty table:</span>
          <span class="c1">// $(&#39;.mytable&#39;, element).dataTable()   </span>
          <span class="c1">// But this does:</span>
-         <span class="nx">$timeout</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span> 
-           <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;.mytable&#39;</span><span class="p">,</span> <span class="nx">element</span><span class="p">).</span><span class="nx">dataTable</span><span class="p">();</span> 
+         <span class="nx">$timeout</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+           <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;.mytable&#39;</span><span class="p">,</span> <span class="nx">element</span><span class="p">).</span><span class="nx">dataTable</span><span class="p">();</span>
          <span class="p">},</span> <span class="mi">0</span><span class="p">)</span>
       <span class="p">}</span>
     <span class="p">}</span>
-<span class="p">}]);</span></code></pre></div>
-
+<span class="p">}]);</span></code></pre></figure></p>
 
 <p>(see this example in action in <a href="http://plnkr.co/edit/ir7U3h1C26NTUpPgyeqG?p=preview">this plunkr</a>)</p>
 
@@ -211,7 +206,7 @@
 </article>
 <div>
   <strong>If you liked this post, please share it!</strong>
-  <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://branchandbound.net/blog/web/2013/08/some-angularjs-pitfalls" data-via="Sander_Mak" data-dnt="true">Tweet</a>
+  <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://branchandbound.net/blog/web/2013/08/some-angularjs-pitfalls/" data-via="Sander_Mak" data-dnt="true">Tweet</a>
   <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
 </div>
 
@@ -222,11 +217,11 @@
   <h3>Related Posts</h3>
   <ul class="posts">
     
-      <li><span>10 Nov 2015</span> &raquo; <a href="/blog/web/2015/11/exploring-angular2">Exploring Angular2</a></li>
+      <li><span>10 Nov 2015</span> &raquo; <a href="/blog/web/2015/11/exploring-angular2/">Exploring Angular2</a></li>
     
-      <li><span>27 Oct 2015</span> &raquo; <a href="/blog/java/2015/10/osgi-to-jigsaw">From OSGi to Jigsaw</a></li>
+      <li><span>27 Oct 2015</span> &raquo; <a href="/blog/java/2015/10/osgi-to-jigsaw/">From OSGi to Jigsaw</a></li>
     
-      <li><span>21 Nov 2012</span> &raquo; <a href="/blog/web/2012/11/unify-server-side-client-side-rendering-embedding-json">Unify client-side and server-side rendering by embedding JSON</a></li>
+      <li><span>21 Nov 2012</span> &raquo; <a href="/blog/web/2012/11/unify-server-side-client-side-rendering-embedding-json/">Unify client-side and server-side rendering by embedding JSON</a></li>
     
   </ul>
 </div>
@@ -257,7 +252,7 @@
         </div>
         <div class="span3">
          <div class="hero-unit sidebar">
-           <a href="http://feeds.feedburner.com/BranchAndBound"><img class="rss pull-right" title="Branch and Bound Blog RSS Feed" alt="RSS Feed" src="/assets/themes/sander/rss.png"></a>
+           <a href="http://feeds.feedburner.com/BranchAndBound"><img class="rss pull-right" title="Branch and Bound Blog RSS Feed" alt="RSS Feed" src="/assets/themes//rss.png"></a>
            <h4 class="sidebar"><strong>Branch and Bound Blog</strong></h4>
            <em>... pruning the software universe</em> 
            <hr>
@@ -265,10 +260,10 @@
              <li><a href="/about.html">About Sander</a></li>
            </ul>
            <span class="sidebar pull-right">
-             <a href="http://www.twitter.com/Sander_Mak" target="_blank"><img title="Twitter" alt="Twitter" class="small" src="/assets/themes/sander/twitter.png"></a>
-             <a href="http://nl.linkedin.com/in/SanderMak" target="_blank"><img title="Linkedin profile" alt="Linkedin profile" class="small" src="/assets/themes/sander/linkedin.png"><a>
-             <a href="http://www.github.com/SanderMak" target="_blank"><img  title="GitHub" alt="GitHub" class="small" src="/assets/themes/sander/github.png"></a>
-             <a href="http://www.slideshare.net/SanderMak/presentations" target="_blank"><img title="Slideshare presentations"  alt="Slideshare presentations" class="small" src="/assets/themes/sander/slideshare.png"></a>
+             <a href="http://www.twitter.com/Sander_Mak" target="_blank"><img title="Twitter" alt="Twitter" class="small" src="/assets/themes//twitter.png"></a>
+             <a href="http://nl.linkedin.com/in/SanderMak" target="_blank"><img title="Linkedin profile" alt="Linkedin profile" class="small" src="/assets/themes//linkedin.png"><a>
+             <a href="http://www.github.com/SanderMak" target="_blank"><img  title="GitHub" alt="GitHub" class="small" src="/assets/themes//github.png"></a>
+             <a href="http://www.slideshare.net/SanderMak/presentations" target="_blank"><img title="Slideshare presentations"  alt="Slideshare presentations" class="small" src="/assets/themes//slideshare.png"></a>
            </span>
            <hr>
            <h5 class="sidebar">&nbsp;View archive by:</h5>
@@ -330,7 +325,7 @@
 
     <!-- Scripts at the end for faster loading. -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
-    <script src="/assets/themes/sander/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+    <script src="/assets/themes//bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
    
 
     <script type="text/javascript">

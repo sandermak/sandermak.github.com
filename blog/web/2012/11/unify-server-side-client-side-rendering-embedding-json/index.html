@@ -10,10 +10,10 @@
 
     <link href="http://feeds.feedburner.com/BranchAndBound" rel="alternate" title="Branch and Bound Blog Feed" type="application/atom+xml" />
     <!-- Le styles -->
-    <link href="/assets/themes/sander/bootstrap/css/bootstrap.css" rel="stylesheet">
-    <link href="/assets/themes/sander/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
-    <link href="/assets/themes/sander/syntax.css" rel="stylesheet">
-    <link href="/assets/themes/sander/style.css" rel="stylesheet">
+    <link href="/assets/themes//bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="/assets/themes//bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="/assets/themes//syntax.css" rel="stylesheet">
+    <link href="/assets/themes//style.css" rel="stylesheet">
 
     <style type="text/css">
       body {
@@ -98,33 +98,32 @@
 
 <p>Think about how you would implement this example. Strictly speaking, you can't really prevent duplicated logic. On the one hand, you need to render the table with the products from page one server-side on the initial request. Like in this JSP/JQuery based example:</p>
 
-<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;table&gt;</span>
-    <span class="nt">&lt;thead&gt;</span>
-        <span class="nt">&lt;tr&gt;</span>
-            <span class="nt">&lt;th&gt;</span>Product<span class="nt">&lt;/th&gt;</span>
-            <span class="nt">&lt;th&gt;</span>Description<span class="nt">&lt;/th&gt;</span>
-            <span class="nt">&lt;th&gt;</span>Price<span class="nt">&lt;/th&gt;</span>
-        <span class="nt">&lt;/tr&gt;</span>
-    <span class="nt">&lt;/thead&gt;</span>
-    <span class="nt">&lt;c:forEach</span> <span class="na">var=</span><span class="s">&quot;product&quot;</span> <span class="na">items=</span><span class="s">&quot;${products}&quot;</span><span class="nt">&gt;</span>
-        <span class="nt">&lt;tr&gt;</span>
-            <span class="nt">&lt;td&gt;&lt;c:out</span> <span class="na">value=</span><span class="s">&quot;${product.name}&quot;</span> <span class="nt">/&gt;&lt;/td&gt;</span>
-            <span class="nt">&lt;td&gt;&lt;em&gt;&lt;c:out</span> <span class="na">value=</span><span class="s">&quot;${product.description}&quot;</span> <span class="nt">/&gt;&lt;/em&gt;&lt;/td&gt;</span>
-            <span class="nt">&lt;td&gt;&lt;c:out</span> <span class="na">value=</span><span class="s">&quot;${product.price}&quot;</span> <span class="nt">/&gt;</span> Euro<span class="nt">&lt;/td&gt;</span>
-        <span class="nt">&lt;/tr&gt;</span>
-    <span class="nt">&lt;/c:forEach&gt;</span>
-<span class="nt">&lt;/table&gt;</span>
-<span class="c">&lt;!-- paging links omitted --&gt;</span></code></pre></div>
-
+<p><figure class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="p">&lt;</span><span class="nt">table</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">thead</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">tr</span><span class="p">&gt;</span>
+            <span class="p">&lt;</span><span class="nt">th</span><span class="p">&gt;</span>Product<span class="p">&lt;/</span><span class="nt">th</span><span class="p">&gt;</span>
+            <span class="p">&lt;</span><span class="nt">th</span><span class="p">&gt;</span>Description<span class="p">&lt;/</span><span class="nt">th</span><span class="p">&gt;</span>
+            <span class="p">&lt;</span><span class="nt">th</span><span class="p">&gt;</span>Price<span class="p">&lt;/</span><span class="nt">th</span><span class="p">&gt;</span>
+        <span class="p">&lt;/</span><span class="nt">tr</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">thead</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">c:forEach</span> <span class="na">var</span><span class="o">=</span><span class="s">&quot;product&quot;</span> <span class="na">items</span><span class="o">=</span><span class="s">&quot;${products}&quot;</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">tr</span><span class="p">&gt;</span>
+            <span class="p">&lt;</span><span class="nt">td</span><span class="p">&gt;&lt;</span><span class="nt">c:out</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;${product.name}&quot;</span> <span class="p">/&gt;&lt;/</span><span class="nt">td</span><span class="p">&gt;</span>
+            <span class="p">&lt;</span><span class="nt">td</span><span class="p">&gt;&lt;</span><span class="nt">em</span><span class="p">&gt;&lt;</span><span class="nt">c:out</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;${product.description}&quot;</span> <span class="p">/&gt;&lt;/</span><span class="nt">em</span><span class="p">&gt;&lt;/</span><span class="nt">td</span><span class="p">&gt;</span>
+            <span class="p">&lt;</span><span class="nt">td</span><span class="p">&gt;&lt;</span><span class="nt">c:out</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;${product.price}&quot;</span> <span class="p">/&gt;</span> Euro<span class="p">&lt;/</span><span class="nt">td</span><span class="p">&gt;</span>
+        <span class="p">&lt;/</span><span class="nt">tr</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">c:forEach</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">table</span><span class="p">&gt;</span>
+<span class="c">&lt;!-- paging links omitted --&gt;</span></code></pre></figure></p>
 
 <p>Then you also need to construct the table again after a successful paging AJAX call:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">products</span> <span class="o">=</span> <span class="c1">// JSON result of AJAX call</span>
+<p><figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span>
+<span class="kd">var</span> <span class="nx">products</span> <span class="o">=</span> <span class="c1">// JSON result of AJAX call</span>
 <span class="nx">$</span><span class="p">.</span><span class="nx">each</span><span class="p">(</span><span class="nx">products</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">index</span><span class="p">,</span> <span class="nx">product</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">productTable</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;&lt;tr&gt;&lt;td&gt;&#39;</span><span class="o">+</span><span class="nx">product</span><span class="p">.</span><span class="nx">name</span><span class="o">+</span><span class="s1">&#39;&lt;/td&gt;&lt;td&gt;&lt;em&gt;&#39;</span>
           <span class="o">+</span><span class="nx">product</span><span class="p">.</span><span class="nx">description</span><span class="o">+</span><span class="s1">&#39;&lt;/em&gt;&lt;/td&gt;&lt;td&gt;&#39;</span><span class="o">+</span><span class="nx">product</span><span class="p">.</span><span class="nx">price</span><span class="o">+</span><span class="s1">&#39;&lt;/td&gt;&lt;/tr&gt;&#39;</span><span class="p">));</span>
-<span class="p">});</span></code></pre></div>
-
+<span class="p">});</span></code></pre></figure></p>
 
 <p>(only do this when you can guarantee the concatenated strings are properly escaped!)</p>
 
@@ -146,10 +145,11 @@
 
 <p>While the general idea of client-side only rendering is good, the execution can be improved. What if the server makes the product data available in a format digestible by the client in the first request, but without needing to render the actual HTML? It turns out we can do that by embedding JSON in the page rendered on the server:</p>
 
-<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;html&gt;</span>
-<span class="nt">&lt;head&gt;</span>
+<p><figure class="highlight"><pre><code class="language-html" data-lang="html"><span></span>
+<span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
     <span class="c">&lt;!-- other header tags omitted --&gt;</span>
-    <span class="nt">&lt;script&gt;</span>
+    <span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
         <span class="c1">// Where the magic happens:</span>
         <span class="kd">var</span> <span class="nx">initialProducts</span> <span class="o">=</span> <span class="nx">$</span><span class="p">{</span><span class="nx">productJSON</span><span class="p">};</span>
         <span class="c1">// Fetch products using Ajax call and update html.</span>
@@ -164,13 +164,12 @@
         <span class="nx">$</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
             <span class="nx">updateProducts</span><span class="p">(</span><span class="nx">initialProducts</span><span class="p">);</span>
         <span class="p">});</span>
-    <span class="nt">&lt;/script&gt;</span>
-<span class="nt">&lt;/head&gt;</span>
-<span class="nt">&lt;body&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
    <span class="c">&lt;!-- body containing an empty table and paging links etc. --&gt;</span>
-<span class="nt">&lt;/body&gt;</span>
-<span class="nt">&lt;/html&gt;</span></code></pre></div>
-
+<span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span></code></pre></figure></p>
 
 <p>(View the full source of <a href="https://github.com/sandermak/embedded-json-example/blob/master/src/main/webapp/WEB-INF/views/index.jsp">this page</a> here.)</p>
 
@@ -198,7 +197,7 @@
 </article>
 <div>
   <strong>If you liked this post, please share it!</strong>
-  <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://branchandbound.net/blog/web/2012/11/unify-server-side-client-side-rendering-embedding-json" data-via="Sander_Mak" data-dnt="true">Tweet</a>
+  <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://branchandbound.net/blog/web/2012/11/unify-server-side-client-side-rendering-embedding-json/" data-via="Sander_Mak" data-dnt="true">Tweet</a>
   <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
 </div>
 
@@ -209,11 +208,11 @@
   <h3>Related Posts</h3>
   <ul class="posts">
     
-      <li><span>27 Oct 2015</span> &raquo; <a href="/blog/java/2015/10/osgi-to-jigsaw">From OSGi to Jigsaw</a></li>
+      <li><span>27 Oct 2015</span> &raquo; <a href="/blog/java/2015/10/osgi-to-jigsaw/">From OSGi to Jigsaw</a></li>
     
-      <li><span>10 Nov 2015</span> &raquo; <a href="/blog/web/2015/11/exploring-angular2">Exploring Angular2</a></li>
+      <li><span>10 Nov 2015</span> &raquo; <a href="/blog/web/2015/11/exploring-angular2/">Exploring Angular2</a></li>
     
-      <li><span>05 Aug 2013</span> &raquo; <a href="/blog/web/2013/08/some-angularjs-pitfalls">Some AngularJS pitfalls</a></li>
+      <li><span>05 Aug 2013</span> &raquo; <a href="/blog/web/2013/08/some-angularjs-pitfalls/">Some AngularJS pitfalls</a></li>
     
   </ul>
 </div>
@@ -244,7 +243,7 @@
         </div>
         <div class="span3">
          <div class="hero-unit sidebar">
-           <a href="http://feeds.feedburner.com/BranchAndBound"><img class="rss pull-right" title="Branch and Bound Blog RSS Feed" alt="RSS Feed" src="/assets/themes/sander/rss.png"></a>
+           <a href="http://feeds.feedburner.com/BranchAndBound"><img class="rss pull-right" title="Branch and Bound Blog RSS Feed" alt="RSS Feed" src="/assets/themes//rss.png"></a>
            <h4 class="sidebar"><strong>Branch and Bound Blog</strong></h4>
            <em>... pruning the software universe</em> 
            <hr>
@@ -252,10 +251,10 @@
              <li><a href="/about.html">About Sander</a></li>
            </ul>
            <span class="sidebar pull-right">
-             <a href="http://www.twitter.com/Sander_Mak" target="_blank"><img title="Twitter" alt="Twitter" class="small" src="/assets/themes/sander/twitter.png"></a>
-             <a href="http://nl.linkedin.com/in/SanderMak" target="_blank"><img title="Linkedin profile" alt="Linkedin profile" class="small" src="/assets/themes/sander/linkedin.png"><a>
-             <a href="http://www.github.com/SanderMak" target="_blank"><img  title="GitHub" alt="GitHub" class="small" src="/assets/themes/sander/github.png"></a>
-             <a href="http://www.slideshare.net/SanderMak/presentations" target="_blank"><img title="Slideshare presentations"  alt="Slideshare presentations" class="small" src="/assets/themes/sander/slideshare.png"></a>
+             <a href="http://www.twitter.com/Sander_Mak" target="_blank"><img title="Twitter" alt="Twitter" class="small" src="/assets/themes//twitter.png"></a>
+             <a href="http://nl.linkedin.com/in/SanderMak" target="_blank"><img title="Linkedin profile" alt="Linkedin profile" class="small" src="/assets/themes//linkedin.png"><a>
+             <a href="http://www.github.com/SanderMak" target="_blank"><img  title="GitHub" alt="GitHub" class="small" src="/assets/themes//github.png"></a>
+             <a href="http://www.slideshare.net/SanderMak/presentations" target="_blank"><img title="Slideshare presentations"  alt="Slideshare presentations" class="small" src="/assets/themes//slideshare.png"></a>
            </span>
            <hr>
            <h5 class="sidebar">&nbsp;View archive by:</h5>
@@ -317,7 +316,7 @@
 
     <!-- Scripts at the end for faster loading. -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
-    <script src="/assets/themes/sander/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+    <script src="/assets/themes//bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
    
 
     <script type="text/javascript">

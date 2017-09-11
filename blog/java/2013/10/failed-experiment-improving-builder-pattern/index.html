@@ -10,10 +10,10 @@
 
     <link href="http://feeds.feedburner.com/BranchAndBound" rel="alternate" title="Branch and Bound Blog Feed" type="application/atom+xml" />
     <!-- Le styles -->
-    <link href="/assets/themes/sander/bootstrap/css/bootstrap.css" rel="stylesheet">
-    <link href="/assets/themes/sander/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
-    <link href="/assets/themes/sander/syntax.css" rel="stylesheet">
-    <link href="/assets/themes/sander/style.css" rel="stylesheet">
+    <link href="/assets/themes//bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="/assets/themes//bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="/assets/themes//syntax.css" rel="stylesheet">
+    <link href="/assets/themes//style.css" rel="stylesheet">
 
     <style type="text/css">
       body {
@@ -99,94 +99,93 @@
 
 <p>But here we are in 2013. Let's say we want a domain object modeling pizza orders. The usual solution looks somewhat like this, using a static inner class to implement the builder:</p>
 
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">PizzaOrderOldStyle</span> <span class="o">{</span>
+<p><figure class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">PizzaOrderOldStyle</span> <span class="o">{</span></p>
 
-    <span class="kd">private</span> <span class="kt">int</span> <span class="n">size</span><span class="o">;</span>
-    <span class="kd">private</span> <span class="kt">boolean</span> <span class="n">pepperoni</span><span class="o">;</span>
-    <span class="kd">private</span> <span class="kt">boolean</span> <span class="n">chicken</span><span class="o">;</span>
-    <span class="kd">private</span> <span class="kt">boolean</span> <span class="n">mushroom</span><span class="o">;</span>
-    <span class="kd">private</span> <span class="kt">boolean</span> <span class="n">peppers</span><span class="o">;</span>
-    <span class="kd">private</span> <span class="n">String</span> <span class="n">cheese</span><span class="o">;</span>
-    <span class="kd">private</span> <span class="n">String</span> <span class="n">sauce</span><span class="o">;</span>
-    <span class="kd">private</span> <span class="n">String</span> <span class="n">orderFor</span><span class="o">;</span>
+<pre><code>&lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;size&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+&lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="kt"&gt;boolean&lt;/span&gt; &lt;span class="n"&gt;pepperoni&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+&lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="kt"&gt;boolean&lt;/span&gt; &lt;span class="n"&gt;chicken&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+&lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="kt"&gt;boolean&lt;/span&gt; &lt;span class="n"&gt;mushroom&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+&lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="kt"&gt;boolean&lt;/span&gt; &lt;span class="n"&gt;peppers&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+&lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="n"&gt;String&lt;/span&gt; &lt;span class="n"&gt;cheese&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+&lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="n"&gt;String&lt;/span&gt; &lt;span class="n"&gt;sauce&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+&lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="n"&gt;String&lt;/span&gt; &lt;span class="n"&gt;orderFor&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
 
-    <span class="kd">public</span> <span class="kd">static</span> <span class="n">Builder</span> <span class="nf">pizzaOrder</span><span class="o">(</span><span class="kt">int</span> <span class="n">size</span><span class="o">,</span> <span class="n">String</span> <span class="n">sauce</span><span class="o">,</span> <span class="n">String</span> <span class="n">orderFor</span><span class="o">)</span> 
-    <span class="o">{</span>
-        <span class="k">return</span> <span class="k">new</span> <span class="n">PizzaOrderOldStyle</span><span class="o">.</span><span class="na">Builder</span><span class="o">(</span><span class="n">size</span><span class="o">,</span> <span class="n">sauce</span><span class="o">,</span> <span class="n">orderFor</span><span class="o">);</span>
-    <span class="o">}</span> 
-    
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">class</span> <span class="nc">Builder</span> <span class="o">{</span>
-        
-        <span class="kd">private</span> <span class="kt">int</span> <span class="n">size</span><span class="o">;</span>
-        <span class="kd">private</span> <span class="kt">boolean</span> <span class="n">pepperoni</span><span class="o">;</span>
-        <span class="kd">private</span> <span class="kt">boolean</span> <span class="n">chicken</span><span class="o">;</span>
-        <span class="kd">private</span> <span class="kt">boolean</span> <span class="n">mushroom</span><span class="o">;</span>
-        <span class="kd">private</span> <span class="kt">boolean</span> <span class="n">peppers</span><span class="o">;</span>
-        <span class="n">String</span> <span class="n">cheese</span><span class="o">;</span>
-        <span class="kd">private</span> <span class="n">String</span> <span class="n">sauce</span><span class="o">;</span>
-        <span class="kd">private</span> <span class="n">String</span> <span class="n">orderFor</span><span class="o">;</span>
+&lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kd"&gt;static&lt;/span&gt; &lt;span class="n"&gt;Builder&lt;/span&gt; &lt;span class="nf"&gt;pizzaOrder&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;size&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;String&lt;/span&gt; &lt;span class="n"&gt;sauce&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;String&lt;/span&gt; &lt;span class="n"&gt;orderFor&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; 
+&lt;span class="o"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;PizzaOrderOldStyle&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;Builder&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;size&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;sauce&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;orderFor&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt; 
 
-        <span class="kd">public</span> <span class="nf">Builder</span><span class="o">(</span><span class="kt">int</span> <span class="n">size</span><span class="o">,</span> <span class="n">String</span> <span class="n">sauce</span><span class="o">,</span> <span class="n">String</span> <span class="n">orderFor</span><span class="o">)</span> <span class="o">{</span>
-            <span class="k">this</span><span class="o">.</span><span class="na">size</span> <span class="o">=</span> <span class="n">size</span><span class="o">;</span>
-            <span class="k">this</span><span class="o">.</span><span class="na">sauce</span> <span class="o">=</span> <span class="n">sauce</span><span class="o">;</span>
-            <span class="k">this</span><span class="o">.</span><span class="na">orderFor</span> <span class="o">=</span> <span class="n">orderFor</span><span class="o">;</span>
-        <span class="o">}</span>
+&lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kd"&gt;static&lt;/span&gt; &lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Builder&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
 
-        <span class="kd">public</span> <span class="n">Builder</span> <span class="nf">withPepperoni</span><span class="o">()</span> <span class="o">{</span>
-            <span class="k">this</span><span class="o">.</span><span class="na">pepperoni</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
-            <span class="k">return</span> <span class="k">this</span><span class="o">;</span>
-        <span class="o">}</span>
+    &lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;size&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+    &lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="kt"&gt;boolean&lt;/span&gt; &lt;span class="n"&gt;pepperoni&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+    &lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="kt"&gt;boolean&lt;/span&gt; &lt;span class="n"&gt;chicken&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+    &lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="kt"&gt;boolean&lt;/span&gt; &lt;span class="n"&gt;mushroom&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+    &lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="kt"&gt;boolean&lt;/span&gt; &lt;span class="n"&gt;peppers&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+    &lt;span class="n"&gt;String&lt;/span&gt; &lt;span class="n"&gt;cheese&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+    &lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="n"&gt;String&lt;/span&gt; &lt;span class="n"&gt;sauce&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+    &lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="n"&gt;String&lt;/span&gt; &lt;span class="n"&gt;orderFor&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
 
-        <span class="kd">public</span> <span class="n">Builder</span> <span class="nf">withChicken</span><span class="o">()</span> <span class="o">{</span>
-            <span class="k">this</span><span class="o">.</span><span class="na">chicken</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
-            <span class="k">return</span> <span class="k">this</span><span class="o">;</span>
-        <span class="o">}</span>
+    &lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="nf"&gt;Builder&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;size&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;String&lt;/span&gt; &lt;span class="n"&gt;sauce&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;String&lt;/span&gt; &lt;span class="n"&gt;orderFor&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+        &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;size&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;size&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+        &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;sauce&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;sauce&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+        &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;orderFor&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;orderFor&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+    &lt;span class="o"&gt;}&lt;/span&gt;
 
-        <span class="kd">public</span> <span class="n">Builder</span> <span class="nf">withMushroom</span><span class="o">()</span> <span class="o">{</span>
-            <span class="k">this</span><span class="o">.</span><span class="na">mushroom</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
-            <span class="k">return</span> <span class="k">this</span><span class="o">;</span>
-        <span class="o">}</span>
+    &lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="n"&gt;Builder&lt;/span&gt; &lt;span class="nf"&gt;withPepperoni&lt;/span&gt;&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+        &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;pepperoni&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+    &lt;span class="o"&gt;}&lt;/span&gt;
 
-        <span class="kd">public</span> <span class="n">Builder</span> <span class="nf">withPeppers</span><span class="o">()</span> <span class="o">{</span>
-            <span class="k">this</span><span class="o">.</span><span class="na">peppers</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
-            <span class="k">return</span> <span class="k">this</span><span class="o">;</span>
-        <span class="o">}</span>
+    &lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="n"&gt;Builder&lt;/span&gt; &lt;span class="nf"&gt;withChicken&lt;/span&gt;&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+        &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;chicken&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+    &lt;span class="o"&gt;}&lt;/span&gt;
 
-        <span class="kd">public</span> <span class="n">Builder</span> <span class="nf">withCheese</span><span class="o">(</span><span class="n">String</span> <span class="n">cheese</span><span class="o">)</span> <span class="o">{</span>
-            <span class="k">this</span><span class="o">.</span><span class="na">cheese</span> <span class="o">=</span> <span class="n">cheese</span><span class="o">;</span>
-            <span class="k">return</span> <span class="k">this</span><span class="o">;</span>
-        <span class="o">}</span>
+    &lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="n"&gt;Builder&lt;/span&gt; &lt;span class="nf"&gt;withMushroom&lt;/span&gt;&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+        &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;mushroom&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+    &lt;span class="o"&gt;}&lt;/span&gt;
 
-        <span class="kd">public</span> <span class="n">PizzaOrderOldStyle</span> <span class="nf">build</span><span class="o">()</span> <span class="o">{</span>
-            <span class="k">return</span> <span class="k">new</span> <span class="nf">PizzaOrderOldStyle</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
-        <span class="o">}</span>
-    <span class="o">}</span>
+    &lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="n"&gt;Builder&lt;/span&gt; &lt;span class="nf"&gt;withPeppers&lt;/span&gt;&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+        &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;peppers&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+    &lt;span class="o"&gt;}&lt;/span&gt;
 
-    <span class="kd">private</span> <span class="nf">PizzaOrderOldStyle</span><span class="o">(</span><span class="n">Builder</span> <span class="n">builder</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">size</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="na">size</span><span class="o">;</span>
-        <span class="n">pepperoni</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="na">pepperoni</span><span class="o">;</span>
-        <span class="n">chicken</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="na">chicken</span><span class="o">;</span>
-        <span class="n">mushroom</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="na">mushroom</span><span class="o">;</span>
-        <span class="n">peppers</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="na">peppers</span><span class="o">;</span>
-        <span class="n">cheese</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="na">cheese</span><span class="o">;</span>
-        <span class="n">sauce</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="na">sauce</span><span class="o">;</span>
-        <span class="n">orderFor</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="na">orderFor</span><span class="o">;</span>
-    <span class="o">}</span>
+    &lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="n"&gt;Builder&lt;/span&gt; &lt;span class="nf"&gt;withCheese&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt; &lt;span class="n"&gt;cheese&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+        &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;cheese&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;cheese&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+    &lt;span class="o"&gt;}&lt;/span&gt;
 
-<span class="c1">// Omitted getters</span>
+    &lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="n"&gt;PizzaOrderOldStyle&lt;/span&gt; &lt;span class="nf"&gt;build&lt;/span&gt;&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;PizzaOrderOldStyle&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+    &lt;span class="o"&gt;}&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+
+&lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="nf"&gt;PizzaOrderOldStyle&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Builder&lt;/span&gt; &lt;span class="n"&gt;builder&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;size&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;builder&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;size&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+    &lt;span class="n"&gt;pepperoni&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;builder&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;pepperoni&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+    &lt;span class="n"&gt;chicken&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;builder&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;chicken&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+    &lt;span class="n"&gt;mushroom&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;builder&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;mushroom&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+    &lt;span class="n"&gt;peppers&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;builder&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;peppers&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+    &lt;span class="n"&gt;cheese&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;builder&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;cheese&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+    &lt;span class="n"&gt;sauce&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;builder&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;sauce&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+    &lt;span class="n"&gt;orderFor&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;builder&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;orderFor&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+</code></pre>
+
+<p><span class="c1">// Omitted getters</span>
 <span class="c1">// Omitted equals/hashCode</span>
-<span class="o">}</span></code></pre></div>
-
+<span class="o">}</span></code></pre></figure></p>
 
 <p>It's fairly straightforward. The constructor for <code>PizzaOrderOldStyle</code> is private and takes an instance of the builder. In this constructor, the fields on the domain object are initialized to the values from the builder. Only <code>Builder</code> can be instantiated by the user of the API and it takes the non-optional values directly. The <code>with*()</code> methods on the builder expose a <a href="http://en.wikipedia.org/wiki/Fluent_interface">Fluent API</a> by returning <code>this</code>. Since the resulting domain object has no setters, it is effectively immutable after it is returned from <code>build()</code>.</p>
 
 <p>Building the domain object is now as simple as:</p>
 
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="n">pizzaOrder</span><span class="o">(</span><span class="mi">10</span><span class="o">,</span> <span class="s">&quot;tomato&quot;</span><span class="o">,</span> <span class="s">&quot;Sander&quot;</span><span class="o">)</span>
+<p><figure class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="n">pizzaOrder</span><span class="o">(</span><span class="mi">10</span><span class="o">,</span> <span class="s">&quot;tomato&quot;</span><span class="o">,</span> <span class="s">&quot;Sander&quot;</span><span class="o">)</span>
     <span class="o">.</span><span class="na">withPepperoni</span><span class="o">()</span>
     <span class="o">.</span><span class="na">withMushroom</span><span class="o">()</span>
-    <span class="o">.</span><span class="na">withCheese</span><span class="o">(</span><span class="s">&quot;parmesan&quot;</span><span class="o">).</span><span class="na">build</span><span class="o">();</span></code></pre></div>
-
+    <span class="o">.</span><span class="na">withCheese</span><span class="o">(</span><span class="s">&quot;parmesan&quot;</span><span class="o">).</span><span class="na">build</span><span class="o">();</span></code></pre></figure></p>
 
 <p>(I added a static convenience method <code>pizzaOrder</code> to instantiate the builder)</p>
 
@@ -202,92 +201,91 @@
 
 <p>Seeing this problem got me thinking. What if the builder is just a façade on top of the domain object? It could use the fields of the domain object as 'intermediate' storage, without exposing the domain object as a whole before it is ready. Java allows non-static inner classes to mess with private state of the outer object. So that was a good starting point:</p>
 
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">PizzaOrder</span> <span class="o">{</span>
+<p><figure class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">PizzaOrder</span> <span class="o">{</span></p>
 
-    <span class="kd">private</span> <span class="kt">int</span> <span class="n">size</span><span class="o">;</span>
-    <span class="kd">private</span> <span class="kt">boolean</span> <span class="n">pepperoni</span><span class="o">;</span>
-    <span class="kd">private</span> <span class="kt">boolean</span> <span class="n">chicken</span><span class="o">;</span>
-    <span class="kd">private</span> <span class="kt">boolean</span> <span class="n">mushroom</span><span class="o">;</span>
-    <span class="kd">private</span> <span class="kt">boolean</span> <span class="n">peppers</span><span class="o">;</span>
-    <span class="kd">private</span> <span class="n">String</span> <span class="n">cheese</span><span class="o">;</span>
-    <span class="kd">private</span> <span class="n">String</span> <span class="n">sauce</span><span class="o">;</span>
-    <span class="kd">private</span> <span class="n">String</span> <span class="n">orderFor</span><span class="o">;</span>
-    
-    <span class="kd">private</span> <span class="nf">PizzaOrder</span><span class="o">()</span> <span class="o">{</span>
-        <span class="c1">// Prevent direct instantiation</span>
-    <span class="o">}</span>
-    
-    <span class="kd">public</span> <span class="kd">static</span> <span class="n">Builder</span> <span class="nf">pizzaOrder</span><span class="o">(</span><span class="kt">int</span> <span class="n">size</span><span class="o">,</span> <span class="n">String</span> <span class="n">sauce</span><span class="o">,</span> <span class="n">String</span> <span class="n">orderFor</span><span class="o">)</span> 
-    <span class="o">{</span>
-        <span class="k">return</span> <span class="k">new</span> <span class="nf">PizzaOrder</span><span class="o">().</span><span class="na">new</span> <span class="n">Builder</span><span class="o">(</span><span class="n">size</span><span class="o">,</span> <span class="n">sauce</span><span class="o">,</span> <span class="n">orderFor</span><span class="o">);</span>
-    <span class="o">}</span>
-    
-    <span class="kd">public</span> <span class="kd">class</span> <span class="nc">Builder</span> <span class="o">{</span>
-        <span class="kd">private</span> <span class="n">AtomicBoolean</span> <span class="n">build</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">AtomicBoolean</span><span class="o">(</span><span class="kc">false</span><span class="o">);</span>
+<pre><code>&lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;size&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+&lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="kt"&gt;boolean&lt;/span&gt; &lt;span class="n"&gt;pepperoni&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+&lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="kt"&gt;boolean&lt;/span&gt; &lt;span class="n"&gt;chicken&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+&lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="kt"&gt;boolean&lt;/span&gt; &lt;span class="n"&gt;mushroom&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+&lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="kt"&gt;boolean&lt;/span&gt; &lt;span class="n"&gt;peppers&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+&lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="n"&gt;String&lt;/span&gt; &lt;span class="n"&gt;cheese&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+&lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="n"&gt;String&lt;/span&gt; &lt;span class="n"&gt;sauce&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+&lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="n"&gt;String&lt;/span&gt; &lt;span class="n"&gt;orderFor&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
 
-        <span class="kd">public</span> <span class="nf">Builder</span><span class="o">(</span><span class="kt">int</span> <span class="n">_size</span><span class="o">,</span> <span class="n">String</span> <span class="n">_sauce</span><span class="o">,</span> <span class="n">String</span> <span class="n">_orderFor</span><span class="o">)</span> <span class="o">{</span>
-            <span class="n">size</span> <span class="o">=</span> <span class="n">_size</span><span class="o">;</span>
-            <span class="n">sauce</span> <span class="o">=</span> <span class="n">_sauce</span><span class="o">;</span>
-            <span class="n">orderFor</span> <span class="o">=</span> <span class="n">_orderFor</span><span class="o">;</span>
-        <span class="o">}</span>
+&lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="nf"&gt;PizzaOrder&lt;/span&gt;&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+    &lt;span class="c1"&gt;// Prevent direct instantiation&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
 
-        <span class="kd">public</span> <span class="n">Builder</span> <span class="nf">withPepperoni</span><span class="o">()</span> <span class="o">{</span>
-            <span class="n">throwIfBuild</span><span class="o">();</span>
-            <span class="n">pepperoni</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
-            <span class="k">return</span> <span class="k">this</span><span class="o">;</span>
-        <span class="o">}</span>
+&lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kd"&gt;static&lt;/span&gt; &lt;span class="n"&gt;Builder&lt;/span&gt; &lt;span class="nf"&gt;pizzaOrder&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;size&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;String&lt;/span&gt; &lt;span class="n"&gt;sauce&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;String&lt;/span&gt; &lt;span class="n"&gt;orderFor&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; 
+&lt;span class="o"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;PizzaOrder&lt;/span&gt;&lt;span class="o"&gt;().&lt;/span&gt;&lt;span class="na"&gt;new&lt;/span&gt; &lt;span class="n"&gt;Builder&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;size&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;sauce&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;orderFor&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
 
-        <span class="kd">public</span> <span class="n">Builder</span> <span class="nf">withChicken</span><span class="o">()</span> <span class="o">{</span>
-            <span class="n">throwIfBuild</span><span class="o">();</span>
-            <span class="n">chicken</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
-            <span class="k">return</span> <span class="k">this</span><span class="o">;</span>
-        <span class="o">}</span>
+&lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Builder&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+    &lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="n"&gt;AtomicBoolean&lt;/span&gt; &lt;span class="n"&gt;build&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;AtomicBoolean&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="kc"&gt;false&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
 
-        <span class="kd">public</span> <span class="n">Builder</span> <span class="nf">withMushroom</span><span class="o">()</span> <span class="o">{</span>
-            <span class="n">throwIfBuild</span><span class="o">();</span>
-            <span class="n">mushroom</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
-            <span class="k">return</span> <span class="k">this</span><span class="o">;</span>
-        <span class="o">}</span>
+    &lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="nf"&gt;Builder&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;_size&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;String&lt;/span&gt; &lt;span class="n"&gt;_sauce&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;String&lt;/span&gt; &lt;span class="n"&gt;_orderFor&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+        &lt;span class="n"&gt;size&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;_size&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+        &lt;span class="n"&gt;sauce&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;_sauce&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+        &lt;span class="n"&gt;orderFor&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;_orderFor&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+    &lt;span class="o"&gt;}&lt;/span&gt;
 
-        <span class="kd">public</span> <span class="n">Builder</span> <span class="nf">withPeppers</span><span class="o">()</span> <span class="o">{</span>
-            <span class="n">throwIfBuild</span><span class="o">();</span>
-            <span class="n">peppers</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
-            <span class="k">return</span> <span class="k">this</span><span class="o">;</span>
-        <span class="o">}</span>
+    &lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="n"&gt;Builder&lt;/span&gt; &lt;span class="nf"&gt;withPepperoni&lt;/span&gt;&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+        &lt;span class="n"&gt;throwIfBuild&lt;/span&gt;&lt;span class="o"&gt;();&lt;/span&gt;
+        &lt;span class="n"&gt;pepperoni&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+    &lt;span class="o"&gt;}&lt;/span&gt;
 
-        <span class="kd">public</span> <span class="n">Builder</span> <span class="nf">withCheese</span><span class="o">(</span><span class="n">String</span> <span class="n">_cheese</span><span class="o">)</span> <span class="o">{</span>
-            <span class="n">throwIfBuild</span><span class="o">();</span>
-            <span class="n">cheese</span> <span class="o">=</span> <span class="n">_cheese</span><span class="o">;</span>
-            <span class="k">return</span> <span class="k">this</span><span class="o">;</span>
-        <span class="o">}</span>
-        
-        <span class="kd">public</span> <span class="n">PizzaOrder</span> <span class="nf">build</span><span class="o">()</span> <span class="o">{</span>
-            <span class="k">if</span> <span class="o">(</span><span class="n">build</span><span class="o">.</span><span class="na">compareAndSet</span><span class="o">(</span><span class="kc">false</span><span class="o">,</span> <span class="kc">true</span><span class="o">))</span> <span class="o">{</span>
-                <span class="c1">// check consistency here...                </span>
-                <span class="k">return</span> <span class="n">PizzaOrder</span><span class="o">.</span><span class="na">this</span><span class="o">;</span>
-            <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
-                <span class="k">throw</span> <span class="k">new</span> <span class="nf">IllegalStateException</span><span class="o">(</span><span class="s">&quot;Build may only be called once!&quot;</span><span class="o">);</span>
-            <span class="o">}</span>
-        <span class="o">}</span>
-        <span class="kd">private</span> <span class="kt">void</span> <span class="nf">throwIfBuild</span><span class="o">()</span> <span class="o">{</span>
-            <span class="k">if</span> <span class="o">(</span><span class="n">build</span><span class="o">.</span><span class="na">get</span><span class="o">())</span> <span class="o">{</span>
-                <span class="k">throw</span> <span class="k">new</span> <span class="nf">IllegalStateException</span><span class="o">(</span><span class="s">&quot;Cannot modify builder after calling build()&quot;</span><span class="o">);</span>
-            <span class="o">}</span>
-        <span class="o">}</span>
-    <span class="o">}</span>
+    &lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="n"&gt;Builder&lt;/span&gt; &lt;span class="nf"&gt;withChicken&lt;/span&gt;&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+        &lt;span class="n"&gt;throwIfBuild&lt;/span&gt;&lt;span class="o"&gt;();&lt;/span&gt;
+        &lt;span class="n"&gt;chicken&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+    &lt;span class="o"&gt;}&lt;/span&gt;
 
-<span class="c1">// Omitted getters</span>
+    &lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="n"&gt;Builder&lt;/span&gt; &lt;span class="nf"&gt;withMushroom&lt;/span&gt;&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+        &lt;span class="n"&gt;throwIfBuild&lt;/span&gt;&lt;span class="o"&gt;();&lt;/span&gt;
+        &lt;span class="n"&gt;mushroom&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+    &lt;span class="o"&gt;}&lt;/span&gt;
+
+    &lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="n"&gt;Builder&lt;/span&gt; &lt;span class="nf"&gt;withPeppers&lt;/span&gt;&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+        &lt;span class="n"&gt;throwIfBuild&lt;/span&gt;&lt;span class="o"&gt;();&lt;/span&gt;
+        &lt;span class="n"&gt;peppers&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+    &lt;span class="o"&gt;}&lt;/span&gt;
+
+    &lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="n"&gt;Builder&lt;/span&gt; &lt;span class="nf"&gt;withCheese&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt; &lt;span class="n"&gt;_cheese&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+        &lt;span class="n"&gt;throwIfBuild&lt;/span&gt;&lt;span class="o"&gt;();&lt;/span&gt;
+        &lt;span class="n"&gt;cheese&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;_cheese&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+    &lt;span class="o"&gt;}&lt;/span&gt;
+
+    &lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="n"&gt;PizzaOrder&lt;/span&gt; &lt;span class="nf"&gt;build&lt;/span&gt;&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;build&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;compareAndSet&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="kc"&gt;false&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;&lt;span class="o"&gt;))&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+            &lt;span class="c1"&gt;// check consistency here...                &lt;/span&gt;
+            &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;PizzaOrder&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;this&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+        &lt;span class="o"&gt;}&lt;/span&gt; &lt;span class="k"&gt;else&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+            &lt;span class="k"&gt;throw&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;IllegalStateException&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Build may only be called once!&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+        &lt;span class="o"&gt;}&lt;/span&gt;
+    &lt;span class="o"&gt;}&lt;/span&gt;
+    &lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;throwIfBuild&lt;/span&gt;&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;build&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;get&lt;/span&gt;&lt;span class="o"&gt;())&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+            &lt;span class="k"&gt;throw&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;IllegalStateException&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Cannot modify builder after calling build()&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+        &lt;span class="o"&gt;}&lt;/span&gt;
+    &lt;span class="o"&gt;}&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+</code></pre>
+
+<p><span class="c1">// Omitted getters</span>
 <span class="c1">// Omitted equals/hashCode    </span>
-<span class="o">}</span></code></pre></div>
-
+<span class="o">}</span></code></pre></figure></p>
 
 <p>Interestingly, the exposed API is identical since we again offer a static convenience function <code>pizzaOrder</code> hiding the slightly funky <code>new PizzaOrder().new Builder(..)</code> that is necessary to instantiate the builder:</p>
 
-<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="n">pizzaOrder</span><span class="o">(</span><span class="mi">10</span><span class="o">,</span> <span class="s">&quot;basil&quot;</span><span class="o">,</span> <span class="s">&quot;Fred&quot;</span><span class="o">)</span>
+<p><figure class="highlight"><pre><code class="language-java" data-lang="java"><span></span><span class="n">pizzaOrder</span><span class="o">(</span><span class="mi">10</span><span class="o">,</span> <span class="s">&quot;basil&quot;</span><span class="o">,</span> <span class="s">&quot;Fred&quot;</span><span class="o">)</span>
     <span class="o">.</span><span class="na">withPepperoni</span><span class="o">()</span>
     <span class="o">.</span><span class="na">withMushroom</span><span class="o">()</span>
-    <span class="o">.</span><span class="na">withCheese</span><span class="o">(</span><span class="s">&quot;mozzarella&quot;</span><span class="o">).</span><span class="na">build</span><span class="o">();</span></code></pre></div>
-
+    <span class="o">.</span><span class="na">withCheese</span><span class="o">(</span><span class="s">&quot;mozzarella&quot;</span><span class="o">).</span><span class="na">build</span><span class="o">();</span></code></pre></figure></p>
 
 <p>Even though from a syntactic standpoint the API hasn't changed, from a usage perspective there are differences. After a call to <code>build()</code> any other call on the builder results in an exception. This must be the case, since the underlying fields are the actual fields of the domain object. We don't want those to change after the builder is done. I used an <code>AtomicBoolean</code> to 'seal' the builder and the underlying domain object. Compare this with the original approach, where you can build as many times as you want with the same <code>Builder</code> instance. Whether this is a good or bad thing is debatable. In practice it doesn't make much difference since you tend to use a builder only once anyway.</p>
 
@@ -309,7 +307,7 @@
 </article>
 <div>
   <strong>If you liked this post, please share it!</strong>
-  <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://branchandbound.net/blog/java/2013/10/failed-experiment-improving-builder-pattern" data-via="Sander_Mak" data-dnt="true">Tweet</a>
+  <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://branchandbound.net/blog/java/2013/10/failed-experiment-improving-builder-pattern/" data-via="Sander_Mak" data-dnt="true">Tweet</a>
   <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
 </div>
 
@@ -320,11 +318,11 @@
   <h3>Related Posts</h3>
   <ul class="posts">
     
-      <li><span>27 Oct 2015</span> &raquo; <a href="/blog/java/2015/10/osgi-to-jigsaw">From OSGi to Jigsaw</a></li>
+      <li><span>27 Oct 2015</span> &raquo; <a href="/blog/java/2015/10/osgi-to-jigsaw/">From OSGi to Jigsaw</a></li>
     
-      <li><span>10 Nov 2015</span> &raquo; <a href="/blog/web/2015/11/exploring-angular2">Exploring Angular2</a></li>
+      <li><span>10 Nov 2015</span> &raquo; <a href="/blog/web/2015/11/exploring-angular2/">Exploring Angular2</a></li>
     
-      <li><span>18 Jul 2013</span> &raquo; <a href="/blog/java/2013/07/java-modularity-story">The Java Modularity Story</a></li>
+      <li><span>18 Jul 2013</span> &raquo; <a href="/blog/java/2013/07/java-modularity-story/">The Java Modularity Story</a></li>
     
   </ul>
 </div>
@@ -355,7 +353,7 @@
         </div>
         <div class="span3">
          <div class="hero-unit sidebar">
-           <a href="http://feeds.feedburner.com/BranchAndBound"><img class="rss pull-right" title="Branch and Bound Blog RSS Feed" alt="RSS Feed" src="/assets/themes/sander/rss.png"></a>
+           <a href="http://feeds.feedburner.com/BranchAndBound"><img class="rss pull-right" title="Branch and Bound Blog RSS Feed" alt="RSS Feed" src="/assets/themes//rss.png"></a>
            <h4 class="sidebar"><strong>Branch and Bound Blog</strong></h4>
            <em>... pruning the software universe</em> 
            <hr>
@@ -363,10 +361,10 @@
              <li><a href="/about.html">About Sander</a></li>
            </ul>
            <span class="sidebar pull-right">
-             <a href="http://www.twitter.com/Sander_Mak" target="_blank"><img title="Twitter" alt="Twitter" class="small" src="/assets/themes/sander/twitter.png"></a>
-             <a href="http://nl.linkedin.com/in/SanderMak" target="_blank"><img title="Linkedin profile" alt="Linkedin profile" class="small" src="/assets/themes/sander/linkedin.png"><a>
-             <a href="http://www.github.com/SanderMak" target="_blank"><img  title="GitHub" alt="GitHub" class="small" src="/assets/themes/sander/github.png"></a>
-             <a href="http://www.slideshare.net/SanderMak/presentations" target="_blank"><img title="Slideshare presentations"  alt="Slideshare presentations" class="small" src="/assets/themes/sander/slideshare.png"></a>
+             <a href="http://www.twitter.com/Sander_Mak" target="_blank"><img title="Twitter" alt="Twitter" class="small" src="/assets/themes//twitter.png"></a>
+             <a href="http://nl.linkedin.com/in/SanderMak" target="_blank"><img title="Linkedin profile" alt="Linkedin profile" class="small" src="/assets/themes//linkedin.png"><a>
+             <a href="http://www.github.com/SanderMak" target="_blank"><img  title="GitHub" alt="GitHub" class="small" src="/assets/themes//github.png"></a>
+             <a href="http://www.slideshare.net/SanderMak/presentations" target="_blank"><img title="Slideshare presentations"  alt="Slideshare presentations" class="small" src="/assets/themes//slideshare.png"></a>
            </span>
            <hr>
            <h5 class="sidebar">&nbsp;View archive by:</h5>
@@ -428,7 +426,7 @@
 
     <!-- Scripts at the end for faster loading. -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
-    <script src="/assets/themes/sander/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+    <script src="/assets/themes//bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
    
 
     <script type="text/javascript">

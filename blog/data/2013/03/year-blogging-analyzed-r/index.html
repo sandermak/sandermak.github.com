@@ -10,10 +10,10 @@
 
     <link href="http://feeds.feedburner.com/BranchAndBound" rel="alternate" title="Branch and Bound Blog Feed" type="application/atom+xml" />
     <!-- Le styles -->
-    <link href="/assets/themes/sander/bootstrap/css/bootstrap.css" rel="stylesheet">
-    <link href="/assets/themes/sander/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
-    <link href="/assets/themes/sander/syntax.css" rel="stylesheet">
-    <link href="/assets/themes/sander/style.css" rel="stylesheet">
+    <link href="/assets/themes//bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="/assets/themes//bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="/assets/themes//syntax.css" rel="stylesheet">
+    <link href="/assets/themes//style.css" rel="stylesheet">
 
     <style type="text/css">
       body {
@@ -99,19 +99,18 @@
 
 <p>How do you get the Google Analytics data into R? We could work with the Analytics REST API directly in R, but there is also a nice wrapper library call <a href="http://skardhamar.github.com/rga/">rga</a>. Did I mention there's a package for everything in R? Here's how you call the Google Analytics API:</p>
 
-<div class="highlight"><pre><code class="language-r" data-lang="r"><span class="kn">library</span><span class="p">(</span>rga<span class="p">)</span> 
+<p><figure class="highlight"><pre><code class="language-r" data-lang="r"><span></span><span class="kn">library</span><span class="p">(</span>rga<span class="p">)</span>
 rga.open<span class="p">(</span>instance <span class="o">=</span> <span class="s">&quot;ga&quot;</span><span class="p">,</span> where <span class="o">=</span> <span class="s">&quot;~/temp/ga-api&quot;</span><span class="p">)</span>
 <span class="c1"># the call above triggers the oAuth flow, and the resulting  </span>
-<span class="c1"># key is cached in the specified file.</span>
+<span class="c1"># key is cached in the specified file.</span></p>
 
-ga.df <span class="o">&lt;-</span> ga<span class="o">$</span>getData<span class="p">(</span><span class="s">&quot;XXXXXXXX&quot;</span><span class="p">,</span> <span class="c1"># replace with your GA profile id</span>
+<p>ga.df <span class="o">&lt;-</span> ga<span class="o">$</span>getData<span class="p">(</span><span class="s">&quot;XXXXXXXX&quot;</span><span class="p">,</span> <span class="c1"># replace with your GA profile id</span>
                     start.date <span class="o">=</span> <span class="s">&quot;2012-03-23&quot;</span><span class="p">,</span>
                     end.date <span class="o">=</span> <span class="s">&quot;2013-03-23&quot;</span><span class="p">,</span>
                     metrics <span class="o">=</span> <span class="s">&quot;ga:visits&quot;</span><span class="p">,</span>
                     dimensions <span class="o">=</span> <span class="s">&quot;ga:date&quot;</span><span class="p">,</span>
                     max <span class="o">=</span> <span class="m">1500</span><span class="p">,</span>
-                    sort <span class="o">=</span> <span class="s">&quot;ga:date&quot;</span><span class="p">)</span></code></pre></div>
-
+                    sort <span class="o">=</span> <span class="s">&quot;ga:date&quot;</span><span class="p">)</span></code></pre></figure></p>
 
 <p>Yes, that <code>instance="ga"</code> on the second line specifies the name of a variable that will pop into existence, later to be used in <code>ga$getData()</code>. Life's full of dynamic surprises with R.</p>
 
@@ -119,8 +118,7 @@ ga.df <span class="o">&lt;-</span> ga<span class="o">$</span>getData<span class=
 
 <p>Actually, the hardest part was finding out the right profile id to use for calling the API. Just so you know, this id is not the same as the tracking id you use on your page. Anyway, a quick way to find all your profile id's is to head to Google's <a href="https://developers.google.com/oauthplayground/">OAuth2 playground</a>, authorize the Analytics API and call:</p>
 
-<div class="highlight"><pre><code class="language-html" data-lang="html">https://www.googleapis.com/analytics/v3/management/accounts/~all/webproperties/~all/profiles</code></pre></div>
-
+<p><figure class="highlight"><pre><code class="language-html" data-lang="html"><span></span>https://www.googleapis.com/analytics/v3/management/accounts/~all/webproperties/~all/profiles</code></pre></figure></p>
 
 <h3>Visitors</h3>
 
@@ -183,7 +181,7 @@ ga.df <span class="o">&lt;-</span> ga<span class="o">$</span>getData<span class=
 </article>
 <div>
   <strong>If you liked this post, please share it!</strong>
-  <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://branchandbound.net/blog/data/2013/03/year-blogging-analyzed-r" data-via="Sander_Mak" data-dnt="true">Tweet</a>
+  <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://branchandbound.net/blog/data/2013/03/year-blogging-analyzed-r/" data-via="Sander_Mak" data-dnt="true">Tweet</a>
   <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
 </div>
 
@@ -194,11 +192,11 @@ ga.df <span class="o">&lt;-</span> ga<span class="o">$</span>getData<span class=
   <h3>Related Posts</h3>
   <ul class="posts">
     
-      <li><span>27 Oct 2015</span> &raquo; <a href="/blog/java/2015/10/osgi-to-jigsaw">From OSGi to Jigsaw</a></li>
+      <li><span>27 Oct 2015</span> &raquo; <a href="/blog/java/2015/10/osgi-to-jigsaw/">From OSGi to Jigsaw</a></li>
     
-      <li><span>27 Oct 2014</span> &raquo; <a href="/blog/data/2014/10/road-to-data-science">The Road to Data Science</a></li>
+      <li><span>27 Oct 2014</span> &raquo; <a href="/blog/data/2014/10/road-to-data-science/">The Road to Data Science</a></li>
     
-      <li><span>10 Nov 2015</span> &raquo; <a href="/blog/web/2015/11/exploring-angular2">Exploring Angular2</a></li>
+      <li><span>10 Nov 2015</span> &raquo; <a href="/blog/web/2015/11/exploring-angular2/">Exploring Angular2</a></li>
     
   </ul>
 </div>
@@ -229,7 +227,7 @@ ga.df <span class="o">&lt;-</span> ga<span class="o">$</span>getData<span class=
         </div>
         <div class="span3">
          <div class="hero-unit sidebar">
-           <a href="http://feeds.feedburner.com/BranchAndBound"><img class="rss pull-right" title="Branch and Bound Blog RSS Feed" alt="RSS Feed" src="/assets/themes/sander/rss.png"></a>
+           <a href="http://feeds.feedburner.com/BranchAndBound"><img class="rss pull-right" title="Branch and Bound Blog RSS Feed" alt="RSS Feed" src="/assets/themes//rss.png"></a>
            <h4 class="sidebar"><strong>Branch and Bound Blog</strong></h4>
            <em>... pruning the software universe</em> 
            <hr>
@@ -237,10 +235,10 @@ ga.df <span class="o">&lt;-</span> ga<span class="o">$</span>getData<span class=
              <li><a href="/about.html">About Sander</a></li>
            </ul>
            <span class="sidebar pull-right">
-             <a href="http://www.twitter.com/Sander_Mak" target="_blank"><img title="Twitter" alt="Twitter" class="small" src="/assets/themes/sander/twitter.png"></a>
-             <a href="http://nl.linkedin.com/in/SanderMak" target="_blank"><img title="Linkedin profile" alt="Linkedin profile" class="small" src="/assets/themes/sander/linkedin.png"><a>
-             <a href="http://www.github.com/SanderMak" target="_blank"><img  title="GitHub" alt="GitHub" class="small" src="/assets/themes/sander/github.png"></a>
-             <a href="http://www.slideshare.net/SanderMak/presentations" target="_blank"><img title="Slideshare presentations"  alt="Slideshare presentations" class="small" src="/assets/themes/sander/slideshare.png"></a>
+             <a href="http://www.twitter.com/Sander_Mak" target="_blank"><img title="Twitter" alt="Twitter" class="small" src="/assets/themes//twitter.png"></a>
+             <a href="http://nl.linkedin.com/in/SanderMak" target="_blank"><img title="Linkedin profile" alt="Linkedin profile" class="small" src="/assets/themes//linkedin.png"><a>
+             <a href="http://www.github.com/SanderMak" target="_blank"><img  title="GitHub" alt="GitHub" class="small" src="/assets/themes//github.png"></a>
+             <a href="http://www.slideshare.net/SanderMak/presentations" target="_blank"><img title="Slideshare presentations"  alt="Slideshare presentations" class="small" src="/assets/themes//slideshare.png"></a>
            </span>
            <hr>
            <h5 class="sidebar">&nbsp;View archive by:</h5>
@@ -302,7 +300,7 @@ ga.df <span class="o">&lt;-</span> ga<span class="o">$</span>getData<span class=
 
     <!-- Scripts at the end for faster loading. -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
-    <script src="/assets/themes/sander/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+    <script src="/assets/themes//bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
    
 
     <script type="text/javascript">

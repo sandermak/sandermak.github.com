@@ -10,10 +10,10 @@
 
     <link href="http://feeds.feedburner.com/BranchAndBound" rel="alternate" title="Branch and Bound Blog Feed" type="application/atom+xml" />
     <!-- Le styles -->
-    <link href="/assets/themes/sander/bootstrap/css/bootstrap.css" rel="stylesheet">
-    <link href="/assets/themes/sander/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
-    <link href="/assets/themes/sander/syntax.css" rel="stylesheet">
-    <link href="/assets/themes/sander/style.css" rel="stylesheet">
+    <link href="/assets/themes//bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="/assets/themes//bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="/assets/themes//syntax.css" rel="stylesheet">
+    <link href="/assets/themes//style.css" rel="stylesheet">
 
     <style type="text/css">
       body {
@@ -156,12 +156,12 @@ A component is an annotated class, that can refer to an associated HTML template
 
 <p><em>PlaylistComponents.ts</em>:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kr">import</span> <span class="p">{</span> <span class="nx">Component</span><span class="p">,</span> <span class="nx">View</span><span class="p">,</span> <span class="nx">NgFor</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;angular2/angular2&#39;</span><span class="p">;</span>
-<span class="kr">import</span> <span class="p">{</span> <span class="nx">LocalStoragePlayList</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;./PlaylistBackend&#39;</span><span class="p">;</span>
+<p><figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kr">import</span> <span class="p">{</span> <span class="nx">Component</span><span class="p">,</span> <span class="nx">View</span><span class="p">,</span> <span class="nx">NgFor</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;angular2/angular2&#39;</span><span class="p">;</span>
+<span class="kr">import</span> <span class="p">{</span> <span class="nx">LocalStoragePlayList</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;./PlaylistBackend&#39;</span><span class="p">;</span></p>
 
-<span class="c1">// PlaylistEntryComponent class definition omitted for brevity.</span>
+<p><span class="c1">// PlaylistEntryComponent class definition omitted for brevity.</span></p>
 
-<span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
+<p><span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
   <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;playlist&#39;</span><span class="p">,</span>
   <span class="nx">providers</span><span class="o">:</span> <span class="p">[</span><span class="nx">LocalStoragePlayList</span><span class="p">]</span>
 <span class="p">})</span>
@@ -169,27 +169,25 @@ A component is an annotated class, that can refer to an associated HTML template
   <span class="nx">templateUrl</span><span class="o">:</span> <span class="s2">&quot;ytlive/playlist/playlist.html&quot;</span><span class="p">,</span>
   <span class="nx">directives</span><span class="o">:</span> <span class="p">[</span><span class="nx">NgFor</span><span class="p">,</span> <span class="nx">PlaylistEntryComponent</span><span class="p">]</span>
 <span class="p">})</span>
-<span class="kr">export</span> <span class="kr">class</span> <span class="nx">PlaylistComponent</span> <span class="p">{</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">PlaylistComponent</span> <span class="p">{</span></p>
 
-  <span class="nx">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">playlistService</span><span class="o">:</span> <span class="nx">LocalStoragePlayList</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span>
+<p>  <span class="nx">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">playlistService</span><span class="o">:</span> <span class="nx">LocalStoragePlayList</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span></p>
 
-  <span class="nx">get</span> <span class="nx">entries</span><span class="p">()</span><span class="o">:</span> <span class="nx">ConcertSummary</span><span class="p">[]</span> <span class="p">{</span>
+<p>  <span class="nx">get</span> <span class="nx">entries</span><span class="p">()</span><span class="o">:</span> <span class="nx">ConcertSummary</span><span class="p">[]</span> <span class="p">{</span>
     <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">playlistService</span><span class="p">.</span><span class="nx">getPlaylist</span><span class="p">();</span>
-  <span class="p">}</span>
+  <span class="p">}</span></p>
 
-<span class="p">}</span></code></pre></div>
-
+<p><span class="p">}</span></code></pre></figure></p>
 
 <p>In particular, the @View annotation contains a reference to this template:</p>
 
 <p><em>playlist.html</em>:</p>
 
-<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;playlist row&quot;</span><span class="nt">&gt;</span>
-  <span class="nt">&lt;div</span> <span class="err">*</span><span class="na">ng-for=</span><span class="s">&quot;#entry of entries&quot;</span><span class="nt">&gt;</span>
-    <span class="nt">&lt;playlist-entry</span> <span class="err">[</span><span class="na">entry</span><span class="err">]=&quot;</span><span class="na">entry</span><span class="err">&quot;</span><span class="nt">&gt;&lt;/playlist-entry&gt;</span>
-  <span class="nt">&lt;/div&gt;</span>
-<span class="nt">&lt;/div&gt;</span></code></pre></div>
-
+<p><figure class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;playlist row&quot;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">div</span> <span class="err">*</span><span class="na">ng-for</span><span class="o">=</span><span class="s">&quot;#entry of entries&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">playlist-entry</span> <span class="err">[</span><span class="na">entry</span><span class="err">]=&quot;</span><span class="na">entry</span><span class="err">&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">playlist-entry</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span></code></pre></figure></p>
 
 <p>Together, the template and component class form a reusable whole.
 Through the selector property on the @Component annotation, we control how this component can be instantiated in templates.
@@ -236,25 +234,24 @@ You will not find an example of using custom events in YouTube live!, but you ca
 It's possible to start a video both from the playlist entries and the search results.
 This shared functionality can be achieved by simply creating a VideoPlayer class with the appropriate methods and state:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kr">export</span> <span class="kr">class</span> <span class="nx">VideoPlayer</span> <span class="p">{</span>
+<p><figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kr">export</span> <span class="kr">class</span> <span class="nx">VideoPlayer</span> <span class="p">{</span>
   <span class="kr">public</span> <span class="nx">isPlaying</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
-  <span class="kr">public</span> <span class="nx">currentVideoUrl</span><span class="o">:</span> <span class="nx">string</span>
+  <span class="kr">public</span> <span class="nx">currentVideoUrl</span><span class="o">:</span> <span class="nx">string</span></p>
 
-  <span class="kr">public</span> <span class="nx">playConcert</span><span class="p">(</span><span class="nx">id</span><span class="o">:</span> <span class="nx">string</span><span class="p">)</span> <span class="p">{</span>
+<p>  <span class="kr">public</span> <span class="nx">playConcert</span><span class="p">(</span><span class="nx">id</span><span class="o">:</span> <span class="nx">string</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">isPlaying</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">currentVideoUrl</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">concertIdToEmbedUrl</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
-  <span class="p">}</span>
+  <span class="p">}</span></p>
 
-  <span class="kr">public</span> <span class="nx">stop</span><span class="p">()</span> <span class="p">{</span>
+<p>  <span class="kr">public</span> <span class="nx">stop</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">isPlaying</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">currentVideoUrl</span> <span class="o">=</span> <span class="kc">undefined</span><span class="p">;</span>
-  <span class="p">}</span>
+  <span class="p">}</span></p>
 
-  <span class="kr">private</span> <span class="nx">concertIdToEmbedUrl</span><span class="p">(</span><span class="nx">id</span><span class="o">:</span> <span class="nx">string</span><span class="p">)</span><span class="o">:</span> <span class="nx">string</span> <span class="p">{</span>
+<p>  <span class="kr">private</span> <span class="nx">concertIdToEmbedUrl</span><span class="p">(</span><span class="nx">id</span><span class="o">:</span> <span class="nx">string</span><span class="p">)</span><span class="o">:</span> <span class="nx">string</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nx">yt_embed</span> <span class="o">+</span> <span class="nx">id</span> <span class="o">+</span> <span class="s1">&#39;?showinfo=0&amp;autoplay=1&#39;</span><span class="p">;</span>
   <span class="p">}</span>
-<span class="p">}</span></code></pre></div>
-
+<span class="p">}</span></code></pre></figure></p>
 
 <p>It's just a plain class, no special Angular annotations necessary.
 There is no view attached.
@@ -264,7 +261,7 @@ It's a bit like services in AngularJS 1.x.</p>
 
 <p>Take for example the SearchResult component, showing the constructor injection:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
+<p><figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="err">@</span><span class="nx">Component</span><span class="p">({</span>
   <span class="nx">selector</span><span class="o">:</span> <span class="s1">&#39;search-result&#39;</span><span class="p">,</span>
   <span class="nx">properties</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;concert&quot;</span><span class="p">],</span>
   <span class="nx">providers</span><span class="o">:</span> <span class="p">[</span><span class="nx">LocalStoragePlayList</span><span class="p">]</span>
@@ -274,20 +271,19 @@ It's a bit like services in AngularJS 1.x.</p>
   <span class="nx">directives</span><span class="o">:</span> <span class="p">[]</span>
 <span class="p">})</span>
 <span class="kr">class</span> <span class="nx">SearchResultComponent</span> <span class="p">{</span>
-  <span class="nx">concert</span><span class="o">:</span> <span class="nx">ytbackend</span><span class="p">.</span><span class="nx">ConcertSummary</span>
+  <span class="nx">concert</span><span class="o">:</span> <span class="nx">ytbackend</span><span class="p">.</span><span class="nx">ConcertSummary</span></p>
 
-  <span class="nx">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">playlistService</span><span class="o">:</span> <span class="nx">LocalStoragePlayList</span><span class="p">,</span>
-     <span class="kr">private</span> <span class="nx">videoPlayer</span><span class="o">:</span> <span class="nx">ytbackend</span><span class="p">.</span><span class="nx">VideoPlayer</span><span class="p">)</span> <span class="p">{}</span>
+<p>  <span class="nx">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">playlistService</span><span class="o">:</span> <span class="nx">LocalStoragePlayList</span><span class="p">,</span>
+     <span class="kr">private</span> <span class="nx">videoPlayer</span><span class="o">:</span> <span class="nx">ytbackend</span><span class="p">.</span><span class="nx">VideoPlayer</span><span class="p">)</span> <span class="p">{}</span></p>
 
-  <span class="nx">addToPlaylist</span><span class="p">(</span><span class="nx">concert</span><span class="o">:</span> <span class="nx">ytbackend</span><span class="p">.</span><span class="nx">ConcertSummary</span><span class="p">)</span> <span class="p">{</span>
+<p>  <span class="nx">addToPlaylist</span><span class="p">(</span><span class="nx">concert</span><span class="o">:</span> <span class="nx">ytbackend</span><span class="p">.</span><span class="nx">ConcertSummary</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">playlistService</span><span class="p">.</span><span class="nx">addConcert</span><span class="p">(</span><span class="nx">concert</span><span class="p">);</span>
-  <span class="p">}</span>
+  <span class="p">}</span></p>
 
-  <span class="nx">playConcert</span><span class="p">(</span><span class="nx">id</span><span class="o">:</span> <span class="nx">string</span><span class="p">)</span> <span class="p">{</span>
+<p>  <span class="nx">playConcert</span><span class="p">(</span><span class="nx">id</span><span class="o">:</span> <span class="nx">string</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">videoPlayer</span><span class="p">.</span><span class="nx">playConcert</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
   <span class="p">}</span>
-<span class="p">}</span></code></pre></div>
-
+<span class="p">}</span></code></pre></figure></p>
 
 <p>Two things are injected into the constructor: LocalStoragePlayList (so we can save search results) and VideoPlayer (so we can play search results).
 In the @Component annotation, you can see that the injection of LocalStoragePlaylist is setup in the <code>providers</code> property.
@@ -303,11 +299,10 @@ One video can be played at the time, which makes the VideoPlayer is a shared res
 
 <p><em>searchresult.html</em>:</p>
 
-<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="c">&lt;!-- lots of stuff omitted --&gt;</span>
-<span class="nt">&lt;button</span> <span class="na">title=</span><span class="s">&quot;Play now&quot;</span> <span class="na">class=</span><span class="s">&quot;play btn btn-success&quot;</span><span class="nt">&gt;</span>
-    <span class="nt">&lt;span</span> <span class="err">(</span><span class="na">click</span><span class="err">)=&quot;</span><span class="na">playConcert</span><span class="err">(</span><span class="na">concert</span><span class="err">.</span><span class="na">id</span><span class="err">)&quot;</span> <span class="na">class=</span><span class="s">&quot;glyphicon glyphicon-play-circle&quot;</span><span class="nt">&gt;&lt;/span&gt;</span>
-<span class="nt">&lt;/button&gt;</span></code></pre></div>
-
+<p><figure class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="c">&lt;!-- lots of stuff omitted --&gt;</span>
+<span class="p">&lt;</span><span class="nt">button</span> <span class="na">title</span><span class="o">=</span><span class="s">&quot;Play now&quot;</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;play btn btn-success&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">span</span> <span class="err">(</span><span class="na">click</span><span class="err">)=&quot;</span><span class="na">playConcert</span><span class="err">(</span><span class="na">concert</span><span class="err">.</span><span class="na">id</span><span class="err">)&quot;</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;glyphicon glyphicon-play-circle&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span></code></pre></figure></p>
 
 <p>It binds the click-event on this span to the <code>playConcert</code> method on the SearchResultComponent, which in turn calls the shared VideoPlayer component.
 Binding to DOM-events like this is the primary means of user-interaction.
@@ -317,11 +312,10 @@ Obviously, higher-level components are available for easily integration input co
 
 <p><em>search.html</em>:</p>
 
-<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="c">&lt;!-- lots of stuff omitted --&gt;</span>
-<span class="nt">&lt;div</span> <span class="err">*</span><span class="na">ng-if=</span><span class="s">&quot;playing&quot;</span> <span class="na">id=</span><span class="s">&quot;concerts&quot;</span> <span class="na">class=</span><span class="s">&quot;row&quot;</span><span class="nt">&gt;</span>
-  <span class="nt">&lt;iframe</span> <span class="na">width=</span><span class="s">&quot;100%&quot;</span> <span class="na">height=</span><span class="s">&quot;100%&quot;</span> <span class="err">[</span><span class="na">src</span><span class="err">]=&quot;</span><span class="na">embedUrl</span><span class="err">&quot;</span> <span class="na">frameborder=</span><span class="s">&quot;0&quot;</span> <span class="na">allowfullscreen</span><span class="nt">&gt;&lt;/iframe&gt;</span>
-<span class="nt">&lt;/div&gt;</span></code></pre></div>
-
+<p><figure class="highlight"><pre><code class="language-html" data-lang="html"><span></span><span class="c">&lt;!-- lots of stuff omitted --&gt;</span>
+<span class="p">&lt;</span><span class="nt">div</span> <span class="err">*</span><span class="na">ng-if</span><span class="o">=</span><span class="s">&quot;playing&quot;</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;concerts&quot;</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;row&quot;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">iframe</span> <span class="na">width</span><span class="o">=</span><span class="s">&quot;100%&quot;</span> <span class="na">height</span><span class="o">=</span><span class="s">&quot;100%&quot;</span> <span class="err">[</span><span class="na">src</span><span class="err">]=&quot;</span><span class="na">embedUrl</span><span class="err">&quot;</span> <span class="na">frameborder</span><span class="o">=</span><span class="s">&quot;0&quot;</span> <span class="na">allowfullscreen</span><span class="p">&gt;&lt;/</span><span class="nt">iframe</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span></code></pre></figure></p>
 
 <p>The <code>[src]</code> syntax binds the src property of the iframe to the <code>embedUrl</code> property of the component for this template.
 If the embedUrl changes, the src of the iframe is automatically updated (but not the other way around).</p>
@@ -337,29 +331,25 @@ It takes some getting used to, but RxJs is a proven library offering a great way
 
 <p>In YouTube live!, we use an injected Http component to do the YouTube API calls:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="err">@</span><span class="nx">Injectable</span><span class="p">()</span>
-<span class="kr">export</span> <span class="kr">class</span> <span class="nx">ConcertService</span> <span class="p">{</span>
+<p><figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="err">@</span><span class="nx">Injectable</span><span class="p">()</span>
+<span class="kr">export</span> <span class="kr">class</span> <span class="nx">ConcertService</span> <span class="p">{</span></p>
 
-  <span class="kr">private</span> <span class="nx">concerts</span><span class="o">:</span> <span class="nx">ConcertSummary</span><span class="p">[];</span>
+<p>  <span class="kr">private</span> <span class="nx">concerts</span><span class="o">:</span> <span class="nx">ConcertSummary</span><span class="p">[];</span></p>
 
-  <span class="nx">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">http</span><span class="o">:</span> <span class="nx">Http</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span>
+<p>  <span class="nx">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">http</span><span class="o">:</span> <span class="nx">Http</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span></p>
 
-  <span class="kr">public</span> <span class="nx">findConcerts</span><span class="p">(</span><span class="nx">artist</span><span class="o">:</span> <span class="nx">string</span><span class="p">,</span> <span class="nx">duration</span> <span class="o">=</span> <span class="nx">Duration</span><span class="p">.</span><span class="nx">FULLCONCERT</span><span class="p">)</span><span class="o">:</span> <span class="nx">any</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">ytDuration</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
-    
-    <span class="c1">// .. snipped for brevity ..</span>
+<p>  <span class="kr">public</span> <span class="nx">findConcerts</span><span class="p">(</span><span class="nx">artist</span><span class="o">:</span> <span class="nx">string</span><span class="p">,</span> <span class="nx">duration</span> <span class="o">=</span> <span class="nx">Duration</span><span class="p">.</span><span class="nx">FULLCONCERT</span><span class="p">)</span><span class="o">:</span> <span class="nx">any</span> <span class="p">{</span>
+   <span class="kd">var</span> <span class="nx">ytDuration</span><span class="o">:</span> <span class="nx">string</span>
+   <span class="kd">var</span> <span class="nx">searchString</span> <span class="o">=</span> <span class="nx">yt_search</span> <span class="o">+</span> <span class="nx">ytDuration</span> <span class="o">+</span> <span class="s1">&#39;&amp;q=&#39;</span> <span class="o">+</span> <span class="nb">encodeURIComponent</span><span class="p">(</span><span class="s1">&#39;live &#39;</span> <span class="o">+</span> <span class="nx">artist</span><span class="p">);</span></p>
 
-    <span class="kd">var</span> <span class="nx">searchString</span> <span class="o">=</span> <span class="nx">yt_search</span> <span class="o">+</span> <span class="nx">ytDuration</span> <span class="o">+</span> <span class="s1">&#39;&amp;q=&#39;</span> <span class="o">+</span> <span class="nb">encodeURIComponent</span><span class="p">(</span><span class="s1">&#39;live &#39;</span> <span class="o">+</span> <span class="nx">artist</span><span class="p">);</span>
-
-    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">http</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">searchString</span><span class="p">).</span><span class="nx">map</span><span class="p">((</span><span class="nx">res</span><span class="o">:</span> <span class="nx">any</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+<p>   <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">http</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">searchString</span><span class="p">).</span><span class="nx">map</span><span class="p">((</span><span class="nx">res</span><span class="o">:</span> <span class="nx">any</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
       <span class="kd">var</span> <span class="nx">ytResults</span><span class="o">:</span> <span class="p">{</span><span class="nx">items</span><span class="o">:</span> <span class="nx">YTSearchResult</span><span class="p">[]</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">res</span><span class="p">.</span><span class="nx">json</span><span class="p">();</span>
       <span class="kd">var</span> <span class="nx">transformedResults</span> <span class="o">=</span> <span class="nx">ytResults</span><span class="p">.</span><span class="nx">items</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">toConcertSummary</span><span class="p">)</span>
       <span class="k">this</span><span class="p">.</span><span class="nx">concerts</span> <span class="o">=</span> <span class="nx">transformedResults</span><span class="p">;</span>
       <span class="k">return</span> <span class="nx">transformedResults</span><span class="p">;</span>
     <span class="p">});</span>
   <span class="p">}</span>
-<span class="p">}</span></code></pre></div>
-
+<span class="p">}</span></code></pre></figure></p>
 
 <p>Again, we see a viewless component, but this time with the @Injectable annotation since we need Angular to inject the Http component in the constructor.
 After performing a <code>get</code> call, the result is transformed using <code>map</code> on the observable.
@@ -369,21 +359,20 @@ It would be nice to use the RxJS type definitions for Observables, so we can get
 
 <p>The resulting Observable is used in the <code>searchConcerts</code> method on SearchComponent:</p>
 
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kr">export</span> <span class="kr">class</span> <span class="nx">SearchComponent</span> <span class="p">{</span>
-  
-  <span class="kr">private</span> <span class="nx">concerts</span><span class="o">:</span> <span class="nx">ytbackend</span><span class="p">.</span><span class="nx">ConcertSummary</span><span class="p">[]</span> <span class="o">=</span> <span class="p">[];</span>
+<p><figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span></span><span class="kr">export</span> <span class="kr">class</span> <span class="nx">SearchComponent</span> <span class="p">{</span></p>
 
-  <span class="nx">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">concertService</span><span class="o">:</span> <span class="nx">ytbackend</span><span class="p">.</span><span class="nx">ConcertService</span><span class="p">,</span>
-      <span class="kr">private</span> <span class="nx">videoPlayer</span><span class="o">:</span> <span class="nx">ytbackend</span><span class="p">.</span><span class="nx">VideoPlayer</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span>
+<p>  <span class="kr">private</span> <span class="nx">concerts</span><span class="o">:</span> <span class="nx">ytbackend</span><span class="p">.</span><span class="nx">ConcertSummary</span><span class="p">[]</span> <span class="o">=</span> <span class="p">[];</span></p>
 
-  <span class="nx">searchConcerts</span><span class="p">()</span><span class="o">:</span> <span class="k">void</span> <span class="p">{</span>
+<p>  <span class="nx">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">concertService</span><span class="o">:</span> <span class="nx">ytbackend</span><span class="p">.</span><span class="nx">ConcertService</span><span class="p">,</span>
+      <span class="kr">private</span> <span class="nx">videoPlayer</span><span class="o">:</span> <span class="nx">ytbackend</span><span class="p">.</span><span class="nx">VideoPlayer</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span></p>
+
+<p>  <span class="nx">searchConcerts</span><span class="p">()</span><span class="o">:</span> <span class="k">void</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">videoPlayer</span><span class="p">.</span><span class="nx">stop</span><span class="p">();</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">concertService</span>
       <span class="p">.</span><span class="nx">findConcerts</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">searchTerm</span><span class="p">)</span>
       <span class="p">.</span><span class="nx">subscribe</span><span class="p">((</span><span class="nx">results</span><span class="o">:</span> <span class="nx">ytbackend</span><span class="p">.</span><span class="nx">ConcertSummary</span><span class="p">[])</span> <span class="o">=&gt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">concerts</span> <span class="o">=</span> <span class="nx">results</span><span class="p">);</span>
   <span class="p">}</span>
-<span class="p">}</span></code></pre></div>
-
+<span class="p">}</span></code></pre></figure></p>
 
 <p>Since the ConcertService returns an observable, we cannot assign it directly to a class member of type <code>ConcertSummary[]</code>.
 Instead, we subscribe to the observable and assign the result once our subscriber is called when results are available.
@@ -408,7 +397,7 @@ There's definitely some rough edges to Angular2, but all in all it looks very pr
 </article>
 <div>
   <strong>If you liked this post, please share it!</strong>
-  <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://branchandbound.net/blog/web/2015/11/exploring-angular2" data-via="Sander_Mak" data-dnt="true">Tweet</a>
+  <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://branchandbound.net/blog/web/2015/11/exploring-angular2/" data-via="Sander_Mak" data-dnt="true">Tweet</a>
   <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
 </div>
 
@@ -419,11 +408,11 @@ There's definitely some rough edges to Angular2, but all in all it looks very pr
   <h3>Related Posts</h3>
   <ul class="posts">
     
-      <li><span>27 Oct 2015</span> &raquo; <a href="/blog/java/2015/10/osgi-to-jigsaw">From OSGi to Jigsaw</a></li>
+      <li><span>27 Oct 2015</span> &raquo; <a href="/blog/java/2015/10/osgi-to-jigsaw/">From OSGi to Jigsaw</a></li>
     
-      <li><span>10 Sep 2015</span> &raquo; <a href="/blog/java/2015/09/java-module-system-first-look">The Java Module system: a first look</a></li>
+      <li><span>10 Sep 2015</span> &raquo; <a href="/blog/java/2015/09/java-module-system-first-look/">The Java Module system: a first look</a></li>
     
-      <li><span>18 Jul 2013</span> &raquo; <a href="/blog/java/2013/07/java-modularity-story">The Java Modularity Story</a></li>
+      <li><span>18 Jul 2013</span> &raquo; <a href="/blog/java/2013/07/java-modularity-story/">The Java Modularity Story</a></li>
     
   </ul>
 </div>
@@ -454,7 +443,7 @@ There's definitely some rough edges to Angular2, but all in all it looks very pr
         </div>
         <div class="span3">
          <div class="hero-unit sidebar">
-           <a href="http://feeds.feedburner.com/BranchAndBound"><img class="rss pull-right" title="Branch and Bound Blog RSS Feed" alt="RSS Feed" src="/assets/themes/sander/rss.png"></a>
+           <a href="http://feeds.feedburner.com/BranchAndBound"><img class="rss pull-right" title="Branch and Bound Blog RSS Feed" alt="RSS Feed" src="/assets/themes//rss.png"></a>
            <h4 class="sidebar"><strong>Branch and Bound Blog</strong></h4>
            <em>... pruning the software universe</em> 
            <hr>
@@ -462,10 +451,10 @@ There's definitely some rough edges to Angular2, but all in all it looks very pr
              <li><a href="/about.html">About Sander</a></li>
            </ul>
            <span class="sidebar pull-right">
-             <a href="http://www.twitter.com/Sander_Mak" target="_blank"><img title="Twitter" alt="Twitter" class="small" src="/assets/themes/sander/twitter.png"></a>
-             <a href="http://nl.linkedin.com/in/SanderMak" target="_blank"><img title="Linkedin profile" alt="Linkedin profile" class="small" src="/assets/themes/sander/linkedin.png"><a>
-             <a href="http://www.github.com/SanderMak" target="_blank"><img  title="GitHub" alt="GitHub" class="small" src="/assets/themes/sander/github.png"></a>
-             <a href="http://www.slideshare.net/SanderMak/presentations" target="_blank"><img title="Slideshare presentations"  alt="Slideshare presentations" class="small" src="/assets/themes/sander/slideshare.png"></a>
+             <a href="http://www.twitter.com/Sander_Mak" target="_blank"><img title="Twitter" alt="Twitter" class="small" src="/assets/themes//twitter.png"></a>
+             <a href="http://nl.linkedin.com/in/SanderMak" target="_blank"><img title="Linkedin profile" alt="Linkedin profile" class="small" src="/assets/themes//linkedin.png"><a>
+             <a href="http://www.github.com/SanderMak" target="_blank"><img  title="GitHub" alt="GitHub" class="small" src="/assets/themes//github.png"></a>
+             <a href="http://www.slideshare.net/SanderMak/presentations" target="_blank"><img title="Slideshare presentations"  alt="Slideshare presentations" class="small" src="/assets/themes//slideshare.png"></a>
            </span>
            <hr>
            <h5 class="sidebar">&nbsp;View archive by:</h5>
@@ -527,7 +516,7 @@ There's definitely some rough edges to Angular2, but all in all it looks very pr
 
     <!-- Scripts at the end for faster loading. -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
-    <script src="/assets/themes/sander/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+    <script src="/assets/themes//bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
    
 
     <script type="text/javascript">

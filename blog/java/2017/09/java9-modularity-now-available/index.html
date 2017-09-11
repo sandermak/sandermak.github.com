@@ -3,7 +3,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>On monoliths, microservices and critical thinking - Branch and Bound</title>
+    <title>Java 9 Modularity (O'Reilly) now available - Branch and Bound</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="Sander Mak">
@@ -69,49 +69,77 @@
           
 <article>
   <header>
-    <h1>On monoliths, microservices and critical thinking</h1>
-    <strong><time datetime="2015-06-10" pubdate>10 June 2015</time></strong>
+    <h1>Java 9 Modularity (O'Reilly) now available</h1>
+    <strong><time datetime="2017-09-11" pubdate>11 September 2017</time></strong>
 
     <br>
     <br>
 
-    <p><em><p>Something very interesting happened last week. At first I wasn't sure whether it was a misguided attempt at humor. Sure enough, Twitter timelines switched en masse from advocating microservices to glorifying monoliths. What a strange world we live in.</p>
+    <p><em><p>With the imminent release of Java 9, we're happy to announce the O'Reilly book <strong>Java 9 Modularity</strong> is available as ebook, and soon in print as well. More info about how to get the book can be found at <a href="https://javamodularity.com">javamodularity.com</a>.</p>
 </em></p>
   </header>
   
 
   <section>
-   <h3>Microservices</h3>
+   <p>About a year ago, the Early Release version of Java 9 Modularity was announced by Paul Bakker and me.
+It contained a rough version of the first three chapters.
+A lot has happened since.
+The book has grown to encompass 14 chapters, highlighting all aspects of the upcoming Java module system.
+At <a href="https://javamodularity.com">javamodularity.com</a> you'll find an overview of the chapters, as well as information on how to get the book.</p>
 
-<p>Microservices burst onto the conference scene, blogosphere and other echo-chambers with blunt force in the past years. Like all movements, the microservices movement offers some good points amongst the propaganda. We are dealing with increasingly complex problems at an increasingly large scale. It's good to pause and reflect on these challenges.</p>
+<p>Since the Early Release, the module system implementation itself has seen quite some changes, especially in the area of migration support.
+The book has been updated with all recent developments and shows you not only how to create modular applications with Java 9, but also how to approach a migration to Java 9 from earlier versions.
+Java 9 Modularity is the definitive guide to the Java module system.</p>
 
-<p>Except, that's not what happens. Instead, microservices frameworks, microservices books and other microservices  paraphernalia convert large swathes of developers into 'early adopters' of the golden age. Vendors create microservices platforms, including some sweet lock-in of course. Suddenly we're counting lines of code like a weightwatcher counts calories. Must. Not. Exceed. &lt;insert arbitrary figure here&gt;. It's unhealthy.</p>
+<p><a href="https://javamodularity.com"><img src="/pics/java9modularity-3d-cover.png" alt="Java 9 Modularity Cover" /></a></p>
 
-<h3>Monoliths</h3>
+<h3>Why Modules?</h3>
 
-<p>Then, pendulum swings back. Martin Fowler publishes his <a href="http://martinfowler.com/bliki/MonolithFirst.html">MonolithFirst</a> post. And the people rejoice. It's ok to officially push back against the cool kids again. Now you're scolded for ever starting from scratch with a service oriented architecture. YAGNI, silly! And if you do need it, just chop up your monolith and season to taste. Easy, right?</p>
+<p>The module system has been a boon to the JDK itself.
+Once a gigantic monolithic codebase, it is now neatly modularized into recognizable components:</p>
 
-<p>As you might have guessed by now, this post is not about technical arguments either for or against monoliths and microservices. If you're looking for that, read Fowler's post. Then, read <a href="http://martinfowler.com/articles/dont-start-monolith.html">Stefan Tilkov's counterpoint</a> (graciously hosted on Fowler's site as well). I'm much more interested in what this all means for our profession. What does it mean if public software engineering opinion flips 180 degrees in a matter of weeks? It's too easy to chalk it all up to people needing authority figures. Yes, I know: not everybody was all over microservices. But you have to admit there's something fundamentally unsound going on here.</p>
+<p><a href="https://javamodularity.com"><img src="/pics/java.se.ee.small.png" alt="Java 9 Modularity Cover" /></a></p>
 
-<h3>The art of problem solving</h3>
+<p>Modularizing the JDK makes it future proof.
+Through strong encapsulation in modules, internal packages can truly stay private, allowing evolution of internal code as was envisioned from the start.
+Before strong module boundaries, it was all too easy to 'accidentally' rely on non-public APIs.
+Explicit dependencies ensure there's backsliding into a big ball of mud.</p>
 
-<p>Software development (and by extension, software architecture) is often characterised as a form of problem solving. There's a problem (requirements, input), and we need to create a solution (software, output). It's not wrong per se, but framing it like this primes your thinking in a dangerous way. If there's a problem, there must be an exact solution, right?</p>
+<p>The nice thing is, with Java 9 you can use the very same module system used to modularize the JDK to modularize your own applications.
+Translate those boxes and arrows on your whiteboard into actual Java modules, with module boundaries and dependencies enforced by the Java compiler and runtime.
+In the book we approach both new development with Java 9, as well as migration scenarios.</p>
 
-<p><img src="/pics/solutionspace.jpg" alt="Solution space" /></p>
+<h3>But I Won't Be Using Modules (Anytime Soon)</h3>
 
-<p>However, we all know that there's no single perfect solution. There's a vast <em>solution space</em> and it is our task to navigate it and arrive at a reasonable location in this space. All hypes like microservices are doing, is prematurely pruning our solution space. Without knowing anything about the problem. That's wrong. We all know it. Still, the solution space is often so enormous, it is tempting to think "this time it's different" when a new voice of (apparent) reason appears. Hopefully, the monolith vs. microservices farce brings us back to reality. Critical thinking cannot be done for you.</p>
+<p>Modules are optional in Java 9.
+You can keep running applications on the classpath, or you can choose to create modular applications.
+However, applications on the classpath still have to run on top of the modularized JDK.
+This brings some new challenges when migrating to Java 9.</p>
 
-<h3>Risk management</h3>
+<p>Especially when the application uses libraries that poke into JDK internals (and there are many of these), you need to know how to address these situations.
+The book covers all scenarios you need to handle when migrating existing codebases to Java 9.
+For library authors, it is even more important to support Java 9 as soon as possible.
+A special chapter on migration of libraries offers help.</p>
 
-<p>Instead of problem solving, a much better characterisation of software architecture is risk management. There are trade-offs in every dimension of the solution space. A software architect must quantify, disqualify and hedge the risks. This is a tough job. There's no substitute for experience here. Books like <a href="http://amzn.to/1Itaaim">'The architecture of open-source applications'</a>, containing case-studies, are much more valuable than books on architecture patterns in that sense. Managing risks means building up your architecture from first principles. Not arriving at some architecture through elimination of fashionable trends.</p>
+<h3>Book Signing Event at JavaOne</h3>
 
-<p>Architectural patterns are tools for navigating the solution space we must explore. Ultimately, the problem we're solving dictates which direction to go. Not our philosophical preference for certain solutions, unless it is based on similar problems we have solved before. If technical debt is like that irresistible car loan - costly but typically harmless -, then choosing the wrong architecture is more like a sub-prime mortgage. Hey, everybody does it. And when you are left homeless, there's nothing else to blame than your own critical thinking skills.</p>
+<p>If you're at <a href="https://www.oracle.com/javaone/index.html">JavaOne</a> this year, be sure to stop by at one of our talks as well:</p>
+
+<ul>
+<li>Designing for Modularity With Java 9 (<a href="https://events.rainfocus.com/catalog/oracle/oow17/catalogjavaone17?search=CON2606&amp;showEnrolled=false">CON2606</a>)</li>
+<li>Modules or Microservices (<a href="https://events.rainfocus.com/catalog/oracle/oow17/catalogjavaone17?search=CON1450&amp;showEnrolled=false">CON1450</a>)</li>
+<li>Migrating to Java 9 Modules (<a href="https://events.rainfocus.com/catalog/oracle/oow17/catalogjavaone17?search=CON1455&amp;showEnrolled=false">CON1455</a>)</li>
+</ul>
+
+
+<p>Besides these technical sessions, we will also be doing a book signing session at the O'Reilly booth on Wednesday afternoon, October 5th. It will be the first time we hold the print version of the book in our hands as well, so it's going to be special.
+Hope to see many people there!</p>
 
   </section>
 </article>
 <div>
   <strong>If you liked this post, please share it!</strong>
-  <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://branchandbound.net/blog/architecture/2015/06/on-microservices-monoliths-and-critical-thinking/" data-via="Sander_Mak" data-dnt="true">Tweet</a>
+  <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://branchandbound.net/blog/java/2017/09/java9-modularity-now-available/" data-via="Sander_Mak" data-dnt="true">Tweet</a>
   <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
 </div>
 
@@ -122,11 +150,11 @@
   <h3>Related Posts</h3>
   <ul class="posts">
     
-      <li><span>23 Mar 2012</span> &raquo; <a href="/blog/security/2012/03/crossbuild-injection-how-safe-is-your-build/">Cross-build injection attacks: how safe is your build?</a></li>
+      <li><span>30 Aug 2016</span> &raquo; <a href="/blog/java/2016/08/java9-modularity-oreilly-early-access-release/">Java 9 Modularity: O'Reilly Early Access Release</a></li>
+    
+      <li><span>27 Oct 2015</span> &raquo; <a href="/blog/java/2015/10/osgi-to-jigsaw/">From OSGi to Jigsaw</a></li>
     
       <li><span>18 Jul 2013</span> &raquo; <a href="/blog/java/2013/07/java-modularity-story/">The Java Modularity Story</a></li>
-    
-      <li><span>27 Oct 2014</span> &raquo; <a href="/blog/data/2014/10/road-to-data-science/">The Road to Data Science</a></li>
     
   </ul>
 </div>
