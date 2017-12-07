@@ -4,7 +4,7 @@
  <title>Branch and Bound</title>
  <link href="http://branchandbound.net/atom.xml" rel="self"/>
  <link href="http://branchandbound.net"/>
- <updated>2017-12-07T15:33:24+01:00</updated>
+ <updated>2017-12-07T22:27:31+01:00</updated>
  <id>http://branchandbound.net/</id>
  <author>
    <name>Sander Mak</name>
@@ -56,7 +56,7 @@ Code in modular JARs on the module path can't access code in traditional JARs on
 So what happens when a modular application wants to use a library living on the classpath, which doesn't have a module descriptor yet?
 The modular application can't express such a dependency in its module descriptor.&lt;/p&gt;
 
-&lt;p&gt;It would be unworkable if the only resort for application developers were to wait for the library maintainter to write a module descriptor, or worse, attempt to patch the JAR themselves with a module descriptor.
+&lt;p&gt;It would be unworkable if the only resort for application developers were to wait for the library maintainer to write a module descriptor, or worse, attempt to patch the JAR themselves with a module descriptor.
 To prevent this possibly indefinite waiting game, a feature called &lt;em&gt;automatic modules&lt;/em&gt; was introduced.
 Moving a traditional JAR (without module descriptor) from the classpath to the module path turns it into an automatic module.
 Such an automatic module exports all of its packages and depends on all other resolved modules.
