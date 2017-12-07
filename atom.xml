@@ -4,13 +4,175 @@
  <title>Branch and Bound</title>
  <link href="http://branchandbound.net/atom.xml" rel="self"/>
  <link href="http://branchandbound.net"/>
- <updated>2017-11-13T22:27:34+01:00</updated>
+ <updated>2017-12-07T13:23:31+01:00</updated>
  <id>http://branchandbound.net/</id>
  <author>
    <name>Sander Mak</name>
    <email>sandermak@gmail.com</email>
  </author>
 
+ 
+ <entry>
+   <author><name>Sander Mak</name></author>
+   <title>Automatic-Module-Name: Calling all Java Library Maintainers</title>
+   <link href="http://branchandbound.net/blog/java/2017/12/automatic-module-name/"/>
+   <updated>2017-12-07T00:00:00+01:00</updated>
+   <id>http://branchandbound.net/blog/java/2017/12/automatic-module-name</id>
+   <content type="html">
+       &lt;p&gt;With the Java 9 release, developers can use the new module system to create modular applications. However, in order to modularize applications, libraries should be usable as modules as well.&lt;/p&gt;
+
+       &lt;p&gt;Creating modular applications using the Java module system is an enticing prospect.
+Modules have module descriptors in the form of &lt;code&gt;module-info.java&lt;/code&gt;, declaring which packages are exported and what dependencies it has on other modules.
+This means we finally have explicit dependencies between modules at the language level, and can strongly encapsulate code within these modules.
+The book &lt;a href=&quot;https://javamodularity.com&quot;&gt;Java 9 Modularity&lt;/a&gt; (O'Reilly) written by Paul Bakker and me explains these mechanisms and their benefits in detail.&lt;/p&gt;
+
+&lt;p&gt;That, however, is not what this post is about.
+Today, we'll talk about what needs to be done to move the Java library ecosystem toward modules.
+In the ideal world where all libraries have module descriptors, all is well.
+That's not yet where we are in the Java community.&lt;/p&gt;
+
+&lt;h3&gt;What You Need To Do Now&lt;/h3&gt;
+
+&lt;p&gt;We need Java library maintainers to step up!
+Ultimately, it would be best for your library to have a module descriptor so that modular applications can depend on it.
+Getting there isn't trivial in all cases.
+Fortunately, support for the Java module system can be incrementally added to libraries.
+This post explains the first step you can take as library maintainer on your way to becoming a Java module.
+This first step boils down to picking a module name, and adding it as &lt;code&gt;Automatic-Module-Name: &amp;lt;module name&amp;gt;&lt;/code&gt; entry to the library's MANIFEST.MF.
+That's it.&lt;/p&gt;
+
+&lt;p&gt;With this first step you make your library usable as Java module without moving the library itself to Java 9 or creating a module descriptor for the library, yet.
+It doesn't even require re-compilation.
+So, do yourself a favor and do it now.
+Then, if you'd like to know why this is a good idea and how it actually works, keep reading.&lt;/p&gt;
+
+&lt;h3&gt;Automatic Modules&lt;/h3&gt;
+
+&lt;p&gt;Traditional applications are packaged into JARs and run from the classpath.
+Java 9 still supports this, but also opens the door to more reliable and efficient deployment.
+Modular applications on Java 9 and later are packaged into JARs which contain module descriptors (&lt;em&gt;modular JARs&lt;/em&gt;) and run from the module path.
+Code in modular JARs on the module path can't access code in traditional JARs on the classpath.
+So what happens when a modular application wants to use a library living on the classpath, which doesn't have a module descriptor yet?
+The modular application can't express such a dependency in its module descriptor.&lt;/p&gt;
+
+&lt;p&gt;It would be unworkable if the only resort for application developers were to wait for the library maintainter to write a module descriptor, or worse, attempt to patch the JAR themselves with a module descriptor.
+To prevent this possibly indefinite waiting game, a feature called &lt;em&gt;automatic modules&lt;/em&gt; was introduced.
+Moving a traditional JAR (without module descriptor) from the classpath to the module path turns it into an automatic module.
+Such an automatic module exports all of its packages and depends on all other resolved modules.
+Additionally, automatic modules themselves &lt;em&gt;can&lt;/em&gt; still access code on the classpath.&lt;/p&gt;
+
+&lt;p&gt;So, instead of waiting for libraries to be modularized, application developers can take matters into their own hands.
+Traditional JARs can be used as if they were modules.
+For an example of automatic modules in action, look at &lt;a href=&quot;http://paulbakker.io/java/java9-vertx/&quot;&gt;Paul's post&lt;/a&gt; where he uses Vert.x JARs as automatic modules in an application.&lt;/p&gt;
+
+&lt;h3&gt;Automatic Module Name Derivation&lt;/h3&gt;
+
+&lt;p&gt;Still, the question remains how you can express a dependency on an automatic module from application modules.
+Where does its name come from?&lt;/p&gt;
+
+&lt;p&gt;There are two possible ways for an automatic module to get its name:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;When an &lt;code&gt;Automatic-Module-Name&lt;/code&gt; entry is available in the manifest, its value is the name of the automatic module&lt;/li&gt;
+&lt;li&gt;Otherwise, a name is derived from the JAR filename (see the &lt;a href=&quot;https://docs.oracle.com/javase/9/docs/api/java/lang/module/ModuleFinder.html#of-java.nio.file.Path...-&quot;&gt;ModuleFinder JavaDoc&lt;/a&gt; for the derivation algorithm)&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;p&gt;That second option probably had you shaking your head.
+Filenames are not exactly the hallmark of stability, and your library may be distributed in many ways that could lead to different filenames on the user's end. (Maven's standardized approach to artifact naming alleviates this a bit, but is still far from ideal.)
+Moreover, the module name derived from a filename might not be your ideal pick as module name.
+That's exactly why you're reading this call to action for adding &lt;code&gt;Automatic-Module-Name&lt;/code&gt; to libraries.
+Pick an explicit module name, put it in the &lt;code&gt;MANIFEST.MF&lt;/code&gt; and ensure a smooth ride into the modular age for users of your library.
+This way, you're not forcing users of your library to depend on an 'accidental' module name.&lt;/p&gt;
+
+&lt;h3&gt;Naming Library Modules&lt;/h3&gt;
+
+&lt;p&gt;Naming is hard.
+Picking the right module name for your library is important; module descriptors will refer to your library module by this name.
+It's effectively part of your API&amp;mdash;once you pick a name, changing it constitutes a breaking change.&lt;/p&gt;
+
+&lt;p&gt;For libraries it's essential to pick a globally unique module name.
+A long-standing practice in Java is to use reverse DNS notation for packages (e.g. &lt;code&gt;com.acme.mylibrary.core&lt;/code&gt;).
+We can apply the same to module names.
+Name your module after the &lt;em&gt;root package&lt;/em&gt; of your module.
+This is the longest shared prefix of all packages in the module (for the previous example it might be &lt;code&gt;com.acme.mylibrary&lt;/code&gt;).
+Read Stephen Colebourne's &lt;a href=&quot;http://blog.joda.org/2017/04/java-se-9-jpms-module-naming.html&quot;&gt;excellent advice&lt;/a&gt; on why this is a good idea.
+Ensure your module name is valid, meaning it consists of one or more &lt;a href=&quot;https://docs.oracle.com/javase/specs/jls/se7/html/jls-3.html#jls-3.8&quot;&gt;java identifiers&lt;/a&gt; separated by a dot.&lt;/p&gt;
+
+&lt;p&gt;If you want to see examples of libraries who've already gone through this process, look at the module name discussion for &lt;a href=&quot;https://github.com/google/guava/pull/2846&quot;&gt;Google Guava&lt;/a&gt; and the &lt;a href=&quot;https://spring.io/blog/2017/05/08/spring-framework-5-0-goes-rc1&quot;&gt;Spring Framework&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3&gt;Practical Tips&lt;/h3&gt;
+
+&lt;p&gt;Most likely your library is built using Maven or Gradle.
+Adding a manifest entry to the resulting JAR is a breeze in both build tools.
+For Maven, make sure the jar plugin has the following configuration:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;plugin&amp;gt;
+  &amp;lt;groupId&amp;gt;org.apache.maven.plugins&amp;lt;/groupId&amp;gt;
+  &amp;lt;artifactId&amp;gt;maven-jar-plugin&amp;lt;/artifactId&amp;gt;
+  &amp;lt;configuration&amp;gt;
+    &amp;lt;archive&amp;gt;
+      &amp;lt;manifestEntries&amp;gt;
+        &amp;lt;Automatic-Module-Name&amp;gt;com.acme.mylibrary&amp;lt;/Automatic-Module-Name&amp;gt;
+      &amp;lt;/manifestEntries&amp;gt;
+    &amp;lt;/archive&amp;gt;
+  &amp;lt;/configuration&amp;gt;
+&amp;lt;/plugin&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;With Gradle, you can configure the jar plugin as follows:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;jar {
+    manifest {
+        name = &quot;mylibrary&quot;
+        instruction &quot;Automatic-Module-Name&quot;, &quot;com.acme.mylibrary&quot;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3&gt;Sanity-Check Your Library&lt;/h3&gt;
+
+&lt;p&gt;Is this really all there is to do as a first step toward modularization?
+Ideally, yes.
+But if you want your library to be used as automatic module on Java 9 and later, there's a few other potential issues you need to verify:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Make sure your library doesn't use internal types from the JDK (run &lt;code&gt;jdeps --jdk-internals mylibrary.jar&lt;/code&gt; to find offending code). JDeps (as bundled with Java 9 and later) will offer publicly supported alternatives for any use of encapsulated JDK APIs. When your library runs from the classpath on Java 9 and later, you can still &lt;a href=&quot;http://openjdk.java.net/jeps/261#Relaxed-strong-encapsulation&quot;&gt;get away&lt;/a&gt; with this. Not so if your library lives on the module path as automatic module.&lt;/li&gt;
+&lt;li&gt;Your library can't have classes in the default (unnamed) package. This is a bad idea regardless, but when your library is used as automatic module, this rule is enforced by the module system.&lt;/li&gt;
+&lt;li&gt;Your library can't split packages (two or more JARs defining the types in the same package), nor can it redefine JDK packages (&lt;code&gt;javax.annotation&lt;/code&gt; is a notorious example, being defined in the JDK's &lt;code&gt;java.xml.ws.annotation&lt;/code&gt; module but also in external libraries).&lt;/li&gt;
+&lt;li&gt;When your library's JAR has a META-INF/services directory to specify service providers, then the specified providers must exist in this JAR (as described in the &lt;a href=&quot;https://docs.oracle.com/javase/9/docs/api/java/lang/module/ModuleFinder.html#of-java.nio.file.Path...-&quot;&gt;ModuleFinder JavaDoc&lt;/a&gt;)&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;p&gt;Addressing these concerns is a matter of good hygiene.
+If you encounter one of these issues and you can't address those, don't add the &lt;code&gt;Automatic-Module-Name&lt;/code&gt; entry yet.
+For now, your library is better off on the classpath.
+It will only raise false expectations if you do add the entry.&lt;/p&gt;
+
+&lt;h3&gt;What You Need To Do Next&lt;/h3&gt;
+
+&lt;p&gt;While your library can now be used as automatic module, it isn't really a great module.
+Every package is exported and it doesn't express its dependencies yet.
+That's why your next step is to add a &lt;code&gt;module-info.java&lt;/code&gt; file describing which packages must be exported and which dependencies on other modules the library has.
+This might even entail some refactoring, by dividing up your code into API (exported) packages and internal packages.&lt;/p&gt;
+
+&lt;p&gt;If your library has no external dependencies, creating and compiling this module descriptor is relatively straightforward (see &lt;a href=&quot;http://blog.headius.com/2017/10/migrating-to-java-9-modules-maven-osgi.html&quot;&gt;this real-world example&lt;/a&gt;).
+However, if you have external dependencies, you'll have to wait until those libraries have added module descriptors (or at least have an &lt;code&gt;Automatic-Module-Name&lt;/code&gt; themselves).
+Writing your module descriptor to depend on filename-derived automatic module names is a sure way to break things for your users.
+When these transitive dependencies do start modularizing with a different module name, users of your library will experience breakage.&lt;/p&gt;
+
+&lt;p&gt;In &lt;a href=&quot;https://javamodularity.com/#features&quot;&gt;Chapter 10&lt;/a&gt; of our book, we give in-depth advice on how to migrate a library to a proper module step-by-step.
+For example, we explain how you add a module descriptor to your library without having to target Java 9+ when compiling your code.
+Features like the new &lt;code&gt;--release&lt;/code&gt; flag and &lt;a href=&quot;http://openjdk.java.net/jeps/238&quot;&gt;Multi-Release JARs&lt;/a&gt; are very helpful.
+That all goes far beyond the scope of this post.
+So, please be a good citizen of the Java community.
+Decide upon a module name and add it to your library's manifest.
+Then, keep the ball rolling by reading up on the module system and adding a real module descriptor.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Special thanks to Alex Buckley for commenting on a draft version of this post.&lt;/em&gt;&lt;/p&gt;
+
+   </content>
+ </entry>
  
  <entry>
    <author><name>Sander Mak</name></author>
@@ -43,7 +205,7 @@ Once a gigantic monolithic codebase, it is now neatly modularized into recogniza
 &lt;p&gt;Modularizing the JDK makes it future proof.
 Through strong encapsulation in modules, internal packages can truly stay private, allowing evolution of internal code as was envisioned from the start.
 Before strong module boundaries, it was all too easy to 'accidentally' rely on non-public APIs.
-Explicit dependencies ensure there's backsliding into a big ball of mud.&lt;/p&gt;
+Explicit dependencies ensure there's no backsliding into a big ball of mud.&lt;/p&gt;
 
 &lt;p&gt;The nice thing is, with Java 9 you can use the very same module system used to modularize the JDK to modularize your own applications.
 Translate those boxes and arrows on your whiteboard into actual Java modules, with module boundaries and dependencies enforced by the Java compiler and runtime.

@@ -8,6 +8,7 @@ http://branchandbound.net/sitemap.txt
 http://branchandbound.net/tags.html
 http://branchandbound.net/talks.html
 
+http://branchandbound.net/blog/java/2017/12/automatic-module-name/
 http://branchandbound.net/blog/java/2017/09/java9-modularity-now-available/
 http://branchandbound.net/blog/java/2016/08/java9-modularity-oreilly-early-access-release/
 http://branchandbound.net/blog/web/2015/11/exploring-angular2/
