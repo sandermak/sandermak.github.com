@@ -4,7 +4,7 @@
  <title>Branch and Bound</title>
  <link href="http://branchandbound.net/atom.xml" rel="self"/>
  <link href="http://branchandbound.net"/>
- <updated>2017-12-07T13:23:31+01:00</updated>
+ <updated>2017-12-07T13:54:53+01:00</updated>
  <id>http://branchandbound.net/</id>
  <author>
    <name>Sander Mak</name>
@@ -44,6 +44,7 @@ That's it.&lt;/p&gt;
 &lt;p&gt;With this first step you make your library usable as Java module without moving the library itself to Java 9 or creating a module descriptor for the library, yet.
 It doesn't even require re-compilation.
 So, do yourself a favor and do it now.
+If you're not a library maintainer, encourage libraries you use by opening an issue and pointing to this post.
 Then, if you'd like to know why this is a good idea and how it actually works, keep reading.&lt;/p&gt;
 
 &lt;h3&gt;Automatic Modules&lt;/h3&gt;
