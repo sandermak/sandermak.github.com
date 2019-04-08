@@ -183,11 +183,14 @@ For Maven, make sure the jar plugin has the following configuration:</p>
 
 <p>With Gradle, you can configure the jar plugin as follows:</p>
 
-<pre><code>jar {
+<pre><code>ext.moduleName = "com.acme.mylibrary"
+
+jar {
+    inputs.property("moduleName", moduleName)
+
     manifest {
-        name = "mylibrary"
-        instruction "Automatic-Module-Name", "com.acme.mylibrary"
-    }
+       attributes  'Automatic-Module-Name': moduleName
+   }
 }
 </code></pre>
 

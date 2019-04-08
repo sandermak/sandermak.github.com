@@ -4,7 +4,7 @@
  <title>Branch and Bound</title>
  <link href="http://branchandbound.net/atom.xml" rel="self"/>
  <link href="http://branchandbound.net"/>
- <updated>2017-12-07T22:27:31+01:00</updated>
+ <updated>2019-04-08T09:26:54+02:00</updated>
  <id>http://branchandbound.net/</id>
  <author>
    <name>Sander Mak</name>
@@ -123,11 +123,14 @@ For Maven, make sure the jar plugin has the following configuration:&lt;/p&gt;
 
 &lt;p&gt;With Gradle, you can configure the jar plugin as follows:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;jar {
+&lt;pre&gt;&lt;code&gt;ext.moduleName = &quot;com.acme.mylibrary&quot;
+
+jar {
+    inputs.property(&quot;moduleName&quot;, moduleName)
+
     manifest {
-        name = &quot;mylibrary&quot;
-        instruction &quot;Automatic-Module-Name&quot;, &quot;com.acme.mylibrary&quot;
-    }
+       attributes  'Automatic-Module-Name': moduleName
+   }
 }
 &lt;/code&gt;&lt;/pre&gt;
 
